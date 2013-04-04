@@ -17,7 +17,8 @@ I have used nfuse for several years on various projects. It suited my needs bett
 - Authentication
      - Facebook login
 	 - OAuth module
-- MVC pattern
+- Automatic REST API for models
+- Dashboard to manage models
 - Database agnostic with PDO
 - URL Rewriting
 
