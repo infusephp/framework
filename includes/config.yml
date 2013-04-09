@@ -1,0 +1,25 @@
+site:
+	title: nfuse framework
+	email: contact@example.com
+	production-level: true
+	host-name: example.com
+	ssl-enabled: false
+	required-modules: user
+	default-module: default
+	default-admin-module: statistics
+	disabled: false
+	disabled-message: The site is currently unavailable.
+	time-zone: America/Chicago
+	salt: replacewithrandomstring
+
+database:
+	type: mysql
+	user: db_user
+	password: db_password
+	host: localhost
+	name: db_name
+
+memcache:
+	enabled: false
+	host: 127.0.0.1
+	port: 11211

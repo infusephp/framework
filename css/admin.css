@@ -1,0 +1,105 @@
+body {
+	padding-bottom: 40px;
+}
+
+.navbar .secondary-nav img {
+	height: 20px;
+}
+
+.subnavbar {
+	background: #eee;
+	margin: -19px -19px 19px -19px;
+}
+
+.subnavbar ul {
+	list-style-type: none;
+	margin: 0 auto;
+}
+
+.subnavbar ul li {
+	float: left;
+	display: block;
+	height: 40px;
+	line-height: 40px;
+	padding: 0 10px;
+}
+
+.subnavbar ul li a {
+	display: block;
+	width: 100%;
+	height: 100%;
+	padding: 0 10px;
+	text-align: center;
+}
+
+.subnavbar ul li a:hover {
+	background: #09f;
+	color: #fff;
+	text-decoration: none;
+}
+
+.subnavbar ul li.active a {
+	background: #555;
+	color: #fff;
+}
+
+footer p {
+	text-align: center;
+}
+
+#dataTable_wrapper {
+	width: 100%;
+}
+
+div.dataTables_length label {
+	width: 460px;
+	float: left;
+	text-align: left;
+}
+
+div.dataTables_length select {
+	width: 75px;
+}
+
+div.dataTables_filter label {
+	float: right;
+	width: 460px;
+}
+
+div.dataTables_info {
+	padding-top: 8px;
+}
+
+div.dataTables_paginate {
+	float: right;
+	margin: 0;
+}
+
+table {
+	margin: 0;
+	clear: both;
+}
+
+table.dataTable th:active {
+	outline: none;
+}
+
+@media (min-width: 768px) {
+	.subnavbar {
+		margin: -19px 0 19px;
+	}
+}
+
+@media (min-width: 980px) {
+	body {
+		padding-top: 90px;	
+	}
+	
+	.subnavbar {
+		position: fixed;
+		margin: 0;
+		top: 40px;
+		left: 0;
+		right: 0;
+	}
+}

@@ -1,0 +1,10 @@
+title: Groups
+description: Provides management of groups in the administration panel.
+version: 1.1
+author:
+	name: Jared King
+	email: j@jaredtking.com
+	website: http://jaredtking.com
+admin: true
+api: true
+model: Group

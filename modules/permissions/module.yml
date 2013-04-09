@@ -1,0 +1,10 @@
+title: Permissions
+description: Administration panel for changing permissions.
+version: 1.0
+author:
+	name: Jared King
+	email: j@jaredtking.com
+	website: http://jaredtking.com
+admin: true
+api: true
+model: Permission

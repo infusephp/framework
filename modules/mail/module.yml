@@ -1,0 +1,7 @@
+title: Mail
+description: Contains the mailer class used by many modules to send e-mails and adds a newsletter feature to the administration panel.
+version: 1.0
+author:
+	name: Jared King
+	email: j@jaredtking.com
+	website: http://jaredtking.com

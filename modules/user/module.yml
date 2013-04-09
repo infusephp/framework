@@ -1,0 +1,14 @@
+title: Users
+description: Authentication and user support.
+version: 1.0
+author:
+	name: Jared King
+	email: j@jaredtking.com
+	website: http://jaredtking.com
+model: User
+api: true
+admin: true
+dependencies: validation
+remember-me-allowed: true
+forgot-password-allowed: true
+minimum-password-length: 5
