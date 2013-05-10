@@ -42,7 +42,7 @@ The framework configuration can be found in `includes/config.yml`.
 
 ### Web Server
 
-The app is actually served through the `/app` directory to prevent the framework files from being publicly accessible. Whether using apache or nginx, make sure to set the site directory to `{FRAMEWORK_PATH}/app`.
+The app is actually served through the `/app` directory to prevent the framework files from being publicly accessible. Whether using apache or nginx, make sure to set the site directory to `{FRAMEWORK_PATH}/app` or else the URL routing will not work properly.
 
 ## Contributing
 
