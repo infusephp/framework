@@ -30,7 +30,7 @@ A demo has been setup at [nfuse.jaredtking.com](http://nfuse.jaredtking.com).
 
 ## Getting Started
 
-An installer is on the way. Until then, the framework can be set
+An installer is on the way. Until then, there are a couple of steps to take before getting started.
 
 ### Database setup
 
