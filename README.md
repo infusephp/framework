@@ -11,6 +11,10 @@ Nfuse is a node.js inspired framework to make developing web applications quick 
 
 Nfuse is the culmination of best practices that I learned through developing PHP web applications. After using node.js and switching back to PHP, I immediately missed what node and it's awesome frameworks had to offer. I decided to port over some of the patterns learned from node over to PHP with nfuse, despite an already crowded PHP framework space. I have gotten a lot out of the nfuse framework so am open sourcing it in hopes that someone else may benefit. This project has been built to my own taste. If something is off base, I would love to hear about it in the issues.
 
+## Demo
+
+A demo has been setup at [http://nfuse.jaredtking.com](http://nfuse.jaredtking.com).
+
 ## Features
 
 - MVC pattern
