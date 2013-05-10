@@ -13,7 +13,7 @@ Nfuse is the culmination of best practices that I learned through developing PHP
 
 ## Demo
 
-A demo has been setup at [http://nfuse.jaredtking.com](http://nfuse.jaredtking.com).
+A demo has been setup at [nfuse.jaredtking.com](http://nfuse.jaredtking.com).
 
 ## Features
 
