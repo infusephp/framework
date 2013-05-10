@@ -1,5 +1,7 @@
 <?php
 
+namespace nfuse\libs;
+
 class Cron
 {
 	//////////////////////////////
@@ -16,7 +18,7 @@ class Cron
 	*/
 	static function calcNextRun( $minute, $hour, $day, $month, $dow )
 	{
-		$cron_date = new cronDate(time());
+		$cron_date = new \nfuse\libs\cronDate(time());
 		$cron_date->second = 0;
 		
 		if ($minute == '*') $minute = null;
@@ -95,7 +97,7 @@ class Cron
 		
 		try
 		{	
-			$task = Database::select(
+			$task = \nfuse\Database::select(
 				'Cron',
 				'minute,hour,day,month,week,command,module',
 				array(
@@ -105,15 +107,15 @@ class Cron
 			
 			$command = $task[ 'command' ];
 
-			if( !Modules::exists($task[ 'module' ]) )
+			if( !\nfuse\Modules::exists($task[ 'module' ]) )
 				return false;
 				
-			Modules::load( $task[ 'module' ] );
+			\nfuse\Modules::load( $task[ 'module' ] );
 	
 			$next_run = self::calcNextRun($task[ 'minute' ], $task[ 'hour' ], $task[ 'day' ], $task[ 'month' ], $task[ 'week' ]);
 	
-			return Modules::controller( $task[ 'module' ] )->cron( $command ) &&
-				Database::update(
+			return \nfuse\Modules::controller( $task[ 'module' ] )->cron( $command ) &&
+				\nfuse\Database::update(
 					'Cron',
 					array(
 						'id' => $id,
@@ -137,15 +139,15 @@ class Cron
 	static function scheduleCheck( $echoOutput = false )
 	{
 		if( $echoOutput )
-			echo "-- Starting Cron on " . Config::value('site', 'title') . "\n";
+			echo "-- Starting Cron on " . \nfuse\Config::value('site', 'title') . "\n";
 			 
-		Modules::loadAll();
+		\nfuse\Modules::loadAll();
 		
-		$tasks = Database::select( 'Cron', 'id, next_run, last_ran, module, command' );
+		$tasks = \nfuse\Database::select( 'Cron', 'id, next_run, last_ran, module, command' );
 
 		$success = true;
 
-		if( Database::numrows() > 0)
+		if( \nfuse\Database::numrows() > 0)
 		{
 			foreach ($tasks as $t)
 			{					

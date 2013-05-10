@@ -21,7 +21,9 @@
 	WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
- 
+
+namespace nfuse;
+
 abstract class Controller extends Acl
 {
 	//////////////////////////////
@@ -50,7 +52,7 @@ abstract class Controller extends Acl
 	static function initialize()
 	{
 		// register autoloader
-		spl_autoload_register( __NAMESPACE__ . '\\' . get_called_class() . '::loadClass' );
+		spl_autoload_register( get_called_class() . '::loadClass' );
 	}
 	
 	/////////////////////////
@@ -63,7 +65,7 @@ abstract class Controller extends Acl
 	*/
 	static function name()
 	{
-		return strtolower( str_replace( 'nFuse_Controller_', '', get_called_class() ) );
+		return strtolower( str_replace( 'nfuse\\controllers\\', '', get_called_class() ) );
 	}
 	
 	/**
@@ -73,28 +75,19 @@ abstract class Controller extends Acl
 	*/
 	public static function loadClass( $class )
 	{
-		// look in modules/MODULE/libs/CLASS.php
-		// this will also look for modules in subdirectories seperated by a _
+		// look in modules/MODULE/CLASS.php
+		// i.e. /nfuse/models/User -> modules/users/models/User.php
 		
-		//echo "looking in:\n";
 		$module = static::name();
 		if( $module != 'Module' || $module != '' )
 		{
-			$files = array(
-				$class . '.php',
-				str_replace('_', '/', $class) . '.php',
-			);
-			$files = array_unique( $files ); // remove duplicates
-			$base_path = Modules::$moduleDirectory;
-			foreach ($files as $file)
+			$name = str_replace( '\\', '/', str_replace( 'nfuse\\', '', $class ) );
+			$path = Modules::$moduleDirectory . "$module/$name.php";
+
+			if (file_exists($path) && is_readable($path))
 			{
-				$path = "$base_path$module/libs/$file";
-				//echo $path."\n";
-				if (file_exists($path) && is_readable($path))
-				{
-					include_once $path;
-					return;
-				}
+				include_once $path;
+				return;
 			}
 		}
 	}
@@ -110,59 +103,77 @@ abstract class Controller extends Acl
 	function can( $permission, $requestor = null )
 	{
 		if( $requestor === null )
-			$requestor = Globals::$currentUser;
+			$requestor = \nfuse\models\User::currentUser();
 		
 		// everyone in ADMIN group can view admin panel
-		if( $permission == 'view-admin' && $requestor->group()->id() == ADMIN )
+		if( $permission == 'view-admin' && $requestor->isMemberOf( ADMIN ) )
 			return true;
 
 		return parent::can( $permission, $requestor );
-	}		
+	}
 	
 	/**
-	* Performs a GET request on the controller
-	*
-	* @param string $url URL (i.e. /users/104)
-	* @param array $params parameters
-	* @param string $accept the requested response type
-	*
-	* @return mixed response
-	*/
-	function get( $url, $params, $accept )
+	 * Allows the controller to perform middleware tasks before routing
+	 *
+	 * NOTE: Middleware only gets called on required modules. A module must be specified
+	 * as required for middleware to work for every request.
+	 *
+	 * @param Request $request
+	 * @param Response $response
+	 *
+	 */
+	function middleware( $req, $res )
+	{ }
+	
+	
+	/**
+	 * Finds all matching models. Only words when the automatic API feature is turned on
+	 *
+	 * @param Request $req
+	 * @param Response $res
+	 *
+	 */
+	function findAll( $req, $res )
 	{
 		$module = self::name();
 		$moduleInfo = Modules::info($module);
 		$model = val( $moduleInfo, 'model' );
-		
-		if( !$moduleInfo[ 'api' ] || $accept == 'html' || empty( $model ) )
-			sendResponse( 404 );
 
-		$modelObj = new $model(ACL_NO_ID);
+		// check if automatic api generation enabled
+		if( !$moduleInfo[ 'api' ] || empty( $model ) )
+			return $res->setCode( 404 );
+
+		// json only
+		if( !$req->isJson() )
+			return $res->setCode( 406 );
+
+		$modelClassName = "\\nfuse\\models\\$model";
+		$modelObj = new $modelClassName( ACL_NO_ID );
 		
 		// permission?
 		if( !$modelObj->can( 'view' ) )
-			sendResponse( 401 );
+			return $res->setCode( 401 );
 		
-		$return = new stdClass;
+		$return = new \stdClass;
 		$return->$module = array();
 		
 		// limit
-		$limit = val( $params, 'limit' );
+		$limit = $req->query( 'limit' );
 		if( $limit <= 0 || $limit > 1000 )
 			$limit = 100;
 		
 		// start
-		$start = val( $params, 'start' );
+		$start = $req->query( 'start' );
 		if( $start < 0 || !is_numeric( $start ) )
 			$start = 0;
 		
 		// sort
-		$sort = val( $params, 'sort' );
+		$sort = $req->query( 'sort' );
 		
 		// search
-		$search = val( $params, 'search' );
+		$search = $req->query( 'search' );
 		
-		$models = $model::find(
+		$models = $modelClassName::find(
 			$start,
 			$limit,
 			$sort,
@@ -172,7 +183,7 @@ abstract class Controller extends Acl
 			array_push( $return->$module, $m->toArray() );
 		
 		// pagination
-		$total = $model::totalRecords();
+		$total = $modelClassName::totalRecords();
 		$page = $start / $limit + 1;
 		$page_count = ceil( $total / $limit );
 		
@@ -194,45 +205,81 @@ abstract class Controller extends Acl
 			$return->links['previous'] = "$base&start=" . ($page-2) * $limit;
 		if( $page < $page_count )
 			$return->links['next'] = "$base&start=" . ($page) * $limit;
-			
-		// quirky datatables thing
-		if( isset( $params[ 'sEcho' ] ) )
-			$return->sEcho = intval( $params[ 'sEcho' ] );
 		
-		return $return;
+		// quirky datatables thing
+		if( $sEcho = $req->query( 'sEcho' ) )
+			$return->sEcho = intval( $sEcho );
+		
+		$res->setBodyJson( $return );
 	}
 	
 	/**
-	* Performs a POST request on the controller
-	*
-	* @param string $url URL (i.e. /users/104)
-	* @param array $params parameters
-	* @param string $accept the requested response type
-	*
-	* @return mixed response
-	*/
-	function post( $url, $params, $accept )
+	 * Finds a particular model. Only supported when automatic APi turned on.
+	 *
+	 * @param Request $req
+	 * @param Response $res
+	 *
+	 */
+	function find( $req, $res )
 	{
 		$module = self::name();
 		$moduleInfo = Modules::info($module);
 		$model = val( $moduleInfo, 'model' );
 		
-		if( !$moduleInfo[ 'api' ] || $accept == 'html' || empty( $model ) )
-			sendResponse( 404 );
+		// check if automatic api generation enabled
+		if( !$moduleInfo[ 'api' ] || empty( $model ) )
+			return $res->setCode( 404 );
 
-		$modelObj = new $model(ACL_NO_ID);
+		// json only
+		if( !$req->isJson() )
+			return $res->setCode( 406 );
+
+		$modelClassName = "\\nfuse\\models\\$model";
+		$modelObj = new $modelClassName( $req->params( 'id' ) );
+		
+		// must have edit permission
+		if( !$modelObj->can( 'view' ) )
+			return $res->setCode( 401 );
+		
+		$res->setBodyJson( array(
+			strtolower( $model ) => $modelObj->toArray() ) );
+	}
+	
+	/**
+	 * Creates a new model. Only supported when automatic API turned on.
+	 *
+	 * @param Request $req
+	 * @param Response $res
+	 *
+	 */
+	function create( $req, $res )
+	{
+		$module = self::name();
+		$moduleInfo = Modules::info($module);
+		$model = val( $moduleInfo, 'model' );
+		
+		// check if automatic api generation enabled
+		if( !$moduleInfo[ 'api' ] || empty( $model ) )
+			return $res->setCode( 404 );
+
+		// json only
+		if( !$req->isJson() )
+			return $res->setCode( 406 );
+
+		$modelClassName = "\\nfuse\\models\\$model";
+		$modelObj = new $modelClassName( ACL_NO_ID );
 		
 		// permission?
 		if( !$modelObj->can( 'create' ) )
-			sendResponse( 401 );		
-		
+			return $res->setCode( 401 );		
+				
 		// create a new model
-		$newModel = $model::create( $params );
+		$newModel = $modelClassName::create( $req->request() );
 		
 		if( $newModel )
-			return array(
+			$res->setBodyJson( array(
 				strtolower( $model ) => $newModel->toArray(),
-				'success' => true );
+				'success' => true ) );
 		else
 		{
 			$errors = ErrorStack::errorsWithContext( 'create' );
@@ -240,41 +287,45 @@ abstract class Controller extends Acl
 			foreach( $errors as $error )
 				$messages[] = $error['message'];
 			
-			return array(
-				'error' => $messages );
+			$res->setBodyJson( array(
+				'error' => $messages ) );
 		}
 	}
 	
 	/**
-	* Performs a PUT request on the controller
-	*
-	* @param string $url URL (i.e. /users/104)
-	* @param array $params parameters
-	* @param string $accept the requested response type
-	*
-	* @return mixed response
-	*/
-	function put( $url, $params, $accept )
+	 * Edits a model. Requires that automatic API generation is enabled.
+	 *
+	 * @param Request $req
+	 * @param Response $res
+	 *
+	 */
+	function edit( $req, $res )
 	{
 		$module = self::name();
 		$moduleInfo = Modules::info($module);
 		$model = val( $moduleInfo, 'model' );
 		
-		if( !$moduleInfo[ 'api' ] || $accept == 'html' || empty( $model ) )
-			sendResponse( 404 );
+		// check if automatic api generation enabled
+		if( !$moduleInfo[ 'api' ] || empty( $model ) )
+			return $res->setCode( 404 );
 
-		$modelObj = new $model( urlParam( 1 ) );
+		// json only
+		if( !$req->isJson() )
+			return $res->setCode( 406 );
+
+		$modelClassName = "\\nfuse\\models\\$model";
+		$modelObj = new $modelClassName( $req->params( 'id' ) );
 		
 		// must have edit permission
 		if( !$modelObj->can( 'edit' ) )
-			sendResponse( 401 );
+			return $res->setCode( 401 );
 		
 		// update the model
-		$success = $modelObj->edit( $params );
+		$success = $modelObj->edit( $req->request() );
 		
 		if( $success )
-			return array(
-				'success' => true );
+			$res->setBodyJson( array(
+				'success' => true ) );
 		else
 		{
 			$errors = ErrorStack::errorsWithContext( 'edit' );
@@ -282,91 +333,97 @@ abstract class Controller extends Acl
 			foreach( $errors as $error )
 				$messages[] = $error['message'];
 			
-			return array(
-				'error' => $messages );
+			$res->setBodyJson( array(
+				'error' => $messages ) );
 		}
 	}
 	
 	/**
-	* Performs a DELETE request on the controller
-	*
-	* @param string $url URL (i.e. /users/104)
-	* @param string $accept the requested response type
-	*
-	* @return mixed response
-	*/	
-	function delete( $url, $accept )
+	 * Deletes a model. Requires that automatic API generation is eanbled
+	 *
+	 * @param Request $req
+	 * @param Response $res	
+	 *
+	 */	
+	function delete( $req, $res )
 	{
 		$module = self::name();
 		$moduleInfo = Modules::info($module);
 		$model = val( $moduleInfo, 'model' );
 		
-		if( !$moduleInfo[ 'api' ] || $accept == 'html' || empty( $model ) )
-			sendResponse( 404 );
+		// check if automatic api generation enabled
+		if( !$moduleInfo[ 'api' ] || empty( $model ) )
+			return $res->setCode( 404 );
 
-		$modelObj = new $model( urlParam( 1 ) );
+		// json only
+		if( !$req->isJson() )
+			return $res->setCode( 406 );
+
+		$modelClassName = "\\nfuse\\models\\$model";
+		$modelObj = new $modelClassName( $req->params( 'id' ) );
 		
 		// must have delete permission
 		if( !$modelObj->can( 'delete' ) )
-			sendResponse( 401 );
-
+			return $res->setCode( 401 );
+		
 		// delete the model
 		if( $modelObj->delete() )
-			return array(
-				'success' => true );
+			$res->setBodyJson( array(
+				'success' => true ) );
 		else
-			return array(
-				'error' => true );
+			$res->setBodyJson( array(
+				'error' => true ) );
 	}
 
 	/**
-	* Routes a request to the admin view of a module
-	*
-	* @param string $method HTTP method
-	* @param string $url requested url (without the 4dm1n)
-	* @param array $params parameters
-	* @param string $accept accept method
-	*
-	* @return string result
-	*/
-	function routeAdmin( $method, $url, $params, $accept )
+	 * Displays an automatically generated admin view of a module
+	 *
+	 * @param Request $req
+	 * @param Response $res	
+	 *
+	 */
+	function routeAdmin( $req, $res )
 	{
 		$module = self::name();
 		
-		$mInfo = Modules::info( $module );
+		$moduleInfo = Modules::info( $module );
+		$model = val( $moduleInfo, 'model' );
 		
-		// is this thing turned on?
-		if( !$mInfo[ 'admin' ] || $accept != 'html' )
-			sendResponse( 404 );
+		// check if automatic admin generation enabled
+		if( !$moduleInfo[ 'admin' ] || !$model )
+			return $res->setCode( 404 );
+
+		// html only
+		if( !$req->isHtml() )
+			return $res->setCode( 406 );
 		
 		// must have permission to view admin section
 		if( !$this->can( 'view-admin' ) )
-			sendResponse( 401 );
+			return $res->setCode( 401 );
 		
-		$model = $mInfo['model'];
+		$modelClassName = "\\nfuse\\models\\$model";
+		$modelObj = new $modelClassName( ACL_NO_ID );
 		
-		$modelObj = new $model(ACL_NO_ID);
-		
-		$modelInfo = new stdClass;
+		$modelInfo = new \stdClass;
 		$modelInfo->url = '/' . $module;
 		$modelInfo->jsonKey = $module;
 		$modelInfo->permissions = array(
 			'create' => $modelObj->can('create'),
 			'edit' => $modelObj->can('edit'),
 			'delete' => $modelObj->can('delete') );
-		$modelInfo->idFieldName = $model::$idFieldName;
+		$modelInfo->idFieldName = $modelClassName::$idFieldName;
 				
 		$modelInfo->fields = array();
 		$default = array(
 			'truncate' => true,
 			'nowrap' => true
 		);
-		foreach( $model::$properties as $property )
+		foreach( $modelClassName::$properties as $property )
 			$modelInfo->fields[] = array_merge( $default, $property );
 		
-		Globals::$smarty->assign( 'modelJSON', json_encode($modelInfo) );
-		
-		return Globals::$smarty->fetch( 'admin/model.tpl');
+		$res->render( 'admin/model.tpl', array(
+			'modelJSON' => json_encode( $modelInfo )
+		) );
 	}
 	
 	/**

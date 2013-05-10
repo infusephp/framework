@@ -10,9 +10,9 @@ if( !isCLI() )
 
 chdir(__DIR__);
 
-Modules::load( 'cron' );
+\nfuse\Modules::load( 'cron' );
 
-if( Cron::scheduleCheck(true) )
+if( \nfuse\libs\Cron::scheduleCheck(true) )
 	echo "Success\n";
 else
 	echo "Failure\n";

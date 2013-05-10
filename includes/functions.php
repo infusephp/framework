@@ -22,48 +22,9 @@
 	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
  
-function redirect ($page)
-{
-	if( substr( $page, 0, 7 ) != 'http://' && substr( $page, 0, 8 ) != 'https://' )
-	{
-		$page = $_SERVER['HTTP_HOST'] . dirname ($_SERVER['PHP_SELF']) . '/' . urldecode( $page ); // removed basename()
-		$page = urlPrefix() . preg_replace('/\/{2,}/','/',$page);
-	}
-	
-	header ("Location: " . $page);
-	session_write_close();
-	exit();
-}
-
-function urlPrefix()
-{
-	if( !ENABLE_SSL )
-		return 'http://';
-	
-	// check if the user is loggged in and has a plan that has SSL enabled
-	if( Globals::$currentUser != null && Globals::$currentUser->hasSSL() )
-		return ( Globals::$currentUser->logged_in() || isset( $_SERVER["HTTPS"] ) && $_SERVER['HTTPS'] == 'on' ) ? 'https://' : 'http://';
-	
-	// by default, check if the page was requested as https
-	return ( isset( $_SERVER[ 'SERVER_PORT' ] ) && $_SERVER[ 'SERVER_PORT' ] == 443 ) ? 'https://' : 'http://';
-}
-
 function val( $a = array(), $k = '' )
 {
 	return (isset( $a[ $k ] )) ? $a[$k] : null;
-}
-
-function curPageURL() {
-	$pageURL = 'http';
-	if (isset( $_SERVER['HTTPS'] ) && $_SERVER["HTTPS"] == "on") 
-		$pageURL .= "s";
-	$pageURL .= "://";
-	if ($_SERVER["SERVER_PORT"] != "80")
-	$pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].'/'.$_SERVER["REQUEST_URI"];
-	else
-		$pageURL .= $_SERVER["SERVER_NAME"].'/'.$_SERVER["REQUEST_URI"];
-	
-	return $pageURL;
 }
 
 function toBytes($str){
@@ -147,7 +108,7 @@ function successMessage( $message = 'Success!' )
 	return '<div class="alert alert-success">' . $message .	'</div>';
 }
 
-function guid( )
+function guid()
 {
 	if( function_exists( 'com_create_guid' ) )
 		return trim( '{}', com_create_guid() );
@@ -258,124 +219,6 @@ function seoUrl( $string, $id = null )
 	return strtolower(preg_replace('/--+/u', '-', $return));
 }
 
-function sendResponse( $status = 200, $body = '', $content_type = '' )
-{
-	if( empty( $content_type ) )
-	{
-		// send back the content type requested
-		$accept = getAcceptType();
-		
-		switch( $accept )
-		{
-		case 'xml':
-			$content_type = 'text/xml';
-		break;
-		case 'json':
-			$content_type = 'application/json';
-		break;
-		default:
-		case 'html':
-			$content_type = 'text/html';
-		break;
-		}		
-	}
-
-	// set the status
-	header('HTTP/1.1 ' . $status . ' ' . getStatusCodeMessage($status));
-	// set the content type
-	header('Content-type: ' . $content_type . '; charset=utf-8');
-	
-	if( !empty($body) )
-	{
-		// send the body
-		echo $body;
-	}
-	// we need to create the body if none is passed
-	else if( $status != 200 )
-	{
-		// create some body messages
-		$message = '';
-		
-		// this is purely optional, but makes the pages a little nicer to read
-		// for your users.  Since you won't likely send a lot of different status codes,
-		// this also shouldn't be too ponderous to maintain
-		switch($status)
-		{
-			case 401:
-				$message = 'You must be authorized to view this page.';
-			break;
-			case 404:
-				$message = 'The requested URL ' . $_SERVER['REQUEST_URI'] . ' was not found.';
-			break;
-			case 500:
-				$message = 'The server encountered an error processing your request.';
-			break;
-			case 501:
-				$message = 'The requested method is not implemented.';
-			break;
-		}
-			
-		if( $content_type == 'text/html' )
-		{
-			Globals::$smarty->assign( 'errorCode', $status );
-			Globals::$smarty->assign( 'errorMessage', $message );
-			Globals::$smarty->display( 'error.tpl' );
-		}
-	}
-	
-	session_write_close();
-	exit;
-}
-
-function getStatusCodeMessage($status)  
-{  
-	$codes = Array(  
-		100 => 'Continue',  
-		101 => 'Switching Protocols',  
-		200 => 'OK',  
-		201 => 'Created',  
-		202 => 'Accepted',  
-		203 => 'Non-Authoritative Information',  
-		204 => 'No Content',  
-		205 => 'Reset Content',  
-		206 => 'Partial Content',  
-		300 => 'Multiple Choices',  
-		301 => 'Moved Permanently',  
-		302 => 'Found',  
-		303 => 'See Other',  
-		304 => 'Not Modified',  
-		305 => 'Use Proxy',  
-		306 => '(Unused)',  
-		307 => 'Temporary Redirect',  
-		400 => 'Bad Request',  
-		401 => 'Unauthorized',  
-		402 => 'Payment Required',  
-		403 => 'Forbidden',  
-		404 => 'Not Found',  
-		405 => 'Method Not Allowed',  
-		406 => 'Not Acceptable',  
-		407 => 'Proxy Authentication Required',  
-		408 => 'Request Timeout',  
-		409 => 'Conflict',  
-		410 => 'Gone',  
-		411 => 'Length Required',  
-		412 => 'Precondition Failed',  
-		413 => 'Request Entity Too Large',  
-		414 => 'Request-URI Too Long',  
-		415 => 'Unsupported Media Type',  
-		416 => 'Requested Range Not Satisfiable',  
-		417 => 'Expectation Failed',  
-		500 => 'Internal Server Error',  
-		501 => 'Not Implemented',  
-		502 => 'Bad Gateway',  
-		503 => 'Service Unavailable',  
-		504 => 'Gateway Timeout',  
-		505 => 'HTTP Version Not Supported'  
-	);  
-	
-	return (isset($codes[$status])) ? $codes[$status] : '';  
-}
-
 function getAcceptType()
 {
 	$accept = 'html';
@@ -423,5 +266,10 @@ function oauthCredentialsSupplied()
 
 function encryptPassword( $password, $nonce = '' )
 { // nonce currently not used
-	return hash_hmac('sha512', $password . $nonce, Config::value( 'site', 'salt' ));
+	return hash_hmac('sha512', $password . $nonce, \nfuse\Config::value( 'site', 'salt' ));
+}
+
+function json_decode_array($d)
+{
+	return json_decode($d, true);
 }

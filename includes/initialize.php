@@ -22,14 +22,16 @@
 	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-// load configuration
-require_once "libs/Spyc.php";
-require_once 'libs/Config.php';
+// set the root app directory
+define( 'NFUSE_BASE_DIR', dirname(__DIR__));
+set_include_path( get_include_path() . PATH_SEPARATOR . NFUSE_BASE_DIR );
 
-Config::load( 'config.yml' );
+// load configuration
+require_once 'libs/Config.php';
+\nfuse\Config::load( NFUSE_BASE_DIR . '/includes/config.yml' );
 
 // error reporting
-if( Config::value( 'site', 'production-level' ) )
+if( \nfuse\Config::value( 'site', 'production-level' ) )
 {
 	ini_set("display_errors", 0);
 	ini_set("log_errors", 1);
@@ -42,22 +44,10 @@ else
 	error_reporting(E_ALL);
 }
 
-// site messages: different files can be loaded for different languages
-require_once "includes/lang/en/Messages.php";
-
-// important libraries
-require_once 'libs/ErrorStack.php';
-require_once 'libs/Globals.php';
-require_once "includes/functions.php";
-require_once 'libs/Database.php';
-require_once "libs/Acl.php";
-require_once "libs/Model.php";
-require_once "libs/Controller.php";
-require_once 'libs/Page.php';
-require_once "libs/Smarty/Smarty.class.php";
-require_once "libs/Smarty_nFuse.php";
-require_once "libs/Modules.php";
+// site language: different files can be loaded for different languages
+require_once "includes/lang/en/index.php";
 
 // start initializing stuff
+require_once "includes/functions.php";
 require_once "includes/security.php";
 require_once "includes/common.php";

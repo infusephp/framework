@@ -22,43 +22,16 @@
 	IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 	WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- *
- * The properties array looks like this:
- * 		title:
- * 		name: property name
- * 		type: (required)
- * 			1 - hidden
- * 			2 - text
- * 			3 - textarea
- * 			4 - checkbox
- * 			5 - select = [db value, string value, keys array, values array]
- * 			6 - file = [value, url]
- * 			7 - password
- * 			8 - date
- * 			9 - custom = [value, html]
- * 			10 - no form field - static html
- * 		select_keys: Array of keys (actual value being input into database) for dropdowns in the data cell in admin.
- *		select_values: Array of values (value to the end user) corresponding to keys for dropdowns in the data cell in admin.
- * 		filter: Filter for data cell in admin.
- * 		nosort: Prevent the data cell from sorting in admin.
- * 		nowrap: Prevents the data cell from wrapping in admin. (Default: false)
- * 		truncate: Prevents the data cell from truncating in admin. (Default: true)
- * 		validation: Function reference to validate the input of the field (i.e. user creation, editing a user), returns true if valid.
- *		validation_params: An array of extra parameters to pass to the validation function. (default: null)
- *		required: (default: false)
- *
- *
- * The model looks for data in this order Local Cache -> Memcache (if enabled) -> Database
- *
- * The local cache is just a static array laid out as follows:
- *	<class_name> : array(
- *		<id> : array(
- *			<property_name> : <value>
- *			<property_name> : <value>
- *		)
- * 
  */
+ 
+namespace nfuse\libs;
+
+use \nfuse\ErrorStack as ErrorStack;
+use \nfuse\Modules as Modules;
+use \nfuse\models\User as User;
+use \nfuse\Messages as Messages;
+
+
 class Validate
 {
 	/**
@@ -88,7 +61,7 @@ class Validate
 		if( !val( $parameters, 'skipBanCheck' ) )
 		{
 			Modules::load('bans');
-			if( Ban::isBanned( $email, BAN_TYPE_EMAIL ) )
+			if( \nfuse\models\Ban::isBanned( $email, BAN_TYPE_EMAIL ) )
 			{
 				ErrorStack::add( Messages::VALIDATE_EMAIL_ADDRESS_BANNED, __CLASS__, __FUNCTION__ );
 				return false;
@@ -97,19 +70,14 @@ class Validate
 
 		if( !val( $parameters, 'skipRegisteredCheck' ) )
 		{
-			$uid = '';
+			$emailTaken = false;
 			if( isset( $parameters[ 'model' ] ) )
-				$uid = 'uid <> ' . $parameters[ 'model' ]->id();
+				$emailTaken = $parameters[ 'model' ]::emailTaken( $email );
+			else
+				$emailTaken = User::emailTaken( $email );
 			
 			// check if e-mail has already been claimed
-			if( Database::select(
-				'Users',
-				'count(uid)',
-				array(
-					'where' => array(
-						'user_email' => $email,
-						$uid ),
-					'single' => true ) ) > 0 )
+			if( $emailTaken )
 			{
 				ErrorStack::add( Messages::VALIDATE_EMAIL_ADDRESS_REGISTERED, __CLASS__, __FUNCTION__ );
 				return false;
@@ -138,27 +106,23 @@ class Validate
 		if( !val( $parameters, 'skipBanCheck' ) )
 		{
 			Modules::load('bans');
-			if( Ban::isBanned( $username, BAN_TYPE_USERNAME ) )
+			if( \nfuse\models\Ban::isBanned( $username, BAN_TYPE_USERNAME ) )
 			{
 				ErrorStack::add( Messages::VALIDATE_USER_NAME_BANNED, __CLASS__, __FUNCTION__ );
 				return false;
 			}
 		}
 			
-		if( val( $params, 'checkRegistered' ) || !isset( $parameters[ 'model' ] ) )
+		if( val( $parameters, 'checkRegistered' ) || !isset( $parameters[ 'model' ] ) )
 		{
-			if( Globals::$currentUser->getProperty( 'user_name') == $username)
-				return true; // belongs to the current user
+			$usernameTaken = false;
+			if( isset( $parameters[ 'model' ] ) )
+				$usernameTaken = $parameters[ 'model' ]::usernameTaken( $username );
+			else
+				$usernameTaken = User::usernameTaken( $username );
 			
 			// Check if user name is already registered.
-			if( Database::select(
-				'Users',
-				'count(*)',
-				array(
-					'where' => array(
-						'user_name' => $username ),
-					'single' => true ) ) > 0 )
-			{
+			if( $usernameTaken ) {
 				ErrorStack::add( Messages::VALIDATE_USER_NAME_REGISTERED, __CLASS__, __FUNCTION__ );
 				return false;
 			}
@@ -190,7 +154,7 @@ class Validate
 			$password2 = $password;
 		}
 		
-		$min_pass_length = Modules::info( 'user' )[ 'minimum-password-length' ];
+		$min_pass_length = Modules::info( 'users' )[ 'minimum-password-length' ];
 
 		// Check if password is at least N characters long.
 		if( strlen( $password1 ) >= $min_pass_length )
@@ -210,7 +174,7 @@ class Validate
 		
 		// encrypt password
 		$password = encryptPassword( $password1 );
-	
+
 		return true;
 	}
 	
@@ -246,7 +210,7 @@ class Validate
 		}
 		
 		// cannot start out as an admin
-		if( $group_id == ADMIN && Globals::$currentUser->group()->id() != ADMIN )
+		if( $group_id == ADMIN && User::currentUser()->group()->id() != ADMIN )
 		{
 			ErrorStack::add( ERROR_NO_PERMISSION );
 			return false;
@@ -256,7 +220,7 @@ class Validate
 		if( !isset( $parameters[ 'skipPermissionsCheck' ] ) &&
 			isset( $parameters[ 'model' ] ) &&
 			$parameters['model']->group()->id() != $group_id &&
-			Globals::$currentUser->group()->id() != ADMIN )
+			User::currentUser()->group()->id() != ADMIN )
 		{
 			ErrorStack::add( ERROR_NO_PERMISSION );
 			return false;

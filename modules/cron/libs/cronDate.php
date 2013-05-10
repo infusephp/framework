@@ -7,6 +7,9 @@
  * @copyright 2012 Groupr
  * @license
  */
+ 
+namespace nfuse\libs;
+ 
 class cronDate
 {
 	///////////////////////////

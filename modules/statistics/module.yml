@@ -5,4 +5,6 @@ author:
 	name: Jared King
 	email: j@jaredtking.com
 	website: http://jaredtking.com
-hasAdmin: true
+admin: true
+routes:
+	"get /4dm1n/statistics": adminHome

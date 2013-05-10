@@ -21,25 +21,102 @@
 	WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+ 
+namespace nfuse\controllers;
 
-class nFuse_Controller_Backup extends Controller
-{		
-	static function initialize()
+class Backup extends \nfuse\Controller
+{
+	function optimizeDb( $req, $res )
 	{
-		parent::initialize();
+		if( \nfuse\libs\Backup::optimizeDatabase() )
+			\nfuse\ViewEngine::engine()->assign( 'optimizeSuccess', true );
+		
+		$this->adminHome( $req, $res );
+	}
 
-		/*
-		Permissions::createPermission ('view_backup_admin',array('view_admin_panel'),'Backup');
-		Permissions::createPermission ('backup_site',array('view_admin_panel'),'Backup');
-		Permissions::createPermission ('restore_site',array('view_admin_panel'),'Backup');
-		*/
+	function backupDb( $req, $res )
+	{
+		if( !$this->can( 'view-admin' ) && $this->can('backup-site') )
+			return $res->setCode( 401 );
+
+		$tmpDir = NFUSE_TEMP_DIR . '/backup/';
+
+		@mkdir( $tmpDir );
+		$filename = $tmpDir . str_replace( " ", "", \nfuse\Config::value( 'site', 'title' )) . "-" . date("m-d-Y") . ".sql";
+		
+		// generate the SQL and save in file
+		if( \nfuse\libs\Backup::backupSQL( $filename ) )
+		{
+			// Force user to download file.
+			header("Pragma: public");
+			header("Expires: 0");
+			header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+			header("Cache-Control: private",false); // required for certain browsers
+			header("Content-Type: application/octet-stream");
+			header("Content-Disposition: attachment; filename=\"".basename($filename)."\";" );
+			header("Content-Transfer-Encoding: binary");
+			header("Content-Length: ".filesize($filename));
+			readfile("$filename");
+			
+			\nfuse\libs\Backup::cleanTmpDir($tmpDir);
+		}	
+		
+		exit;			
 	}
 	
-	function routeAdmin( $method, $url, $params, $accept )
+	function restoreSite( $req, $res )
 	{
-		return include 'pages/admin/index.php';
+		if( !$this->can( 'view-admin' ) && $this->can('restore-site') )
+			return $res->setCode( 401 );	
+	
+		exit;
+		// TODO out of date/dangerous
+
+		$tmpDir = "temp/backup/";	
+	
+		$target_path = $tmpDir . basename($_FILES['uploadedfile']['name']);
+
+		$file_type = explode (".", $_FILES['uploadedfile']['name']);
+
+		if (in_array('sql', $file_type))
+		{
+			if(!move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path))
+				$parameters[ 'upload_failure' ] = true;
+
+			if (file_exists ($target_path))
+			{
+				$file = fopen($target_path,"r");
+				$line_count = $backup->restoreSQL($file);
+				fclose($file);
+				if ($line_count > 0)
+					$parameters[ 'success' ] = true;
+				else
+					$parameters[ 'error' ] = true;
+					
+				$backup->cleanTmpDir ($tmpDir);
+			}
+
+		} else
+			$parameters[ 'error' ] = 'invalid_file';
+		
+		$this->adminHome( $req, $res );
 	}
 	
+	function adminHome( $req, $res )
+	{
+		if( !$this->can( 'view-admin' ) )
+			return $res->setCode( 401 );
+
+		$canRestoreSite = $this->can('restore-site');
+		$canBackupSite = $this->can('backup-site');
+
+		$res->render( $this->templateDir() . 'admin/index.tpl', array(
+			'canBackupSite' => $canBackupSite,
+			'canRestoreSite' => $canRestoreSite,
+			'title' => 'Backup'
+		) );
+	}
+		
 	function install()
 	{
 		@mkdir ("temp/backup");
@@ -48,8 +125,8 @@ class nFuse_Controller_Backup extends Controller
 	function cron( $command )
 	{
 		if ($command == 'backup_database')
-			return Backup::backupSQL( 'backup/' . str_replace(" ", "", Config::value( 'site_title' ) ) . "-" . date("m-d-Y") . ".sql" );
+			return Backup::backupSQL( 'backup/' . str_replace(" ", "", \nfuse\Config::value( 'site_title' ) ) . "-" . date("m-d-Y") . ".sql" );
 		else if ($command == 'optimize_database')
 			return Backup::optimizeDatabase();
-	}	
+	}
 }

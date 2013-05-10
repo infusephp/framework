@@ -22,5 +22,7 @@
 	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-class nFuse_Controller_Validation extends Controller
+namespace nfuse\controllers;
+
+class Validation extends \nfuse\Controller
 { }

@@ -22,16 +22,20 @@
 	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
  
-class nFuse_Controller_Cron extends Controller
+namespace nfuse\controllers;
+ 
+class Cron extends \nfuse\Controller
 {
-	function get( $url, $params, $accept )
+	function checkSchedule( $req, $res )
 	{
-		if( $accept == 'html' )
-			return include $this->modulePath() . 'pages/index.php';
-		else
-			return parent::get( $url, $params, $accept );
-	}
+		\nfuse\libs\Cron::scheduleCheck();
 	
+		if( $req->isHtml() )
+			$res->setBody( 'Success' );
+		else if( $req->isJson() )
+			$res->setBodyJson( array( 'success' => true ) );
+	}
+		
 	function install()
 	{
 		Database::sql("CREATE TABLE IF NOT EXISTS `Cron` (`id` INT NOT NULL AUTO_INCREMENT ,`name` VARCHAR( 255 ) NOT NULL ,`module` VARCHAR( 100 ) NOT NULL ,

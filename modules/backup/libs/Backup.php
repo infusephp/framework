@@ -1,5 +1,7 @@
 <?php
 
+namespace nfuse\libs;
+
 class Backup
 {
 	static function cleanTmpDir($path)
@@ -27,13 +29,13 @@ class Backup
 		// open the file
 		$file = fopen( $filename, "w" );
 		
-		$tables = Database::listTables();
+		$tables = \nfuse\Database::listTables();
 	
 		foreach( $tables as $table_name )
 		{
 			$sql_string = "DROP TABLE IF EXISTS `$table_name`;\n";
 	
-			$columns = Database::listColumns( $table_name );
+			$columns = \nfuse\Database::listColumns( $table_name );
 
 			$sql_string .= "CREATE TABLE `$table_name` (";
 	
@@ -66,7 +68,7 @@ class Backup
 	
 			self::writeFile($file, $sql_string);
 			
-			$tableData = Database::select( $table_name, '*' );
+			$tableData = \nfuse\Database::select( $table_name, '*' );
 					
 			foreach( $tableData as $row )
 			{	
@@ -108,7 +110,7 @@ class Backup
 	
 			if ($query != null) {
 				$line_count++;
-				Database::sql( $query );
+				\nfuse\Database::sql( $query );
 			}
 	
 		}
@@ -118,10 +120,10 @@ class Backup
 	
 	static function optimizeDatabase()
 	{
-		$tables = Database::listTables();
+		$tables = \nfuse\Database::listTables();
 	
 		foreach( $tables as $table )
-			Database::sql( "OPTIMIZE TABLE `$table`;" );
+			\nfuse\Database::sql( "OPTIMIZE TABLE `$table`;" );
 			
 		return true;
 	}

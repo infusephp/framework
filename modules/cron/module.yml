@@ -8,3 +8,5 @@ author:
 admin: true
 api: true
 model: CronJob
+routes:
+	"get /cron/scheduleCheck": checkSchedule

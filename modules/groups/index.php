@@ -22,8 +22,25 @@
 	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
  
-class nFuse_Controller_Groups extends Controller
-{	
+namespace nfuse\controllers;
+
+class Groups extends \nfuse\Controller
+{
+	function find( $req, $res )
+	{
+		$group = new \nfuse\models\Group( $req->params( 'id' ) );
+		
+		if( !$req->isHtml() )
+			return parent::find( $req, $res );
+		
+		if( !$group->can( 'view' ) )
+			return $res->setCode( 401 );
+			
+		$res->render( $this->templateDir() . 'view.tpl', array(
+			'title' => $group->name(),
+			'group' => $group ) );
+	}
+
 	function get( $url, $params, $accept )
 	{
 		if( $accept == 'html' )

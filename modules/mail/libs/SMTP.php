@@ -46,6 +46,8 @@
  * original author: Chris Ryan
  */
 
+namespace nfuse\libs;
+
 class SMTP {
   /**
    *  SMTP server port

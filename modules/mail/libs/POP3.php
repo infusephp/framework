@@ -58,6 +58,8 @@
  * @package PHPMailer
  * @author Richard Davey
  */
+ 
+namespace nfuse\libs;
 
 class POP3 {
   /**

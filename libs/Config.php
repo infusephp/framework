@@ -21,6 +21,8 @@
 	WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+ 
+namespace nfuse;
 
 class Config
 {
@@ -52,6 +54,32 @@ class Config
 	}
 	
 	/**
+	* Gets a global configuration value, section, or all values
+	*
+	* @param string $section section
+	* @param string $name configuration name
+	*
+	* @return string|null value
+	*/
+	static function get( $section = false, $property = false )
+	{
+		if( !$section )
+			return self::$values;
+		
+		if( !$property )
+		{
+			if( isset( self::$values[ $section ] ) )
+				return self::$values[ $section ];
+			else
+				return null;
+		}
+		
+		if( isset( self::$values[ $section ] ) &&
+			isset( self::$values[ $section ][ $property ] ) )
+			return self::$values[ $section ][ $property ];
+	}
+	
+	/**
 	 * Loads the site configuration from a YAML file
 	 *
 	 * @param string $filename
@@ -60,6 +88,8 @@ class Config
 	 */
 	static function load( $filename )
 	{
+		require_once "libs/Spyc.php";
+	
 		self::$values = (array)spyc_load_file( $filename );
 	}
 }

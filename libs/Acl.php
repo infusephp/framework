@@ -22,6 +22,8 @@
 	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
  
+namespace nfuse;
+ 
 define( 'ACL_RESULT_NOT_CACHED', -1 );
 define( 'ACL_NO_ID', -1 );
  
@@ -68,7 +70,7 @@ abstract class Acl
 	function can( $permission, $requestor = null )
 	{
 		if( $requestor === null )
-			$requestor = Globals::$currentUser;
+			$requestor = \nfuse\models\User::currentUser();
 		
 		// check cache
 		$cache = $this->cachedResult( $permission, $requestor );
@@ -128,17 +130,17 @@ abstract class Acl
 		// setup objects ACL
 		$acl_db = (array)Database::select(
 			'ACL',
-			'user,group_,permission',
+			'uid,gid,permission',
 			array(
 				'where' => $where ) );
 
 		foreach( $acl_db as $acl )
 		{
-			if( !empty( $acl[ 'user' ] ) )
-				$this->acl[ 'users' ][ $acl[ 'user' ] ][ $acl[ 'permission' ] ] = true;
+			if( !empty( $acl[ 'uid' ] ) )
+				$this->acl[ 'users' ][ $acl[ 'uid' ] ][ $acl[ 'permission' ] ] = true;
 			
-			if( !empty( $acl[ 'group' ] ) )
-				$this->acl[ 'groups' ][ $acl[ 'group_' ] ][ $acl[ 'permission' ] ] = true;
+			if( !empty( $acl[ 'gid' ] ) )
+				$this->acl[ 'groups' ][ $acl[ 'gid' ] ][ $acl[ 'permission' ] ] = true;
 		}
 
 		$this->aclLoaded = true;

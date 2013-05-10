@@ -1,0 +1,26 @@
+title: Users
+description: Authentication and user support.
+version: 1.0
+author:
+	name: Jared King
+	email: j@jaredtking.com
+	website: http://jaredtking.com
+model: User
+api: true
+admin: true
+dependencies: validation
+minimum-password-length: 5
+forgot-password-allowed: true
+routes:
+	"get /users/login": loginForm
+	"post /users/login": login
+	"get /users/logout": logout
+	"get /users/forgot": forgotForm
+	"post /users/forgot": forgotStep1
+	"get /users/forgot/:id": forgotForm
+	"post /users/forgot/:id": forgotStep2
+	"get /users/signup": signupForm
+	"post /users/signup": signup
+	"get /users/account": accountSettings
+	"post /users/account": editAccountSettings
+	"get /users/verifyEmail/:id": verifiyEmail

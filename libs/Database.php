@@ -25,7 +25,7 @@
 	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
  
-require_once 'ErrorStack.php';
+namespace nfuse;
  
 class Database
 {
@@ -48,7 +48,7 @@ class Database
 	static function initialize()
 	{
 		if( self::$initializeAttempted )
-			return self::$DBH instanceof PDO;
+			return self::$DBH instanceof \PDO;
 		
 		self::$initializeAttempted = true;
 		
@@ -56,20 +56,20 @@ class Database
 		{
 			// Initialize database
 			if( self::$DBH == null )
-				self::$DBH = new PDO( Config::value( 'database', 'type' ) . ':host=' . Config::value( 'database', 'host' ) . ';dbname=' . Config::value( 'database', 'name' ), Config::value( 'database', 'user' ), Config::value( 'database', 'password' ) );
+				self::$DBH = new \PDO( Config::value( 'database', 'type' ) . ':host=' . Config::value( 'database', 'host' ) . ';dbname=' . Config::value( 'database', 'name' ), Config::value( 'database', 'user' ), Config::value( 'database', 'password' ) );
 		}
 		catch(PDOException $e)
 		{
-			ErrorStack::add( $e->getMessage(), __CLASS__, __FUNCTION__ );
+			\nfuse\ErrorStack::add( $e->getMessage(), __CLASS__, __FUNCTION__ );
 			die( 'Could not connect to database.' );
 			return false;
 		}
 		
 		// Set error level
-		if( Config::value( 'site', 'production-level' ) )
-			self::$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING );
+		if( \nfuse\Config::value( 'site', 'production-level' ) )
+			self::$DBH->setAttribute( \PDO::ATTR_ERRMODE, \PDO::ERRMODE_WARNING );
 		else
-			self::$DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+			self::$DBH->setAttribute( \PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION );
 		
 		// Set counters
 		self::$queryCount = array(
@@ -181,15 +181,15 @@ class Database
 		if( isset($parameters['limit']) )
 			$limit = ' LIMIT ' . $parameters['limit'];
 			
-		$fetchStyle = PDO::FETCH_ASSOC;
+		$fetchStyle = \PDO::FETCH_ASSOC;
 		if( isset($parameters['fetchStyle']) )
 		{
 			switch( $parameters['fetchStyle'] )
 			{
-				case 'assoc':			$fetchStyle = PDO::FETCH_ASSOC; 	break;
-				case 'num':				$fetchStyle = PDO::FETCH_NUM; 		break;
-				case 'singleColumn':	$fetchStyle = PDO::FETCH_COLUMN; 	break;
-				default:				$fetchStyle = PDO::FETCH_ASSOC; 	break;
+				case 'assoc':			$fetchStyle = \PDO::FETCH_ASSOC; 	break;
+				case 'num':				$fetchStyle = \PDO::FETCH_NUM; 		break;
+				case 'singleColumn':	$fetchStyle = \PDO::FETCH_COLUMN; 	break;
+				default:				$fetchStyle = \PDO::FETCH_ASSOC; 	break;
 			}
 		}
 		
@@ -224,7 +224,7 @@ class Database
 		}
 		catch(PDOException $e)
 		{
-			ErrorStack::add( $e->getMessage(), __CLASS__, __FUNCTION__ );
+			\nfuse\ErrorStack::add( $e->getMessage(), __CLASS__, __FUNCTION__ );
 			return false;
 		}
 	}
@@ -278,7 +278,7 @@ class Database
 		}
 		catch(PDOException $e)
 		{
-			ErrorStack::add( $e->getMessage(), __CLASS__, __FUNCTION__ );
+			\nfuse\ErrorStack::add( $e->getMessage(), __CLASS__, __FUNCTION__ );
 			return null;
 		}
 	}
@@ -295,7 +295,7 @@ class Database
 	
 		$result = self::$DBH->query("show tables");
 		
-		return $result->fetchAll( PDO::FETCH_COLUMN );
+		return $result->fetchAll( \PDO::FETCH_COLUMN );
 	}
 	
 	/**
@@ -310,7 +310,7 @@ class Database
 	
 		$result = self::$DBH->query("SHOW COLUMNS FROM `$table`");
 		
-		return $result->fetchAll( PDO::FETCH_NUM );
+		return $result->fetchAll( \PDO::FETCH_NUM );
 	}
 		
 	/**
@@ -384,7 +384,7 @@ class Database
 		}
 		catch(PDOException $e)
 		{
-			ErrorStack::add( $e->getMessage(), __CLASS__, __FUNCTION__ );
+			\nfuse\ErrorStack::add( $e->getMessage(), __CLASS__, __FUNCTION__ );
 			return false;
 		}
 		
@@ -447,7 +447,7 @@ class Database
 		}
 		catch(PDOException $e)
 		{
-			ErrorStack::add( $e->getMessage(), __CLASS__, __FUNCTION__ );
+			\nfuse\ErrorStack::add( $e->getMessage(), __CLASS__, __FUNCTION__ );
 			return false;
 		}
 		
@@ -491,7 +491,7 @@ class Database
 		}
 		catch(PDOException $e)
 		{  
-			ErrorStack::add( $e->getMessage(), __CLASS__, __FUNCTION__ );
+			\nfuse\ErrorStack::add( $e->getMessage(), __CLASS__, __FUNCTION__ );
 			return false;
 		}
 		
@@ -546,7 +546,7 @@ class Database
 		}
 		catch(PDOException $e)
 		{
-			ErrorStack::add( $e->getMessage(), __CLASS__, __FUNCTION__ );
+			\nfuse\ErrorStack::add( $e->getMessage(), __CLASS__, __FUNCTION__ );
 			return false;
 		}
 		

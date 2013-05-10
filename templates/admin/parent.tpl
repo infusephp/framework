@@ -1,27 +1,18 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-	<title>{Globals::$calledPage->title()} :: {Config::value('site','title')} Administration</title>
-	
-	<base href="{urlPrefix()}{Config::value('site','host-name')}/" />
+	<title>{$title} :: {$smarty.const.SITE_TITLE} Administration</title>
 	
 	<meta name="author" content="nFuse" />
 	<meta name="robots" content="noindex, nofollow" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link href="/css/bootstrap.min.css" rel="stylesheet">
-    <style type="text/css">
-    body { padding-top: 70px; }
-    </style>
-    <link href="/css/bootstrap-responsive.min.css" rel="stylesheet">
+	<link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet" type="text/css" />
 	<link rel="stylesheet" href="/css/admin.css" type="text/css" />
 	
-	<script type="text/javascript" src="/js/lazyload.js"></script>
 	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
-	<script type="text/javascript" src="/js/bootstrap.min.js"></script>
-	<script type="text/javascript" src="/js/jquery.dataTables.min.js"></script>
+	<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
 	<script type="text/javascript" src="/js/header.js"></script>
-	<script type="text/javascript" src="/js/admin-header.js"></script>
 
 	{block name=header}{/block}
 </head>
@@ -34,21 +25,19 @@
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
 				</a>
-	    	   <a class="brand" href="/4dm1n">{Config::value('site','title')}</a>
-		       <div class="nav-collapse">
-					<ul class="nav">
-						<li><a href="/">Site Home</a></li>
-					</ul>
-					<ul class="nav secondary-nav pull-right">
-						<li class="{if $params.what=='profile' && $params.id==Globals::$currentUser->info('user_name')}active{/if} dropdown">
-							<a class="dropdown-toggle pull-right" data-toggle="dropdown" href="#">
-								<img src="{Globals::$currentUser->profilePicture()}" alt="{Globals::$currentUser->name()}" height="20" />
-								{Globals::$currentUser->name()}
+	    	   <a class="brand" href="/4dm1n">{$smarty.const.SITE_TITLE}</a>
+		       <div class="nav-collapse collapse">
+					<ul class="nav pull-right">
+						<li><a href="/"><i class="icon-home"></i> Site Home</a></li>
+						<li class="dropdown">
+							<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+								<img src="{$currentUser->profilePicture()}" alt="{$currentUser->name()}" height="20" width="20" />
+								{$currentUser->name()}
 								<b class="caret"></b>
 							</a>
 							<ul class="dropdown-menu">
-								<li><a href="/User/account"><i class="icon-user"></i> Account</a></li>
-								<li><a href="/User/logout"><i class="icon-remove"></i> Logout</a></li>
+								<li><a href="/users/account"><i class="icon-user"></i> Account</a></li>
+								<li><a href="/users/logout"><i class="icon-remove"></i> Logout</a></li>
 							</ul>
 						</li>
 					</ul>
@@ -58,8 +47,8 @@
 	</div>
 	<div class="subnavbar clearfix">
 		<ul>
-			{foreach from=Modules::modulesWithAdmin() item=module}
-				<li class="{if $module.name == urlParam(1)}active{/if}"><a href="/4dm1n/{$module.name}">{$module.title}</a></li>
+			{foreach from=$modulesWithAdmin item=module}
+				<li class="{if $module.name == $selectedModule}active{/if}"><a href="/4dm1n/{$module.name}">{$module.title}</a></li>
 			{/foreach}
 		</ul>
 	</div>

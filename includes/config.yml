@@ -1,25 +1,73 @@
 site:
 	title: nfuse framework
 	email: contact@example.com
-	production-level: true
+	production-level: false
 	host-name: example.com
 	ssl-enabled: false
-	required-modules: user
-	default-module: default
+	required-modules: users
 	default-admin-module: statistics
+	salt: replacewithrandomstring
+	time-zone: America/Chicago
 	disabled: false
 	disabled-message: The site is currently unavailable.
-	time-zone: America/Chicago
-	salt: replacewithrandomstring
 
 database:
 	type: mysql
-	user: db_user
-	password: db_password
+	user: username
+	password: password
 	host: localhost
-	name: db_name
+	name: dbname
 
 memcache:
 	enabled: false
 	host: 127.0.0.1
 	port: 11211
+
+smtp:
+	from: no-reply@example.com
+	username: username
+	password: password
+	port: 587
+	host: smtp.example.com
+
+session:
+	adapter: database
+
+redis:
+	scheme: tcp
+	host: 127.0.0.1
+	port: 6379
+
+routes:
+	"/":
+		controller: home
+	"get /login":
+		controller: users
+		action: loginForm
+	"post /login":
+		controller: users
+		action: login
+	"get /logout":
+		controller: users
+		action: logout
+	"get /signup":
+		controller: users
+		action: signupForm
+	"post /signup":
+		controller: users
+		action: signup
+	"get /forgot":
+		controller: users
+		action: forgotForm
+	"post /forgot":
+		controller: users
+		action: forgotStep1
+	"get /users/forgot/:id":
+		controller: users
+		action: forgotForm
+	"post /users/forgot/:id":
+		controller: users
+		action: forgotStep2		
+	"get /account":
+		controller: users
+		action: accountSettings

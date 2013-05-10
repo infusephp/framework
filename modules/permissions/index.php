@@ -22,5 +22,7 @@
 	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
  
-class nFuse_Controller_Permissions extends Controller
+namespace nfuse\controllers;
+ 
+class Permissions extends \nfuse\Controller
 { }

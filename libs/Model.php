@@ -62,6 +62,8 @@
  * 
  */
  
+namespace nfuse;
+
 abstract class Model extends Acl
 {
 	/////////////////////////////
@@ -212,6 +214,23 @@ abstract class Model extends Acl
 		}
 
 		return ( count( $return ) == 1 ) ? reset( $return ) : $return;
+	}
+	
+	/**
+	 * Checks if the model has a property.
+	 *
+	 * @param string $property property
+	 *
+	 * @return boolean has property
+	 */
+	static function hasProperty( $property )
+	{
+		foreach( static::$properties as $prop ) {
+			if( $property == $prop[ 'name' ] )
+				return true;
+		}
+		
+		return false;
 	}
 	
 	/**
@@ -545,6 +564,14 @@ abstract class Model extends Acl
 			}
 			else
 				$insertArray[ $field ] = $value;
+		}
+		
+		// add in default values
+		foreach( static::$properties as $fieldInfo )
+		{
+			if( isset( $fieldInfo[ 'default' ] ) && !isset( $insertArray[ $fieldInfo[ 'name' ] ] ) ) {
+				$insertArray[ $fieldInfo[ 'name' ] ] = $fieldInfo[ 'default' ];
+			}
 		}
 		
 		// check for required fields

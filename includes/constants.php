@@ -24,25 +24,25 @@
 
 // site configuration
 if( !defined('SITE_TITLE') )
-	define ('SITE_TITLE', Config::value( 'site', 'title' ) );
-if( !defined( 'HOST_NAME' ) )
-	define( 'HOST_NAME', Config::value( 'site', 'host-name' ) );
-if( !defined( 'ENABLE_SSL' ) )
-	define( 'ENABLE_SSL', Config::value( 'site', 'ssl-enabled' ) );
+	define ('SITE_TITLE', \nfuse\Config::value( 'site', 'title' ) );
 if( !defined( 'SMTP_HOST' ) )
 {
-	define( 'SMTP_HOST', Config::value( 'smtp', 'host' ) );
-	define( 'SMTP_USERNAME', Config::value( 'smtp', 'username' ) );
-	define( 'SMTP_PASSWORD', Config::value( 'smtp', 'password' ) );
-	define( 'SMTP_PORT', Config::value( 'smtp', 'port' ) );
-	define( 'SMTP_FROM_ADDRESS', Config::value( 'smtp', 'from' ) );
+	define( 'SMTP_HOST', \nfuse\Config::value( 'smtp', 'host' ) );
+	define( 'SMTP_USERNAME', \nfuse\Config::value( 'smtp', 'username' ) );
+	define( 'SMTP_PASSWORD', \nfuse\Config::value( 'smtp', 'password' ) );
+	define( 'SMTP_PORT', \nfuse\Config::value( 'smtp', 'port' ) );
+	define( 'SMTP_FROM_ADDRESS', \nfuse\Config::value( 'smtp', 'from' ) );
 }
-
-define ('BASE_URL', urlPrefix() . Config::value( 'site', 'host-name' ) . '/' );
+if( !defined( 'NFUSE_BASE_DIR' ) )
+	define( 'NFUSE_BASE_DIR', dirname( __DIR__ ) );
+define( 'NFUSE_APP_DIR', NFUSE_BASE_DIR . '/app' );
+define( 'NFUSE_MODULES_DIR', NFUSE_BASE_DIR . '/modules' );
+define( 'NFUSE_TEMP_DIR', NFUSE_BASE_DIR . '/temp' );
 
 // user levels
-define ('ANONYMOUS', -1);
-define ('ADMIN', 1);
+define( 'ANONYMOUS', -1 );
+define( 'ADMIN', 1 );
+define( 'CLI', 4 );
 
 // error codes
 define( 'ERROR_NO_PERMISSION', 'no_permission' );

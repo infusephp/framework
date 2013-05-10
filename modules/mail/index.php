@@ -21,6 +21,8 @@
 	WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
- 
-class nFuse_Controller_Mail extends Controller
+
+namespace nfuse\controllers; 
+
+class Mail extends \nfuse\Controller
 { }

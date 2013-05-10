@@ -22,13 +22,15 @@
 	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+namespace nfuse;
+
 class Modules
 {
 	/**
 	* Module directory
 	* @staticvar string
 	*/
-	public static $moduleDirectory = 'modules/';
+	public static $moduleDirectory;
 	
 	////////////////////////////////
 	// Private Class Variables
@@ -97,7 +99,7 @@ class Modules
 	*/
 	static function controllerName( $module )
 	{
-		return 'nFuse_Controller_' . ucfirst( strtolower( $module ) );	
+		return '\\nfuse\\Controllers\\' . ucfirst( strtolower( $module ) );	
 	}
 	
 	/**
@@ -111,7 +113,7 @@ class Modules
 	{
 		if( !self::loaded( $module ) )
 			self::load( $module );
-		
+
 		return self::$controllers[ strtolower( $module ) ];
 	}
 	
@@ -177,12 +179,11 @@ class Modules
 		}
 		
 		// sort by name
-		function cmp($a, $b)
-		{
+		$cmp = function($a, $b) {
 		    return strcmp($a["name"], $b["name"]);
-		}
+		};
 
-		usort($return, "cmp");
+		usort($return, $cmp);
 
 		return $return;	
 	}
@@ -193,7 +194,7 @@ class Modules
 		
 		foreach( self::all() as $module => $info )
 		{
-			if( $info['hasAdmin'] || $info['admin'] )
+			if( $info['admin'] )
 				$return[] = $info;
 		}
 
@@ -228,7 +229,8 @@ class Modules
 				'email' => '',
 				'website' => '' ),
 			'api' => false,
-			'admin' => false
+			'admin' => false,
+			'routes' => array()
 		);
 		
 		if( file_exists( $configFile ) )
@@ -251,7 +253,7 @@ class Modules
 		
 		// load settings
 		self::initialize( $module );
-		
+
 		// load module code
 		include_once self::$moduleDirectory . $module . '/' . 'index.php';
 
@@ -272,7 +274,7 @@ class Modules
 					return false;
 			}
 		}
-
+		
 		return true;	
 	}
 
@@ -310,11 +312,30 @@ class Modules
 			self::initialize( $name );	
 	}
 	
+	/**
+	 * Loads required modules
+	 *
+	 */
 	static function loadRequired()
 	{
 		// load required modules
 		foreach( self::requiredModules() as $name )
 			self::load( $name );
+	}
+	
+	
+	/**
+	 * Performs middleware on required modules
+	 *
+	 * @param Request $request
+	 * @param Repsonse $response
+	 *
+	 */
+	static function middleware( $request, $response )
+	{
+		// load required modules
+		foreach( self::requiredModules() as $name )
+			self::$controllers[ $name ]->middleware( $request, $response );		
 	}
 	
 	/**
@@ -393,3 +414,6 @@ class Modules
 		}
 	}
 }
+
+// hack
+Modules::$moduleDirectory = NFUSE_MODULES_DIR . '/';
