@@ -5,7 +5,7 @@ CREATE TABLE `Ban` (`id` int(11) NOT NULL auto_increment, PRIMARY KEY (`id`), `t
 DROP TABLE IF EXISTS `Cron`;
 CREATE TABLE `Cron` (`id` int(11) NOT NULL auto_increment, PRIMARY KEY (`id`), `name` varchar(255) NOT NULL, `module` varchar(100) NOT NULL, `command` varchar(100) NOT NULL, `minute` char(2) NOT NULL, `hour` char(2) NOT NULL, `day` char(2) NOT NULL, `week` char(2) NOT NULL, `month` char(2) NOT NULL, `last_ran` int(10) NULL, `next_run` int(10) NULL);
 DROP TABLE IF EXISTS `Group_Members`;
-CREATE TABLE `Group_Members` (`gid` int(11) NOT NULL, PRIMARY KEY (`gid`), `uid` int(11) NOT NULL, PRIMARY KEY (`uid`));
+CREATE TABLE `Group_Members` (`gid` int(11) NOT NULL, `uid` int(11) NOT NULL, PRIMARY KEY (`gid`,`uid`));
 DROP TABLE IF EXISTS `Groups`;
 CREATE TABLE `Groups` (`id` int(11) NOT NULL auto_increment, PRIMARY KEY (`id`), `group_name` varchar(20) NULL);
 INSERT INTO Groups VALUES('1', 'Administrators');
@@ -16,7 +16,7 @@ CREATE TABLE `Sessions` (`id` varchar(32) NOT NULL, PRIMARY KEY (`id`), `session
 DROP TABLE IF EXISTS `Site_Stats_History`;
 CREATE TABLE `Site_Stats_History` (`id` int(11) NOT NULL auto_increment, PRIMARY KEY (`id`), `timestamp` int(11) NOT NULL, `stats` text NOT NULL);
 DROP TABLE IF EXISTS `User_Links`;
-CREATE TABLE `User_Links` (`uid` int(11) NOT NULL, PRIMARY KEY (`uid`), `link` varchar(32) NOT NULL, PRIMARY KEY (`link`), `link_type` tinyint(2) NOT NULL, PRIMARY KEY (`link_type`), `link_timestamp` int(11) NOT NULL);
+CREATE TABLE `User_Links` (`uid` int(11) NOT NULL, `link` varchar(32) NOT NULL, `link_type` tinyint(2) NOT NULL, PRIMARY KEY (`uid`,`link`,`link_type`), `link_timestamp` int(11) NOT NULL);
 DROP TABLE IF EXISTS `User_Login_History`;
 CREATE TABLE `User_Login_History` (`id` int(11) NOT NULL auto_increment, PRIMARY KEY (`id`), `uid` int(11) NOT NULL, `timestamp` int(11) NOT NULL, `type` tinyint(1) NOT NULL, `ip` varchar(15) NOT NULL);
 DROP TABLE IF EXISTS `Users`;
