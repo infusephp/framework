@@ -241,7 +241,7 @@ abstract class Controller extends Acl
 		$modelClassName = "\\nfuse\\models\\$model";
 		$modelObj = new $modelClassName( $req->params( 'id' ) );
 		
-		// must have edit permission
+		// permission?
 		if( !$modelObj->can( 'view' ) )
 			return $res->setCode( 401 );
 		
@@ -320,7 +320,7 @@ abstract class Controller extends Acl
 		$modelClassName = "\\nfuse\\models\\$model";
 		$modelObj = new $modelClassName( $req->params( 'id' ) );
 		
-		// must have edit permission
+		// permission?
 		if( !$modelObj->can( 'edit' ) )
 			return $res->setCode( 401 );
 		
@@ -366,7 +366,7 @@ abstract class Controller extends Acl
 		$modelClassName = "\\nfuse\\models\\$model";
 		$modelObj = new $modelClassName( $req->params( 'id' ) );
 		
-		// must have delete permission
+		// permission?
 		if( !$modelObj->can( 'delete' ) )
 			return $res->setCode( 401 );
 		

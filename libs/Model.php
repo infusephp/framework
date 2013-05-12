@@ -298,13 +298,16 @@ abstract class Model extends Acl
 			$w = array();
 			foreach( static::$properties as $property )
 			{
-				$name = (is_array( $property )) ? $property['name'] : $property;
-				$w[] = "$name LIKE '%$search%'";
+				if( !isset( $where[ $property['name'] ] ) )
+				{
+					$name = (is_array( $property )) ? $property['name'] : $property;
+					$w[] = "$name LIKE '%$search%'";
+				}
 			}
 			
-			$where[] = implode( ' OR ', $w );
+			$where[] = '(' . implode( ' OR ', $w ) . ')';
 		}
-		
+
 		// verify sort		
 		$sortParams = array();
 
@@ -340,7 +343,7 @@ abstract class Model extends Acl
 			
 			$sortParams[] = "$propertyName $direction";
 		}
-
+		
 		$count = (int)Database::select(
 			static::$tablename,
 			'count(*)',

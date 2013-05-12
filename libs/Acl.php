@@ -60,7 +60,7 @@ abstract class Acl
 	}
 
 	/**
-	 * Checks if a requestor has permission to perform an action on the controller
+	 * Checks if a requestor has permission to perform an action
 	 *
 	 * @param string $permission permission
 	 * @param User $requestor requester
