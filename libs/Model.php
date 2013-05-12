@@ -28,16 +28,16 @@
  * 		title:
  * 		name: property name
  * 		type: (required)
- * 			1 - hidden
- * 			2 - text
- * 			3 - textarea
- * 			4 - checkbox
- * 			5 - select = [db value, string value, keys array, values array]
- * 			6 - file = [value, url]
- * 			7 - password
- * 			8 - date
- * 			9 - custom = [value, html]
- * 			10 - no form field - static html
+ * 			'hidden'
+ * 			'text'
+ * 			'longtext'
+ * 			'boolean'
+ * 			'enum' = [db value, string value, keys array, values array]
+ * 			'file' = [value, url]
+ * 			'password'
+ * 			'date'
+ * 			'custom' = [value, html]
+ * 			'html' - no form field, just static html
  * 		select_keys: Array of keys (actual value being input into database) for dropdowns in the data cell in admin.
  *		select_values: Array of values (value to the end user) corresponding to keys for dropdowns in the data cell in admin.
  * 		filter: Filter for data cell in admin.

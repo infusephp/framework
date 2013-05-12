@@ -18,12 +18,12 @@ class Group extends \nfuse\Model
 		array(
 			'title' => 'ID',
 			'name' => 'id',
-			'type' => 2
+			'type' => 'text'
 		),
 		array(
 			'title' => 'Name',
 			'name' => 'group_name',
-			'type' => 2
+			'type' => 'text'
 		)
 	);
 	

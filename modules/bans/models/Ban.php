@@ -39,12 +39,12 @@ class Ban extends \nfuse\Model
 		array(
 			'title' => 'ID',
 			'name' => 'id',
-			'type' => 2
+			'type' => 'text'
 		),	
 		array(
 			'title' => 'Type',
 			'name' => 'type',
-			'type' => 5,
+			'type' => 'enum',
 			'enum' => array (
 				1 => 'IP',
 				2 => 'Username',
@@ -53,12 +53,12 @@ class Ban extends \nfuse\Model
 		array(
 			'title' => 'Value',
 			'name' => 'value',
-			'type' => 2
+			'type' => 'text'
 		),	
 		array(
 			'title' => 'Reason',
 			'name' => 'reason',
-			'type' => 2
+			'type' => 'text'
 		)
 	);
 	

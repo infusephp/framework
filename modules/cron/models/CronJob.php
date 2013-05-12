@@ -33,57 +33,57 @@ class CronJob extends \nfuse\Model
 		array(
 			'title' => 'ID',
 			'name' => 'id',
-			'type' => 2
+			'type' => 'text'
 		),
 		array(
 			'title' => 'Name',
 			'name' => 'name',
-			'type' => 2
+			'type' => 'text'
 		),
 		array(
 			'title' => 'Next Run',
 			'name' => 'next_run',
-			'type' => 8
+			'type' => 'date'
 		),
 		array(
 			'title' => 'Last Ran',
 			'name' => 'last_ran',
-			'type' => 8
+			'type' => 'date'
 		),
 		array(
 			'title' => 'Module',
 			'name' => 'module',
-			'type' => 2
+			'type' => 'text'
 		),
 		array(
 			'title' => 'Command',
 			'name' => 'command',
-			'type' => 2
+			'type' => 'text'
 		),
 		array(
 			'title' => 'Minute',
 			'name' => 'minute',
-			'type' => 2
+			'type' => 'text'
 		),
 		array(
 			'title' => 'Hour',
 			'name' => 'hour',
-			'type' => 2
+			'type' => 'text'
 		),
 		array(
 			'title' => 'Day',
 			'name' => 'day',
-			'type' => 2
+			'type' => 'text'
 		),
 		array(
 			'title' => 'month',
 			'name' => 'month',
-			'type' => 2
+			'type' => 'text'
 		),
 		array(
 			'title' => 'Week',
 			'name' => 'week',
-			'type' => 2
+			'type' => 'text'
 		)
 	);
 	

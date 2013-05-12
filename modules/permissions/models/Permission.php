@@ -33,35 +33,35 @@ class Permission extends \nfuse\Model
 		array(
 			'title' => 'ID',
 			'name' => 'id',
-			'type' => 2
+			'type' => 'text'
 		),	
 		array(
 			'title' => 'Model',
 			'name' => 'model',
-			'type' => 2
+			'type' => 'text'
 		),
 		array(
 			'title' => 'Model ID',
 			'name' => 'model_id',
-			'type' => 2,
+			'type' => 'text',
 			'null' => true
 		),	
 		array(
 			'title' => 'User',
 			'name' => 'user',
-			'type' => 2,
+			'type' => 'text',
 			'null' => true
 		),	
 		array(
 			'title' => 'Group',
 			'name' => 'group_',
-			'type' => 2,
+			'type' => 'text',
 			'null' => true
 		),	
 		array(
 			'title' => 'Permission',
 			'name' => 'permission',
-			'type' => 2
+			'type' => 'text'
 		)
 	);
 }

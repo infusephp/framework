@@ -45,13 +45,13 @@ class User extends \nfuse\Model
 		array(
 			'title' => 'User ID',
 			'name' => 'uid',
-			'type' => 2,
+			'type' => 'text',
 			'filter' => '<a href="/users/{uid}" target="_blank">{uid}</a>'
 		),
 		array(
 			'title' => 'User Email',
 			'name' => 'user_email',
-			'type' => 2,
+			'type' => 'text',
 			'filter' => '<a href="mailto:{user_email}">{user_email}</a>',
 			'validation' => array('\nfuse\libs\Validate','email'),
 			'required' => true
@@ -59,41 +59,41 @@ class User extends \nfuse\Model
 		array(
 			'title' => 'First Name',
 			'name' => 'first_name',
-			'type' => 2,
+			'type' => 'text',
 			'validation' => array('\nfuse\libs\Validate','firstName'),
 			'required' => true
 		),
 		array(
 			'title' => 'Last Name',
 			'name' => 'last_name',
-			'type' => 2,
+			'type' => 'text',
 			'validation' => array('\nfuse\libs\Validate','lastName')
 		),
 		array(
 			'title' => 'User Password',
 			'name' => 'user_password',
-			'type' => 7,
+			'type' => 'password',
 			'validation' => array('\nfuse\libs\Validate','password'),
 			'required' => true			
 		),
 		array(
 			'title' => 'Registration Date',
 			'name' => 'registered_timestamp',
-			'type' => 8,
+			'type' => 'date',
 			'required' => true,
 			'nowrap' => true
 		),
 		array(
 			'title' => 'IP',
 			'name' => 'ip',
-			'type' => 2,
+			'type' => 'text',
 			'filter' => '<a href="http://www.infobyip.com/ip-{ip}.html" target="_blank">{ip}</a>',
 			'required' => true
 		),
 		array(
 			'title' => 'Enabled',
 			'name' => 'enabled',
-			'type' => 4,
+			'type' => 'boolean',
 			'validation' => array('\nfuse\libs\Validate','boolean_'),
 			'required' => true,
 			'default' => true
@@ -101,7 +101,7 @@ class User extends \nfuse\Model
 		array(
 			'title' => 'Profile Picture',
 			'name' => 'profile_picture',
-			'type' => 5,
+			'type' => 'enum',
 			'enum' => array(
 				0 => 'Gravatar',
 				1 => 'Facebook' ),
@@ -112,7 +112,7 @@ class User extends \nfuse\Model
 		array(
 			'title' => 'Time Zone',
 			'name' => 'time_zone',
-			'type' => 5,
+			'type' => 'enum',
 			'enum' => array(
 				'America/New_York' => 'EST (GMT - 5)',
 				'America/Chicago' => 'CST (GMT - 6)',

@@ -1,28 +1,30 @@
 /*
+
+Header Params:
+	name
+	title
+	type
+	filter
+	nosort
+	nowrap
+	truncate
+	enum
+
 Types:
-0 - reserved for arbitrary fields (edit, delete, etc.)
-1 - hidden
-2 - text
-3 - textarea
-4 - checkbox
-5 - select = [db value, string value, keys array, values array]
-6 - file = [value, url]
-7 - password
-8 - date
-9 - custom = [value, html]
-10 - no form field - static html
+	'system' - reserved for arbitrary fields (edit, delete, etc.)
+	'hidden'
+	'text'
+	'longtext'
+	'boolean'
+	'enum' = [db value, string value, keys array, values array]
+	'file' = [value, url]
+	'password'
+	'date'
+	'custom' = [value, html]
+	'html' - no form field, just static html
 
 Filter i.e. <a href='mailto:![value[email_address]!'>![value[name]]!</a>
 
-Header Params:
-name
-title
-type
-filter
-nosort
-nowrap
-truncate
-enum
 */
 
 var model = {};
@@ -51,7 +53,7 @@ function dt_loadData()
 	var header_index = 0;
 
 	if( model.permissions.edit == 1) {
-		data_headers.splice(header_index,0,{name : 'edit', title : 'Edit', type : 0, truncate : false});
+		data_headers.splice(header_index,0,{name : 'edit', title : 'Edit', type : 'system', truncate : false});
 		no_sort.push(header_index);
 		header_index++;
 		$("#dataHead").find("tr:first-child").append('<th>Edit</th>');
@@ -59,7 +61,7 @@ function dt_loadData()
 	}
 	
 	if (model.permissions.delete == 1) {
-		data_headers.splice(header_index,0,{name : 'delete', title : 'Delete', type : 0, truncate : false});
+		data_headers.splice(header_index,0,{name : 'delete', title : 'Delete', type : 'system', truncate : false});
 		no_sort.push(header_index);
 		header_index++;
 		$("#dataHead").find("tr:first-child").append('<th>Delete</th>');
@@ -69,7 +71,7 @@ function dt_loadData()
 	for (i = 0; i < data_headers.length; i++) {
 		if (typeof(data_headers[i]) == 'undefined')
 			continue;
-		if (data_headers[i].type == 1 || data_headers[i].type == 0)
+		if (data_headers[i].type == 'hidden' || data_headers[i].type == 'system')
 			continue;
 
 		width = null;
@@ -79,7 +81,7 @@ function dt_loadData()
 		if (data_headers[i]['nosort'])
 			no_sort.push(i);
 		
-		if (data_headers[i]['nowrap'] || data_headers[i]['type'] == 8)
+		if (data_headers[i]['nowrap'] || data_headers[i]['type'] == 'date')
 			no_wrap_fields.push(i);
 
 		$("#dataHead").find("tr:first-child").append('<th '+width+'>'+data_headers[i].title+'</th>');
@@ -224,22 +226,22 @@ function generateCell(field, row, editing)
 		
 		// generate input
 		switch (field.type) {
-		case 1:
+		case 'hidden':
 			html = '<input type="hidden" name="' + field.name + '" value="' + value + '" />';
 		break;
-		case 2:
+		case 'text':
 			html = '<input class="input-xlarge" type="text" name="' + field.name + '" value="' + value + '" />';
 		break;
-		case 3:
+		case 'longtext':
 			html = '<textarea name="' + field.name + '">' + value + '</textarea>';
 		break;
-		case 4:
+		case 'boolean':
 			checked = ( value > 0 || value == 'y' ) ? 'checked="checked"' : '';
 			disabled = ( checked != '' ) ? 'disabled="disabled"' : '';
 			html = '<input type="hidden" value="0" name="' + field.name + '" ' + disabled + ' />';
 			html += '<input type="checkbox" class="checkbox-field" value="1" name="' + field.name + '" ' + checked + ' />';
 		break;
-		case 5:
+		case 'enum':
 			html = '<select class="input-xlarge" name="' + field.name + '">';
 			if( field.enum )
 			{
@@ -251,22 +253,22 @@ function generateCell(field, row, editing)
 			}
 			html += '</select>';
 		break;
-		case 6:
+		case 'file':
 			html = 'not implemented';
 		break;
-		case 7:
+		case 'password':
 			if (row)
 				html = '<a href="#" class="change-password" name="' + field.name + '">Change</a>';
 			else
 				html = '<input class="input-large" type="password" name="' + field.name + '" value="" autocomplete="off" /> ';
 		break;
-		case 8:
+		case 'date':
 			html = '<input name="' + field.name + '" class="date" value="' + value + '" />';
 		break;
-		case 9:
+		case 'custom':
 			html = value[1];
 		break;
-		case 10:
+		case 'html':
 			html = value;
 		break;
 		}
@@ -307,12 +309,12 @@ function parseValue(value, field)
 		value = '';
 	
 	// boolean
-	if (field.type == 4)
+	if (field.type == 'boolean')
 	{
 		value = (value > 0) ? 'Yes' : 'No';
 	}
 	// enum
-	else if (field.type == 5)
+	else if (field.type == 'enum')
 	{
 		if( field.enum )
 		{
@@ -327,12 +329,12 @@ function parseValue(value, field)
 			value = '';
 	}
 	// password
-	else if (field.type == 7)
+	else if (field.type == 'password')
 	{
 		value = '<em>hidden</em>';
 	}
 	// date
-	else if (field.type == 8)
+	else if (field.type == 'date')
 	{
 		var date = new Date(value*1000);
 		var year = date.getFullYear();

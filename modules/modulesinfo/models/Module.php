@@ -30,33 +30,33 @@ class Module extends \nfuse\Model
 		array(
 			'title' => 'Module',
 			'name' => 'title',
-			'type' => 2
+			'type' => 'text'
 		),
 		array(
 			'title' => 'Version',
 			'name' => 'version',
-			'type' => 2
+			'type' => 'text'
 		),
 		array(
 			'title' => 'Description',
 			'name' => 'description',
-			'type' => 2
+			'type' => 'text'
 		),
 		array(
 			'title' => 'Author',
 			'name' => 'author',
-			'type' => 2,
+			'type' => 'text',
 			'truncate' => false
 		),
 		array(
 			'title' => 'Auto API',
 			'name' => 'api',
-			'type' => 4
+			'type' => 'boolean'
 		),
 		array(
 			'title' => 'Auto Admin',
 			'name' => 'admin',
-			'type' => 4
+			'type' => 'boolean'
 		)
 	);	
 
