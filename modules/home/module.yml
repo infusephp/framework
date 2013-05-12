@@ -5,5 +5,3 @@ author:
 	name: Jared King
 	email: j@jaredtking.com
 	website: http://jaredtking.com
-routes:
-	get /does-this-thing-work: hey

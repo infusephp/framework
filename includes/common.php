@@ -46,10 +46,19 @@ require_once "includes/constants.php";
 $req = new \nfuse\Request();
 $res = new \nfuse\Response();
 
-if( $req->isCLI() )
+if( $req->isCli() )
 {
 	// load required modules
 	\nfuse\Modules::loadRequired();
+	
+	if( $argc >= 2 ) {
+		$req->setPath( $argv[ 1 ] );
+	}
+	
+	//route request
+	\nfuse\Router::route( $req, $res );
+	
+	echo $res->getBody();
 }
 else
 {

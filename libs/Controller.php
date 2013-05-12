@@ -214,7 +214,7 @@ abstract class Controller extends Acl
 	}
 	
 	/**
-	 * Finds a particular model. Only supported when automatic APi turned on.
+	 * Finds a particular model. Only supported when automatic API turned on.
 	 *
 	 * @param Request $req
 	 * @param Response $res

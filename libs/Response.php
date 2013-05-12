@@ -72,7 +72,7 @@ class Response
 		$this->body = $body;
 	}
 	
-	public function getBody( $body )
+	public function getBody()
 	{
 		return $this->body;
 	}

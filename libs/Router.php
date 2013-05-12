@@ -5,13 +5,11 @@ namespace nfuse;
 class Router
 {
 	private static $apiRoutes = array(
-		'GET' => array(
-			'list' => 'findAll',
-			'find' => 'find'
-		),
-		'POST' => 'create',
-		'PUT' => 'edit',
-		'DELETE' => 'delete'
+		'get /:controller' => 'findAll',
+		'get /:controller/:id' => 'find',
+		'post /:controller' => 'create',
+		'put /:controller/:id' => 'edit',
+		'delete /:controller/:id' => 'delete'
 	);
 	
 	static function route( $req, $res )
@@ -86,6 +84,13 @@ class Router
 					$staticRoutes[$routeStr] = $route;
 			}
 			
+			/* automatic generated API routes */
+			
+			$moduleInfo = Modules::info( $controller );
+			
+			if( $moduleInfo[ 'api' ] )
+				$dynamicRoutes = array_merge( $dynamicRoutes, self::$apiRoutes );
+
 			/* static routes */
 			
 			if( isset( $staticRoutes[ $routeMethodStr ] ) )
@@ -106,25 +111,6 @@ class Router
 					return self::performRoute( array(
 						'controller' => $controller,
 						'action' => $route ), $req, $res );
-			}
-			
-			/* automatic generated API routes */
-			
-			$moduleInfo = Modules::info( $controller );
-			
-			if( $moduleInfo[ 'api' ] )
-			{
-				$method = $req->method();
-				if( $action = val( self::$apiRoutes, $method ) )
-				{
-					if( $method == 'GET' )
-						$action = (!$req->paths(1)) ? $action[ 'list' ] : $action[ 'find' ];
-					
-					if( $id = $req->paths( 1 ) )
-						$req->setParams( array( 'id' => $id ) );
-					
-					return Modules::controller( $controller )->$action( $req, $res );
-				}
 			}
 		}
 		

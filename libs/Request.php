@@ -73,15 +73,7 @@ class Request
 		// accept Language header
 		$this->languages = $this->parseAcceptHeader( val( $this->headers, 'ACCEPT_LANGUAGE' ) );
 		
-		// get the base path
-		$this->basePath = current(explode('?', val( $this->server, 'REQUEST_URI' )));
-		if( substr( $this->basePath, 0, 1 ) != '/' )
-			$this->basePath = '/' . $this->basePath;
-		
-		// break the URL into paths
-		$this->paths = explode( '/', $this->basePath );
-		if( $this->paths[ 0 ] == '' )
-			array_splice( $this->paths, 0, 1 );
+		$this->setPath( val( $this->server, 'REQUEST_URI' ) );
 			
 		// get the request method
 		if( $request )
@@ -91,6 +83,19 @@ class Request
 			parse_str( file_get_contents( 'php://input' ), $this->request );
 		else
 			$this->request = array();			
+	}
+	
+	public function setPath( $path )
+	{
+		// get the base path
+		$this->basePath = current(explode('?', $path));
+		if( substr( $this->basePath, 0, 1 ) != '/' )
+			$this->basePath = '/' . $this->basePath;
+		
+		// break the URL into paths
+		$this->paths = explode( '/', $this->basePath );
+		if( $this->paths[ 0 ] == '' )
+			array_splice( $this->paths, 0, 1 );	
 	}
 	
 	public function ip()
@@ -194,8 +199,6 @@ class Request
 		return $this->languages;
 	}
 	
-	// TODO generalize these accept methods
-	
 	public function isHtml()
 	{
 		foreach( $this->accept as $type )
@@ -236,13 +239,13 @@ class Request
 	
 	public function isApi()
 	{
-		// TODO should not be here
+		// TODO clean this up
 		return oauthCredentialsSupplied();
 	}
 	
 	public function isCli()
 	{
-		return false;
+		return defined('STDIN');
 	}
 	
 	public function params( $index = false )

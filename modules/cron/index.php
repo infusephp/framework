@@ -28,12 +28,12 @@ class Cron extends \nfuse\Controller
 {
 	function checkSchedule( $req, $res )
 	{
+		if( !$req->isCli() )
+			return $res->setCode( 404 );
+		
 		\nfuse\libs\Cron::scheduleCheck();
 	
-		if( $req->isHtml() )
-			$res->setBody( 'Success' );
-		else if( $req->isJson() )
-			$res->setBodyJson( array( 'success' => true ) );
+		$res->setBody( 'Success' );
 	}
 		
 	function install()
