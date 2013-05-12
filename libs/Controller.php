@@ -189,7 +189,7 @@ abstract class Controller extends Acl
 		// pagination
 		$total = $modelClassName::totalRecords( $filter );
 		$page = $start / $limit + 1;
-		$page_count = max( 1, ceil( $total / $limit ) );
+		$page_count = max( 1, ceil( $models[ 'count' ] / $limit ) );
 		
 		$return->page = $page;
 		$return->per_page = $limit;
@@ -244,6 +244,9 @@ abstract class Controller extends Acl
 		// permission?
 		if( !$modelObj->can( 'view' ) )
 			return $res->setCode( 401 );
+		
+		if( !$modelObj->exists() )
+			return $res->setCode( 404 );
 		
 		$res->setBodyJson( array(
 			strtolower( $model ) => $modelObj->toArray() ) );
