@@ -173,17 +173,21 @@ abstract class Controller extends Acl
 		// search
 		$search = $req->query( 'search' );
 		
+		// filter
+		$filter = (array)$req->query( 'filter' );
+		
 		$models = $modelClassName::find(
 			$start,
 			$limit,
 			$sort,
-			$search );
+			$search,
+			$filter );
 		
 		foreach( $models[ 'models' ] as $m )
 			array_push( $return->$module, $m->toArray() );
 		
 		// pagination
-		$total = $modelClassName::totalRecords();
+		$total = $modelClassName::totalRecords( $filter );
 		$page = $start / $limit + 1;
 		$page_count = max( 1, ceil( $total / $limit ) );
 		

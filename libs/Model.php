@@ -272,14 +272,15 @@ abstract class Model extends Acl
 	/**
 	 * Fetches models with pagination support
 	 *
-	 * @param int $start start
-	 * @param int $limit limit
+	 * @param int $start record number to start at
+	 * @param int $limit max results to return
 	 * @param string $sort sort (i.e. name asc, year asc)
-	 * @param string $search search
+	 * @param string $search search query
+	 * @param array $where criteria
 	 *
 	 * @return array model ids
 	 */
-	static function find( $start = 0, $limit = 100, $sort = '', $search = '' )
+	static function find( $start = 0, $limit = 100, $sort = '', $search = '', $where = array() )
 	{
 		if( empty( $start ) || !is_numeric( $start ) || $start < 0 )
 			$start = 0;
@@ -289,8 +290,6 @@ abstract class Model extends Acl
 		$modelName = get_called_class();
 		
 		$return = array('models'=>array());
-
-		$where = array();
 		
 		// WARNING: using MYSQL LIKE for search, this is very inefficient
 		
@@ -378,16 +377,19 @@ abstract class Model extends Acl
 	}
 	
 	/**
-	 * Gets the toal number of records
+	 * Gets the toal number of records matching an optional criteria
+	 *
+	 * @param array $where criteria
 	 *
 	 * @return int total
 	 */
-	static function totalRecords()
+	static function totalRecords( $where = array() )
 	{
 		return (int)Database::select(
 			static::$tablename,
 			'count(*)',
 			array(
+				'where' => $where,
 				'single' => true ) );
 	}
 	
