@@ -396,6 +396,26 @@ abstract class Model extends Acl
 				'single' => true ) );
 	}
 	
+	/**
+	 * Checks if the model exists in the database
+	 *
+	 * @return boolean
+	 */
+	function exists()
+	{
+		$where = array_merge(
+			array(
+				static::$idFieldName => $this->id ),
+			$this->supplementaryIds );
+
+		return Database::select(
+			static::$tablename,
+			'count(*)',
+			array(
+				'where' => $where,
+				'single' => true ) ) == 1;
+	}
+	
 	/////////////////////////////
 	// SETTERS
 	/////////////////////////////
