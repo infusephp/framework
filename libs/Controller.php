@@ -194,7 +194,7 @@ abstract class Controller extends Acl
 		$return->total_count = $total;
 		
 		// links
-		$base = '/4dm1n/' . $module . "?sort=$sort&limit=$limit";
+		$base = '/' . $module . "?sort=$sort&limit=$limit";
 		$last = ($page_count-1) * $limit;
 		$return->links = array(
 			'self' => "$base&start=$start",
@@ -339,7 +339,7 @@ abstract class Controller extends Acl
 	}
 	
 	/**
-	 * Deletes a model. Requires that automatic API generation is eanbled
+	 * Deletes a model. Requires that automatic API generation is eanbled.
 	 *
 	 * @param Request $req
 	 * @param Response $res	
