@@ -80,8 +80,16 @@ class Request
 			$this->request = $request;
 		// decode request body for POST and PUT
 		else if( in_array( $this->method(), array( 'POST', 'PUT' ) ) )
-			parse_str( file_get_contents( 'php://input' ), $this->request );
-		else
+		{
+			$request = file_get_contents( 'php://input' );
+			
+			// parse json
+			if( strpos( $this->contentType(), 'application/json') !== false )
+				$this->request = json_decode( $request, true );
+			// parse query string
+			else
+				parse_str( $request, $this->request );
+		} else
 			$this->request = array();			
 	}
 	
