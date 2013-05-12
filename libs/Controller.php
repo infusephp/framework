@@ -185,7 +185,7 @@ abstract class Controller extends Acl
 		// pagination
 		$total = $modelClassName::totalRecords();
 		$page = $start / $limit + 1;
-		$page_count = ceil( $total / $limit );
+		$page_count = max( 1, ceil( $total / $limit ) );
 		
 		$return->page = $page;
 		$return->per_page = $limit;
