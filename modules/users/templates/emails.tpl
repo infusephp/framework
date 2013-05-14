@@ -1,11 +1,12 @@
 {if $message == 'registration-welcome'}
 Welcome to {$smarty.const.SITE_TITLE}, {$user->name()}!
 
-Thank you for signing up at {$smarty.const.SITE_TITLE}.
-We would love to hear what you think about {$smarty.const.SITE_TITLE}. Feel free to message us any time at <a href="mailto:{$siteEmail}">{$siteEmail}</a>.
+Thank you for joining. As you become familiar with {$smarty.const.SITE_TITLE}, we would love to hear what you think about it.
+
+Feel free to message us any time at <a href="mailto:{$siteEmail}">{$siteEmail}</a> with any issues, comments, or suggestions.
 
 Sincerely,
-{$smarty.const.SITE_TITLE}
+The team at {$smarty.const.SITE_TITLE}
 {else if $message == 'email-verification'}
 Dear {$user->name()},
 

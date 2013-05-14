@@ -191,18 +191,12 @@ class Users extends \nfuse\Controller
 			// upgrade temporary account
 			Modules::load('validation');
 			
-			if( !(Validate::firstName( $info[ 'first_name' ], true ) &&
-				$user->upgradeFromTemporary(
-					$info[ 'first_name' ] . ' ' . $info[ 'last_name' ],
-					$info[ 'user_password' ][ 0 ],
-					$info[ 'user_password' ][ 1 ] ) ) ) {
+			if( !$user->upgradeFromTemporary( $info ) )
 				$user = false;
-			}
 		} else {
 			// create a new account
 			$user = User::create( $info );
 		}
-		
 		if( $user ) {
 			if( !$req->isApi() )
 				User::currentUser()->login( $info[ 'user_email' ], $info[ 'user_password' ][ 0 ] );
@@ -297,6 +291,6 @@ class Users extends \nfuse\Controller
 		$res->render( $this->templateDir() . 'profile.tpl', array(
 			'user' => $user,
 			'title' => $user->name()
-		) );		
+		) );
 	}
 }

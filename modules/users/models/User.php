@@ -99,17 +99,6 @@ class User extends \nfuse\Model
 			'default' => true
 		),
 		array(
-			'title' => 'Profile Picture',
-			'name' => 'profile_picture',
-			'type' => 'enum',
-			'enum' => array(
-				0 => 'Gravatar',
-				1 => 'Facebook' ),
-			'nowrap' => true,
-			'required' => false,
-			'default' => 0
-		),
-		array(
 			'title' => 'Time Zone',
 			'name' => 'time_zone',
 			'type' => 'enum',
@@ -191,7 +180,7 @@ class User extends \nfuse\Model
 	*
 	* @return link|false true if temporary
 	*/
-	function temporary()
+	function isTemporary()
 	{
 		return Database::select(
 			'User_Links',
@@ -376,27 +365,14 @@ class User extends \nfuse\Model
 	* Gravatar is used for profile pictures. To accomplish this we need to generate a hash of the user's e-mail.
 	*
 	* @param int $size size of the picture (it is square, usually)
-	* @param int $type type of picture to get (0 = gravatar, 1 = facebook)
 	*
 	* @return string url
 	*/
-	function profilePicture( $size = 200, $type = null )
+	function profilePicture( $size = 200 )
 	{
-		$type = ($type !== null) ? $type : $this->getProperty('profile_picture');
-		
-		switch( $type)
-		{
-		// use Facebook
-		case 1:
-			return 'https://graph.facebook.com/' . $this->getProperty('fbid') . '/picture?type=large';
-		break;
 		// use Gravatar
-		default:
-		case 0:
-			$hash = md5( strtolower( trim( $this->getProperty('user_email') ) ) );
-			return "https://secure.gravatar.com/avatar/$hash?s=$size&d=mm";
-		break;
-		}
+		$hash = md5( strtolower( trim( $this->getProperty('user_email') ) ) );
+		return "https://secure.gravatar.com/avatar/$hash?s=$size&d=mm";
 	}	
 	
 	/**
@@ -533,7 +509,7 @@ class User extends \nfuse\Model
 	
 	static function getTemporaryUser( $email )
 	{
-		Modules::load( 'Validation' );
+		Modules::load( 'validation' );
 		
 		if( !\nfuse\libs\Validate::email( $email, array( 'skipRegisteredCheck' => true ) ) )
 			return false;
@@ -629,6 +605,13 @@ class User extends \nfuse\Model
 		return $user;
 	}
 	
+	/**
+	 * Creates a temporary user. Useful for creating invites.
+	 *
+	 * @param array $data user data
+	 *
+	 * @return User temporary user
+	 */
 	static function createTemporary( $data )
 	{
 		if( !Validate::email( $data[ 'user_email' ], true, true ) )
@@ -637,13 +620,15 @@ class User extends \nfuse\Model
 		// temporary string
 		$temporary = md5(uniqid( rand(), true ));
 		
+		$insertArray = array(
+			'user_email' => $data[ 'user_email' ],
+			'ip' => $_SERVER[ 'REMOTE_ADDR' ],
+			'registered_timestamp' => time(),
+			'enabled' => 0
+		);
+		
 		// create the temporary user
-		if( Database::insert(
-			'Users',
-			array(
-				'user_email' => $data[ 'user_email' ],
-				'ip' => $_SERVER[ 'REMOTE_ADDR' ],
-				'enabled' => 0 ) ) )
+		if( Database::insert( 'Users', $insertArray ) )
 		{
 			$uid = Database::lastInsertID();
 			
@@ -656,7 +641,7 @@ class User extends \nfuse\Model
 					'link' => $temporary,
 					'link_timestamp' => time() ) );
 			
-			return $uid;
+			return new User( $uid );
 		}
 			
 		else
@@ -710,51 +695,52 @@ class User extends \nfuse\Model
 	/**
  	 * Upgrades the user from temporary to a fully registered account
 	 *
-	 * @param string $name name
-	 * @param array $password password
+	 * @param array $data user data
 	 *
 	 * @return boolean true if successful
 	 */
-	function upgradeFromTemporary( $name, $password )
+	function upgradeFromTemporary( $data )
 	{
-		\nfuse\ErrorStack::setContext( 'user-register' );
+		\nfuse\ErrorStack::setContext( 'create' );
+		
+		if( !$this->isTemporary() )
+			return true;
 		
 		$validated = true;
-	
-		// break name into first and last name
-		$exp = explode( ' ', $name );
-		
-		if( isset( $exp[ 0 ] ) )
-		{
-			$first_name = $exp[ 0 ];
-			unset( $exp[ 0 ] );
-		}
-		
-		$last_name = implode( ' ', $exp );
-		
-		if( !Validate::firstName( $first_name ) )
+			
+		if( !Validate::firstName( $data[ 'first_name' ] ) )
 			$validated = false;
 		
-		if( !$encryptedPassword = Validate::password( $password ) )
+		if( !Validate::password( $data[ 'user_password' ] ) )
 			$validated = false;
 
-		return $validated &&
+		$updateArray = array(
+			'uid' => $this->id,
+			'first_name' => $data[ 'first_name' ],
+			'last_name' => $data[ 'last_name' ],
+			'user_password' => $data[ 'user_password' ],
+			'registered_timestamp' => time(),
+			'ip' => $_SERVER[ 'REMOTE_ADDR' ],
+			'enabled' => 1 );
+
+		if ( $validated &&
 			Database::update(
 				'Users',
-				array(
-					'uid' => $this->id,
-					'first_name' => $first_name,
-					'last_name' => $last_name,
-					'user_password' => $encryptedPassword,
-					'registered_timestamp' => time(),
-					'ip' => $_SERVER[ 'REMOTE_ADDR' ],
-					'enabled' => 1 ),
+				$updateArray,
 				array( 'uid' ) ) &&
 			Database::delete(
 				'User_Links',
 				array(
 					'uid' => $this->id,
-					'link_type = 1 OR link_type = 2' ) );
+					'link_type = 1 OR link_type = 2' ) ) )
+		{
+			// send the user a welcome message
+			$this->sendEmail( 'registration-welcome', array() );
+		
+			return true;
+		}
+		
+		return false;
 	}
 	
 	/**
@@ -976,6 +962,7 @@ class User extends \nfuse\Model
 			return false;
 		}
 		
+		// give users 1 day to verify their e-mail address
 		$verifyTimeWindow = time() - 3600*24;
 		
 		// Query the Database.
@@ -1132,12 +1119,15 @@ class User extends \nfuse\Model
 	 */
 	function sendEmail( $message, $details = array() )
 	{
+		$email = $this->getProperty( 'user_email' );
+	
 		$subject = 'Message from ' . Config::value( 'site', 'title' );
 		
 		$details[ 'message' ] = $message;
 		$details[ 'user' ] = $this;
 		$details[ 'baseUrl' ] = ((Config::value( 'site', 'ssl-enabled' )) ? 'https://' : 'http://') . Config::value( 'site', 'host-name' ) . '/';
 		$details[ 'siteEmail' ] = Config::value( 'site', 'email' );
+		$details[ 'email' ] = $email;
 
 		switch ($message)
 		{
@@ -1182,7 +1172,7 @@ class User extends \nfuse\Model
 			$mail->MsgHTML( nl2br($body) );
 			
 			// send it to the user
-			$mail->AddAddress( $this->getProperty( 'user_email' ) );
+			$mail->AddAddress( $email );
 			
 			// send the e-mail
 			$success = $mail->Send();
