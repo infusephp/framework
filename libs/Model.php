@@ -244,7 +244,7 @@ abstract class Model extends Acl
 	}
 	
 	/**
-	 * Gets all of the properties for the model
+	 * Converts the modelt to an array
 	 *
 	 * @param array $exclude properties to exclude
 	 *
@@ -267,6 +267,18 @@ abstract class Model extends Acl
 		return array_merge( array(
 			static::$idFieldName => $this->id ),
 			(array)$this->getProperty( $properties ) );
+	}
+	
+	/**
+	 * Converts the object to JSON format
+	 *
+	 * @param array $exclude properties to exclude
+	 *
+	 * @return string json
+	 */
+	function toJson( $exclude = array() )
+	{
+		return json_encode( $this->toArray( $exclude ) );
 	}
 	
 	/**
