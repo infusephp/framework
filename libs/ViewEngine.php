@@ -70,6 +70,13 @@ class ViewEngine Extends \Smarty
 		$this->autoCompileJs( NFUSE_BASE_DIR . '/js', 'header.js' );
 	}
 	
+	/**
+	 * Compiles a LESS file and puts the output in APP_DIR/css
+	 * NOTE: this function employs caching of file modified timesteamps to do as little work as possible
+	 *
+	 * @param string $inputFile input LESS file
+	 * @param sting $outputFileName output filename
+	 */
 	function autoCompileLess( $inputFile, $outputFileName )
 	{
 		$cacheFile = NFUSE_TEMP_DIR . '/css/' . $outputFileName . ".cache";
@@ -99,6 +106,14 @@ class ViewEngine Extends \Smarty
 		}
 	}
 	
+	/**
+	 * Compiles all of the javascript files in a directory in order by name.
+	 * If the framework is in production mode then the javascript will be minified.
+	 * NOTE: this function employs caching of file modified timesteamps to do as little work as possible
+	 *
+	 * @param string $jsDirectory path containing javascript to compile
+	 * @param sting $outputFileName output filename
+	 */
 	function autoCompileJs( $jsDirectory, $outputFileName )
 	{
 		// NOTE js files get appended in order by filename
@@ -137,12 +152,22 @@ class ViewEngine Extends \Smarty
 		}
 	}
 	
+	/**
+	 * Passes an input array of data to the templating engine
+	 *
+	 * @param array $data key-value array
+	 */
 	function assignData( $data )
 	{
-		foreach( $data as $key => $value )
+		foreach( (array)$data as $key => $value )
 			$this->assign( $key, $value );	
 	}
 	
+	/**
+	 * Returns the view engine class
+	 *
+	 * @return ViewEngine view engine class
+	 */
 	static function engine()
 	{
 		if( !self::$engine )
@@ -150,6 +175,10 @@ class ViewEngine Extends \Smarty
 				
 		return self::$engine;
 	}
+	
+	/////////////////////////////////
+	// PRIVATE FUNCTIONS
+	/////////////////////////////////
 		
 	private function md5OfDir( $files )
 	{
