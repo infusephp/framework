@@ -1,4 +1,26 @@
 <?php
+/**
+ * @package nFuse
+ * @author Jared King <j@jaredtking.com>
+ * @link http://jaredtking.com
+ * @version 1.0
+ * @copyright 2013 Jared King
+ * @license MIT
+	Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+	associated documentation files (the "Software"), to deal in the Software without restriction,
+	including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
+	and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so,
+	subject to the following conditions:
+	
+	The above copyright notice and this permission notice shall be included in all copies or
+	substantial portions of the Software.
+	
+	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
+	LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+	IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+	WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
 
 namespace nfuse;
 
@@ -17,6 +39,15 @@ class Request
 	private $basePath;
 	private $paths;
 	
+	/**
+	 * Constructs a request.
+	 *
+	 * @param array $query defaults to $_GET
+	 * @param array $request defaults to php://input
+	 * @param array $cookies defaults to $_COOKIE
+	 * @param array $files defaults to $_FILES
+	 * @param array $server defaults to $_SERVER
+	 */
 	public function __construct( $query = null, $request = null, $cookies = null, $files = null, $server = null )
 	{
 		$this->params = array();
@@ -93,6 +124,11 @@ class Request
 			$this->request = array();			
 	}
 	
+	/** 
+	 * Sets the path for the request and parses it.
+	 *
+	 * @param string $path i.e. /users/1/comments
+	 */
 	public function setPath( $path )
 	{
 		// get the base path
@@ -106,11 +142,21 @@ class Request
 			array_splice( $this->paths, 0, 1 );	
 	}
 	
+	/**
+	 * Gets the ip address associated with the request.
+	 *
+	 * @return string ip address
+	 */
 	public function ip()
 	{
 		return val( $this->server, 'REMOTE_ADDR' );
 	}
-		
+	
+	/**
+	 * Gets the protocol associated with the request
+	 *
+	 * @return string https or http
+	 */	
 	public function protocol()
 	{
 	
@@ -120,26 +166,51 @@ class Request
 		return ($this->port() == 443) ? 'https' : 'http';
 	}
 	
+	/**
+	 * Checks if the request uses a secure protocol.
+	 *
+	 * @return boolean
+	 */
 	public function isSecure()
 	{
 		return $this->protocol() == 'https';
 	}
 
+	/**
+	 * Gets the port associated with the request.
+	 *
+	 * @param int port number
+	 */
 	public function port()
 	{
 		return val( $this->server, 'SERVER_PORT' );
 	}
 	
+	/**
+	 * Gets the username from the auth headers associated with the request
+	 *
+	 * @return string username
+	 */
 	public function user()
 	{
 		return val( $this->headers, 'PHP_AUTH_USER' );
 	}
 	
+	/**
+	 * Gets the password from the auth headers associated with the request
+	 *
+	 * @return string password
+	 */
 	public function password()
 	{
 		return val( $this->headers, 'PHP_AUTH_PW' );
 	}
 	
+	/**
+	 * Gets the host name (or ip) for the request.
+	 *
+	 * @return string host
+	 */
 	public function host()
 	{
 		if( !$host = val( $this->headers, 'HOST' ) )
@@ -155,6 +226,11 @@ class Request
 		return $host;
 	}
 	
+	/**
+	 * Gets the complete url associated with the request.
+	 *
+	 * @param string url
+	 */
 	public function url()
 	{
 		$port = $this->port();
@@ -166,47 +242,81 @@ class Request
 		return $this->protocol() . '://' . $this->host() . $port . $this->basePath();
 	}
 	
+	/**
+	 * Returns each component of the requested path.
+	 *
+	 * @return array paths
+	 */
 	public function paths( $index = false )
 	{
 		return (is_numeric($index)) ? val( $this->paths, $index ) : $this->paths;
 	}
 	
+	/**
+	 * Gets the base path associated with the request. i.e. /comments/10
+	 *
+	 * @param string base path
+	 */
 	public function basePath()
 	{
 		return $this->basePath;
 	}
 	
+	/**
+	 * Gets the method requested.
+	 *
+	 * @param string method (i.e. GET, POST, DELETE, PUT, PATCH)
+	 */
 	public function method()
 	{
 		return val( $this->server, 'REQUEST_METHOD' );
 	}
 	
+	/**
+	 * Gets the content type the request was sent with.
+	 *
+	 * @param string content type
+	 */
 	public function contentType()
 	{
 		return val( $this->server, 'CONTENT_TYPE' );
 	}
 	
 	/**
-	 * 
+	 * Gets the parsed accepts header from the request.
 	 *
-	 *
-	 * @return array
+	 * @return array accept formats
 	 */
 	public function accepts()
 	{
 		return $this->accept;
 	}
 	
+	/**
+	 * Gets the parsed charsets header from the request.
+	 *
+	 * @return array charsets
+	 */
 	public function charsets()
 	{
 		return $this->charsets;
 	}
 	
+	/**
+	 * Gets the parsed language header from the request.
+	 *
+	 * @return array langauges
+	 */
 	public function languages()
 	{
 		return $this->languages;
 	}
 	
+	/**
+	 * Checks if the request accepts HTML
+	 *
+	 * @return boolean
+	 */
 	public function isHtml()
 	{
 		foreach( $this->accept as $type )
@@ -218,6 +328,11 @@ class Request
 		return false;
 	}
 	
+	/**
+	 * Checks if the request accepts JSON
+	 *
+	 * @return boolean
+	 */
 	public function isJson()
 	{
 		foreach( $this->accept as $type )
@@ -229,6 +344,11 @@ class Request
 		return false;
 	}
 	
+	/**
+	 * Checks if the request accepts XML
+	 *
+	 * @return boolean
+	 */
 	public function isXml()
 	{
 		foreach( $this->accept as $type )
@@ -240,41 +360,113 @@ class Request
 		return false;	
 	}
 	
+	/**
+	 * Checks if the request was sent using AJAX
+	 *
+	 * @return boolean
+	 */
 	public function isXhr()
 	{
 		return val( $this->headers, 'X-Requested-With' ) == 'XMLHttpRequest';
 	}
 	
+	/**
+	 * Checks if the request is an API call. Note, this is specific to nfuse framework.
+	 *
+	 * @return boolean
+	 */
 	public function isApi()
 	{
 		// TODO clean this up
 		return oauthCredentialsSupplied();
 	}
 	
+	/**
+	 * Checks if the request was made over the command line.
+	 *
+	 * @return boolean
+	 */
 	public function isCli()
 	{
 		return defined('STDIN');
 	}
 	
+	/**
+	 * Gets the parameters associated with the request.
+	 * These come from the router or other parts of the framework,
+	 * not the HTTP request itself. Request params are a convenient way
+	 * to pass data between controllers.
+	 *
+	 * @param string $index optional
+	 *
+	 * @return mixed
+	 */
 	public function params( $index = false )
 	{
 		return ($index) ? val( $this->params, $index ) : $this->params;
 	}
 	
+	/**
+	 * Adds parameters to the request.
+	 *
+	 * @param array $params parameters to add
+	 */
 	public function setParams( $params = array() )
 	{
 		$this->params = array_replace( $this->params, (array)$params );
 	}
-		
+	
+	/**
+	 * Gets values from the query portion of the request. (i.e. GET parameters)
+	 *
+	 * @param string $index optional
+	 *
+	 * @return mixed
+	 */
 	public function query( $index = false )
 	{
 		return ($index) ? val( $this->query, $index ) : $this->query;
 	}
 	
+	/**
+	 * Gets values from the body of the request. (i.e. POST, PUT parameters)
+	 *
+	 * @param string $index optional
+	 *
+	 * @return mixed
+	 */
 	public function request( $index = false )
 	{
 		return ($index) ? val( $this->request, $index ) : $this->request;
-	}	
+	}
+	
+	/**
+	 * Gets the cookies associated with the request.
+	 *
+	 * @param string $index optional
+	 *
+	 * @return mixed
+	 */
+	public function cookies( $index = false )
+	{
+		return ($index) ? val( $this->cookies, $index ) : $this->cookies;
+	}
+	
+	/**
+	 * Gets the files associated with the request. (i.e. $_FILES)
+	 * 
+	 * @param string $index optional
+	 *
+	 * @return mixed
+	 */
+	public function files( $index = false )
+	{
+		return ($index) ? val( $this->files, $index ) : $this->files;
+	}
+	
+	////////////////////////////////////
+	// PRIVATE METHODS
+	////////////////////////////////////
 	
 	private function parseHeaders( $parameters )
 	{
