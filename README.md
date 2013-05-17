@@ -19,14 +19,15 @@ A demo has been setup at [nfuse.jaredtking.com](http://nfuse.jaredtking.com).
 
 - MVC pattern
 - Modular
-- Built-in Authentication
-- Robust Permissions System
+- Built-in authentication
+- Robust permissions system
 - Database agnostic with PDO
-- Flexible URL Routing
+- Flexible URL routing
 - Automatic REST API for models
-- Dashboard to manage models
+- Dashboard to view, create, edit, and delete models
+- Templating with [Smarty](smarty.net)
 - CSS asset minification with LESS
-- JS minification
+- Javascript minification
 
 ## Getting Started
 
