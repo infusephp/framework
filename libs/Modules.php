@@ -159,6 +159,11 @@ class Modules
 		return false;
 	}
 	
+	/**
+	 * Gets information about a module from its module.yml file
+	 *
+	 * @return array info
+	 */
 	static function info( $module )
 	{
 		self::initialize( $module );
@@ -166,6 +171,11 @@ class Modules
 		return self::$info[ strtolower( $module ) ];
 	}
 	
+	/**
+	 * Returns a list of all modules and associated meta-data
+	 *
+	 * @return array modules
+	 */
 	static function all()
 	{
 		self::initializeAll();
@@ -188,6 +198,11 @@ class Modules
 		return $return;	
 	}
 	
+	/**
+	 * Returns a list of modules with an admin section
+	 *
+	 * @return array modules with admin enabled
+	 */
 	static function modulesWithAdmin()
 	{
 		$return = array();
