@@ -22,6 +22,8 @@
 	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+use \nfuse\Config as Config;
+
 // register autoloader
 spl_autoload_register( function( $class ) {
 	$classPaths = explode('\\', $class);
@@ -34,10 +36,10 @@ spl_autoload_register( function( $class ) {
 });
 
 // set the time zone
-date_default_timezone_set( \nfuse\Config::value( 'site', 'time-zone' ) );
+date_default_timezone_set( Config::value( 'site', 'time-zone' ) );
 
 // check if site disabled, still allow access to admin panel
-if( \nfuse\Config::value( 'site', 'disabled' ) && urlParam( 0 ) != '4dm1n' )
+if( Config::value( 'site', 'disabled' ) && urlParam( 0 ) != '4dm1n' )
 	message_die( Config::value( 'site', 'disabled-message' ) );
 
 // load site constants
@@ -85,27 +87,28 @@ else
 		ini_set('session.use_trans_sid', false);
 		ini_set('session.use_only_cookies', true); 
 		ini_set('url_rewriter.tags', '');
+		ini_set('session.gc_maxlifetime', Config::value( 'session', 'lifetime' ) );
 	
 		// set the session name
-		session_name(str_replace(array ('.',' ',"'", '"'), array('','_','',''), \nfuse\Config::value( 'site', 'title' ).'-'.$req->host()));
+		session_name(str_replace(array ('.',' ',"'", '"'), array('','_','',''), Config::value( 'site', 'title' ).'-'.$req->host()));
 		
 		// set the session cookie parameters
 		session_set_cookie_params( 
-		    3600*24, // lifetime = 1 day
+		    Config::value( 'session', 'lifetime' ), // lifetime = 1 day
 		    '/', // path
 		    $req->host(), // domain
 		    $req->isSecure(), // secure
 		    true // http only
-		);	
+		);
 	
 		// session handler
-		if( \nfuse\Config::value( 'session', 'adapter' ) == 'redis' )
+		if( Config::value( 'session', 'adapter' ) == 'redis' )
 		{
 			require_once "libs/RedisSession.php";
 			\nfuse\RedisSession::start(array(
-    			'scheme' => \nfuse\Config::value('redis','scheme'),
-    			'host'   => \nfuse\Config::value('redis','host'),
-		    	'port'   => \nfuse\Config::value('redis','port')
+    			'scheme' => Config::value('redis','scheme'),
+    			'host'   => Config::value('redis','host'),
+		    	'port'   => Config::value('redis','port')
 			));
 		}
 		// default: database
@@ -124,8 +127,8 @@ else
 			session_start();
 		}
 		
-		//set the cookie by sending it in a header. 
-		set_cookie_fix_domain(session_name(),session_id(),time() + 3600*24,'/',$req->host());
+		// set the cookie by sending it in a header.
+		set_cookie_fix_domain(session_name(),session_id(),time() + Config::value( 'session', 'lifetime' ),'/',$req->host());
 	}
 	
 	// load required modules
