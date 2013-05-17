@@ -5,7 +5,7 @@ PHP MVC framework for rapid development of web applications
 
 ## What is nfuse?
 
-Nfuse is a node.js inspired framework to make developing web applications quick and fun. In addition to MVC goodness, the framework also gives you a free REST API and administrator dashboard for models. This becomes an incredibly powerful tool for building a modern web application today. Nfuse does not take long to learn due to its carefully chosen directory structure, which was a main frustration of mine when using other frameworks. Everything outside of core functionality has been contained inside of a module to make navigating the framework easy.
+Nfuse is a node.js inspired framework to make developing web applications quick and fun. In addition to MVC goodness, the framework also gives you a free REST API and administrator dashboard for models. This makes nfuse framework an incredibly powerful tool for building a modern web application today. Nfuse does not take long to learn due to its carefully chosen directory structure, which was a main frustration of mine when using other frameworks. Everything outside of core functionality has been contained inside of a module to make navigating the framework easy.
 
 ## Why another MVC framework?
 
