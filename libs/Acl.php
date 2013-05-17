@@ -23,10 +23,7 @@
  */
  
 namespace nfuse;
- 
-define( 'ACL_RESULT_NOT_CACHED', -1 );
-define( 'ACL_NO_ID', -1 );
- 
+  
 abstract class Acl
 {
 	///////////////////////////////
@@ -146,6 +143,10 @@ abstract class Acl
 		$this->aclLoaded = true;
 	}
 	
+	/////////////////////////////////
+	// PRIVATE FUNCTIONS
+	/////////////////////////////////
+
 	private function cachedResult( $permission, $requestor )
 	{
 		$key = get_class( $requestor ) . '-' . $requestor->id();

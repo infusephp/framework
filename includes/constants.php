@@ -47,3 +47,7 @@ define( 'CLI', 4 );
 // error codes
 define( 'ERROR_NO_PERMISSION', 'no_permission' );
 define( 'ERROR_VALIDATION', 'validation_error' );
+
+// acl
+define( 'ACL_RESULT_NOT_CACHED', -1 );
+define( 'ACL_NO_ID', -1 );
