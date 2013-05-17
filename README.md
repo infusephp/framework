@@ -25,7 +25,7 @@ A demo has been setup at [nfuse.jaredtking.com](http://nfuse.jaredtking.com).
 - Flexible URL routing
 - Automatic REST API for models
 - Dashboard to view, create, edit, and delete models
-- Templating with [Smarty](smarty.net)
+- Templating with [Smarty](http://smarty.net)
 - CSS asset minification with LESS
 - Javascript minification
 
