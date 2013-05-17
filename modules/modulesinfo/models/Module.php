@@ -58,9 +58,9 @@ class Module extends \nfuse\Model
 			'name' => 'admin',
 			'type' => 'boolean'
 		)
-	);	
+	);
 
-	static function find( $start = 0, $limit = 100, $sort = '', $search = '' )
+	static function find( $start = 0, $limit = 100, $sort = '', $search = '', $where = array() )
 	{
 		$return = array('models'=>array());
 		
@@ -73,7 +73,7 @@ class Module extends \nfuse\Model
 		return $return;
 	}
 	
-	static function totalRecords()
+	static function totalRecords( $where = array() )
 	{
 		return count( \nfuse\Modules::all() );
 	}
