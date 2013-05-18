@@ -140,64 +140,6 @@ function unsetSessionVar( $param )
 	unset( $_SESSION[ $param ] );
 }
 
-function urlParam( $n, $url = '' )
-{
-	if( empty( $url ) )
-		$url = val( $_SERVER, 'REQUEST_URI' );
-	
-	$strippedURL = current(explode('?', $url));
-	$urlParams = explode('/', $strippedURL);
-
-	// eliminate the empty entry
-	if( isset( $urlParams[ 0 ] ) && $urlParams[ 0 ] == null )
-		unset( $urlParams[ 0 ] );
-	
-	$urlParams = array_values($urlParams);
-
-	return (isset($urlParams[$n])) ? $urlParams[$n] : null;
-}
-
-function addURLParameter($url, $paramName, $paramValue)
-{
-	$url_data = parse_url($url);
-	if(!isset($url_data["query"]))
-		$url_data["query"]="";
-	
-	$params = array();
-	parse_str($url_data['query'], $params);
-	$params[$paramName] = $paramValue;
-	$url_data['query'] = http_build_query($params);
-	return build_url($url_data);
-}
-
-function build_url($url_data)
-{
-	$url="";
-	if(isset($url_data['host']))
-	{
-		$url .= $url_data['scheme'] . '://';
-		if (isset($url_data['user'])) {
-			$url .= $url_data['user'];
-			if (isset($url_data['pass'])) {
-				$url .= ':' . $url_data['pass'];
-			}
-			$url .= '@';
-		}
-		$url .= $url_data['host'];
-		if (isset($url_data['port'])) {
-			$url .= ':' . $url_data['port'];
-		}
-	}
-	$url .= $url_data['path'];
-	if (isset($url_data['query'])) {
-		$url .= '?' . $url_data['query'];
-	}
-	if (isset($url_data['fragment'])) {
-		$url .= '#' . $url_data['fragment'];
-	}
-	return $url;
-}
-
 function seoUrl( $string, $id = null )
 {
 	$string = strtolower(stripslashes($string));

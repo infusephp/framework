@@ -28,6 +28,7 @@ use \nfuse\models\User as User;
 use \nfuse\Modules as Modules;
 use \nfuse\libs\Validate as Validate;
 use \nfuse\ErrorStack as ErrorStack;
+use \nfuse\Config as Config;
 
 class Users extends \nfuse\Controller
 {
@@ -56,8 +57,8 @@ class Users extends \nfuse\Controller
 		if( !$isApiCall )
 		{
 			// this is useful to know for redirects
-			$what = urlParam( 1 );
-			if( !$currentUser->isLoggedIn() && !in_array( $what, array( 'login', 'register' ) ) && !in_array(urlParam(0),array('features','tour','home','billing','user','pusher')) )
+			$what = $req->paths( 1 );
+			if( !$currentUser->isLoggedIn() && !in_array( $what, array( 'login', 'register' ) ) && !in_array($req->paths(0),array('features','tour','home','billing','user','pusher')) )
 				$_SESSION[ 'redir' ] = $req->url();
 			
 			// check for a successful registration
