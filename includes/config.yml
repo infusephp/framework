@@ -32,6 +32,7 @@ smtp:
 
 session:
 	adapter: database
+	lifetime: 86400
 
 redis:
 	scheme: tcp
