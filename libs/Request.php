@@ -122,6 +122,9 @@ class Request
 			// parse multipart form data
 			else if( strpos( $contentType, 'multipart/form-data' ) !== false )
 				$this->request = $_REQUEST;
+			// plain text
+			else if( strpos( $contentType, 'text/plain' ) !== false )
+				$this->request = $body;
 			// parse query string
 			else
 				parse_str( $body, $this->request );
