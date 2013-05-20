@@ -60,6 +60,9 @@ if( $req->isCli() )
 	//route request
 	\nfuse\Router::route( $req, $res );
 	
+	// super user permissions
+	\nfuse\models\User::elevateToSuperUser();
+	
 	echo $res->getBody();
 }
 else
@@ -79,7 +82,7 @@ else
 		$res->send();
 	}
 	
-	// TODO this could be middleware
+	// TODO oauth call out of place
 	// if no oauth conditions, use sessions
 	if( !oauthCredentialsSupplied() )
 	{

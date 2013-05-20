@@ -40,6 +40,7 @@ define( 'NFUSE_MODULES_DIR', NFUSE_BASE_DIR . '/modules' );
 define( 'NFUSE_TEMP_DIR', NFUSE_BASE_DIR . '/temp' );
 
 // user levels
+define( 'SUPER_USER', -2 );
 define( 'ANONYMOUS', -1 );
 define( 'ADMIN', 1 );
 define( 'CLI', 4 );

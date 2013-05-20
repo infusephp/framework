@@ -268,6 +268,10 @@ class User extends \nfuse\Model
 	{
 		Modules::load( 'groups' );
 		
+		// super user
+		if( $this->id === SUPER_USER )
+			return array( new Group( ADMIN ) );
+
 		// everyone
 		$return = array( new Group(-1) );
 		
@@ -288,9 +292,9 @@ class User extends \nfuse\Model
 			$uid = $inRelationTo;
 		
 		// friends
-		if( $this->isMemberOf( 2, $uid ) )
+		if( $uid && $this->isMemberOf( 2, $uid ) )
 			$return[] = new Group( 2 );
-			
+						
 		return $return;
 	}
 	
@@ -316,7 +320,11 @@ class User extends \nfuse\Model
 	*/
 	function isMemberOf( $gid, $inRelationTo = -1 )
 	{
-		// special cases
+		/* special cases */
+
+		// super user
+		if( $this->id === SUPER_USER )
+			return true;
 		
 		// evreryone
 		if( $gid == -1 )
@@ -325,6 +333,8 @@ class User extends \nfuse\Model
 		// following
 		if( $gid == 2 && $this->id() > 0 && $this->isFollowing( $inRelationTo ) )
 			return true;
+		
+		/* database */
 		
 		return Database::select(
 			'Group_Members',
@@ -744,11 +754,11 @@ class User extends \nfuse\Model
 	}
 	
 	/**
-	* Processes a verify e-mail hash
-	*
-	* @param string $verify verification hashflo
-	*
-	* @return boolean success
+	 * Processes a verify e-mail hash
+	 *
+	 * @param string $verify verification hashflo
+	 *
+	 * @return boolean success
 	*/
 	static function verifyEmail( $verify )
 	{
@@ -932,15 +942,26 @@ class User extends \nfuse\Model
 	///////////////////////////////////
 	
 	/**
-	* Attempts to log the user in
-	*
-	* @param string $email e-mail address
-	* @param string $password password
-	* @param boolean $remember remember me
-	* @param int $fbid facebook id
-	* @param bool $setSessionVars when true sets the $_SESSION with user info
-	*
-	* @return boolean true if successful
+	 * Elevates the current user to super user status. This grants all permissions
+	 * to everything. BE CAREFUL. Typically, this is reserved for cron jobs that need
+	 * to work with models belonging to other users.
+	 */
+	static function elevateToSuperUser()
+	{
+		self::currentUser();
+		self::$currentUser->id = SUPER_USER;
+	}
+	
+	/**
+	 * Attempts to log the user in
+	 *
+	 * @param string $email e-mail address
+	 * @param string $password password
+	 * @param boolean $remember remember me
+	 * @param int $fbid facebook id
+	 * @param bool $setSessionVars when true sets the $_SESSION with user info
+	 *
+	 * @return boolean true if successful
 	*/
 	function login( $email, $password, $remember = false, $fbid = 0, $setSessionVars = true )
 	{
@@ -1141,6 +1162,9 @@ class User extends \nfuse\Model
 		case 'forgot-password':
 			$subject = 'Password change request on ' . Config::value( 'site', 'title' );
 			$details[ 'forgotLink' ] = "{$details['baseUrl']}users/forgot/{$details['forgot']}";
+		break;
+		case 'invite-confirmation':
+			$subject = 'Your invite request has been received';
 		break;
 		default:
 			return false;
