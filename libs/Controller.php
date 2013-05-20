@@ -39,7 +39,7 @@ abstract class Controller extends Acl
 	public static $hasAdmin = false;
 
 	/*
-	* Constructor
+	 * Constructor
 	*/
 	function __construct()
 	{
@@ -47,7 +47,7 @@ abstract class Controller extends Acl
 	}
 	
 	/*
-	* Initializes the module (only called once)
+	 * Initializes the module (only called once)
 	*/
 	static function initialize()
 	{
@@ -60,8 +60,9 @@ abstract class Controller extends Acl
 	/////////////////////////
 	
 	/**
-	* Gets the name of the module
-	* @return string name
+	 * Gets the name of the module
+	 *
+	 * @return string name
 	*/
 	static function name()
 	{
@@ -69,9 +70,11 @@ abstract class Controller extends Acl
 	}
 	
 	/**
-	* Class autoloader
-	* @param string $class class
-	* @return null
+	 * Class autoloader
+	 *
+	 * @param string $class class
+	 *
+	 * @return null
 	*/
 	public static function loadClass( $class )
 	{
@@ -454,9 +457,11 @@ abstract class Controller extends Acl
 	}
 
 	/**
-	* Executes a cron command
-	* @param string $command command
-	* @return boolean true if the command finished successfully
+	 * Executes a cron command
+	 *
+	 * @param string $command command
+	 *
+	 * @return boolean true if the command finished successfully
 	*/
 	function cron( $command )
 	{
@@ -464,8 +469,9 @@ abstract class Controller extends Acl
 	}
 	
 	/**
-	* Gets the module path
-	* @return string path
+	 * Gets the module path
+	 *
+	 * @return string path
 	*/
 	protected function modulePath()
 	{
@@ -473,8 +479,9 @@ abstract class Controller extends Acl
 	}
 	
 	/**
-	* Gets the template path
-	* @return string path
+	 * Gets the template path
+	 *
+	 * @return string path
 	*/
 	protected function templateDir()
 	{
@@ -482,8 +489,9 @@ abstract class Controller extends Acl
 	}
 	
 	/**
-	* Gets the admin template path
-	* @return string path
+	 * Gets the admin template path
+	 *
+	 * @return string path
 	*/
 	protected function adminTemplateDir()
 	{
