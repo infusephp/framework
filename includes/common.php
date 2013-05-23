@@ -57,12 +57,12 @@ if( $req->isCli() )
 		$req->setPath( $argv[ 1 ] );
 	}
 	
-	//route request
-	\nfuse\Router::route( $req, $res );
-	
 	// super user permissions
 	\nfuse\models\User::elevateToSuperUser();
-	
+
+	//route request
+	\nfuse\Router::route( $req, $res );
+		
 	echo $res->getBody();
 }
 else
