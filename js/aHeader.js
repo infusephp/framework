@@ -10,7 +10,6 @@ else if (!debugging || typeof console.log == "undefined") console.log = function
 			type: "GET",
 			data: data,
 			dataType: "json",
-			contentType: "application/json; charset=utf-8",
 			success: success
 		});
 	};
@@ -21,7 +20,6 @@ else if (!debugging || typeof console.log == "undefined") console.log = function
 			type: "POST",
 			data: data,
 			dataType: "json",
-			contentType: "application/json; charset=utf-8",
 			success: success
 		});
 	};
@@ -32,7 +30,6 @@ else if (!debugging || typeof console.log == "undefined") console.log = function
 			type: "PUT",
 			data: data,
 			dataType: "json",
-			contentType: "application/json; charset=utf-8",
 			success: success
 		});
 	};
@@ -42,7 +39,6 @@ else if (!debugging || typeof console.log == "undefined") console.log = function
 			url: url,
 			type: "DELETE",
 			dataType: "json",
-			contentType: "application/json; charset=utf-8",
 			success: success
 		});
 	};

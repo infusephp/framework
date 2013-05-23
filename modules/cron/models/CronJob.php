@@ -105,27 +105,27 @@ class CronJob extends \nfuse\Model
 			ErrorStack::add( ERROR_NO_PERMISSION );
 			return false;
 		}
-
-		if( isset($data[ 'minute' ]) && ( $data[ 'minute' ] < 0 || $data[ 'minute' ] > 59) && $data[ 'minute' ] != '*' )
+		
+		if( !self::validateCronTimePiece( val( $data, 'minute' ), 0, 59 ) )
 			return false;
 		
-		if ( isset( $data[ 'hour' ] ) && ( $data[ 'hour' ] < 0 || $data[ 'hour' ] > 23 ) && $data[ 'hour' ] != '*' )
+		if( !self::validateCronTimePiece( val( $data, 'hour' ), 0, 23 ) )
 			return false;
 		
-		if ( isset($data[ 'day' ]) && ( $data[ 'day' ] < 1 || $data[ 'day' ] > 31) && $data[ 'day' ] != '*' )
+		if( !self::validateCronTimePiece( val( $data, 'day' ), 1, 31 ) )
 			return false;
 		
-		if ( isset($data[ 'month' ]) && ( $data[ 'month' ] < 1 || $data[ 'month' ] > 12 ) && $data[ 'month' ] != '*' )
+		if( !self::validateCronTimePiece( val( $data, 'month' ), 1, 12 ) )
 			return false;
 		
-		if ( isset($data[ 'week' ]) && ( $data[ 'week' ] < 0 || $data[ 'week' ] > 6 ) && $data[ 'week' ] != '*' )
+		if( !self::validateCronTimePiece( val( $data, 'week' ), 0, 6 ) )
 			return false;
 		
 		$data[ 'next_run' ] = Cron::calcNextRun( $data[ 'minute' ], $data[ 'hour' ], $data[ 'day' ],$data[ 'month' ],$data[ 'week' ] );
 
 		return parent::create( $data );
-	}	
-	
+	}
+		
 	/**
 	* Edits a cron job
 	* 
@@ -140,24 +140,29 @@ class CronJob extends \nfuse\Model
 			ErrorStack::add( ERROR_NO_PERMISSION );			
 			return false;
 		}
-				
-		if( isset($data[ 'minute' ]) && ( $data[ 'minute' ] < 0 || $data[ 'minute' ] > 59) && $data[ 'minute' ] != '*' )
+
+		if( !self::validateCronTimePiece( val( $data, 'minute' ), 0, 59 ) )
 			return false;
 		
-		if ( isset( $data[ 'hour' ] ) && ( $data[ 'hour' ] < 0 || $data[ 'hour' ] > 23 ) && $data[ 'hour' ] != '*' )
+		if( !self::validateCronTimePiece( val( $data, 'hour' ), 0, 23 ) )
 			return false;
 		
-		if ( isset($data[ 'day' ]) && ( $data[ 'day' ] < 1 || $data[ 'day' ] > 31) && $data[ 'day' ] != '*' )
+		if( !self::validateCronTimePiece( val( $data, 'day' ), 1, 31 ) )
 			return false;
 		
-		if ( isset($data[ 'month' ]) && ( $data[ 'month' ] < 1 || $data[ 'month' ] > 12 ) && $data[ 'month' ] != '*' )
+		if( !self::validateCronTimePiece( val( $data, 'month' ), 1, 12 ) )
 			return false;
 		
-		if ( isset($data[ 'week' ]) && ( $data[ 'week' ] < 0 || $data[ 'week' ] > 6 ) && $data[ 'week' ] != '*' )
+		if( !self::validateCronTimePiece( val( $data, 'week' ), 0, 6 ) )
 			return false;
 
 		$data[ 'next_run' ] = Cron::calcNextRun( $data[ 'minute' ], $data[ 'hour' ], $data[ 'day' ],$data[ 'month' ],$data[ 'week' ] );
 
 		return parent::edit( $data );
+	}
+	
+	private static function validateCronTimePiece( $p, $lower, $upper )
+	{
+		return (is_numeric( $p ) && $p >= $lower && $p <= $upper) || $p == '*';
 	}	
 }
