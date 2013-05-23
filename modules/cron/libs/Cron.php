@@ -2,6 +2,8 @@
 
 namespace nfuse\libs;
 
+use \nfuse\Modules as Modules;
+
 class Cron
 {
 	//////////////////////////////
@@ -141,16 +143,18 @@ class Cron
 		if( $echoOutput )
 			echo "-- Starting Cron on " . \nfuse\Config::value('site', 'title') . "\n";
 			 
-		\nfuse\Modules::loadAll();
-		
-		$tasks = \nfuse\Database::select( 'Cron', 'id, next_run, last_ran, module, command' );
+		$tasks = \nfuse\Database::select(
+			'Cron',
+			'id,next_run,last_ran,module,command' );
 
 		$success = true;
 
 		if( \nfuse\Database::numrows() > 0)
 		{
 			foreach ($tasks as $t)
-			{					
+			{
+				Modules::load( $t[ 'module' ] );
+				
 				if ((time() - $t['next_run']) > 0 )//&& $t['last_ran'] < $t['next_run'])
 				{
 					if( $echoOutput )

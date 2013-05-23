@@ -23,7 +23,9 @@
  */
  
 namespace nfuse\controllers;
- 
+
+use \nfuse\models\User as User;
+
 class Cron extends \nfuse\Controller
 {
 	function checkSchedule( $req, $res )
@@ -31,11 +33,9 @@ class Cron extends \nfuse\Controller
 		if( !$req->isCli() )
 			return $res->setCode( 404 );
 		
-		\nfuse\libs\Cron::scheduleCheck();
-	
-		$res->setBody( 'Success' );
+		\nfuse\libs\Cron::scheduleCheck(true);
 	}
-		
+	
 	function install()
 	{
 		Database::sql("CREATE TABLE IF NOT EXISTS `Cron` (`id` INT NOT NULL AUTO_INCREMENT ,`name` VARCHAR( 255 ) NOT NULL ,`module` VARCHAR( 100 ) NOT NULL ,
