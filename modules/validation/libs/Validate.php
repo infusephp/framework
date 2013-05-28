@@ -50,7 +50,7 @@ class Validate
 	*/
 	static function email( &$email, $parameters = array() )
 	{
-		$email = strtolower($email);
+		$email = trim(strtolower($email));
 
 		if( filter_var($email, FILTER_VALIDATE_EMAIL) === false )
 		{
@@ -432,31 +432,14 @@ class Validate
 	*/
 	static function timeZone( &$time_zone, $parameters = array() )
 	{	
-		switch ($time_zone) { // Set appropriate time zone based on input.
-		case "America/New_York":
-			return true;
-		break;
-		case "America/Chicago":
-			return true;
-		break;
-		case "America/Denver":
-			return true;
-		break;
-		case "America/Los_Angeles":
-			return true;
-		break;
-		case "America/Anchorage":
-			return true;
-		break;
-		case "Pacific/Honolulu":
-			return true;
-		break;
-		default:
-			// ERROR
-		break;
-		}
-	
-		return false;
+		// thanks to http://stackoverflow.com/questions/5816960/how-to-check-is-timezone-identifier-valid-from-code
+		$valid = array();
+		$tza = timezone_abbreviations_list();
+		foreach ($tza as $zone)
+			foreach ($zone as $item)
+				$valid[$item['timezone_id']] = true;
+		unset($valid['']);
+		return !!$valid[$time_zone];
 	}
 	
 	/**
