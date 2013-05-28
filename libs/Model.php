@@ -734,6 +734,11 @@ abstract class Model extends Acl
 		return false;
 	}
 	
+	/**
+	 * Delete the model
+	 *
+	 * @return boolean success
+	 */
 	function delete()
 	{
 		ErrorStack::setContext( 'delete' );

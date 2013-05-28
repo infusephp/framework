@@ -237,20 +237,21 @@ abstract class Controller extends Acl
 		if( !$moduleInfo[ 'api' ] || empty( $model ) )
 			return $res->setCode( 404 );
 
+		$modelClassName = "\\nfuse\\models\\$model";
+		$modelObj = new $modelClassName( $req->params( 'id' ) );
+		
+		// exists?
+		if( !$modelObj->exists() )
+			return $res->setCode( 404 );
+
 		// json only
 		if( !$req->isJson() )
 			return $res->setCode( 406 );
 
-		$modelClassName = "\\nfuse\\models\\$model";
-		$modelObj = new $modelClassName( $req->params( 'id' ) );
-		
 		// permission?
 		if( !$modelObj->can( 'view' ) )
 			return $res->setCode( 401 );
-		
-		if( !$modelObj->exists() )
-			return $res->setCode( 404 );
-		
+				
 		$res->setBodyJson( array(
 			strtolower( $model ) => $modelObj->toArray() ) );
 	}
