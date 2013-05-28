@@ -1,4 +1,26 @@
 <?php
+/**
+ * @package nFuse
+ * @author Jared King <j@jaredtking.com>
+ * @link http://jaredtking.com
+ * @version 1.0
+ * @copyright 2013 Jared King
+ * @license MIT
+	Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+	associated documentation files (the "Software"), to deal in the Software without restriction,
+	including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
+	and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so,
+	subject to the following conditions:
+	
+	The above copyright notice and this permission notice shall be included in all copies or
+	substantial portions of the Software.
+	
+	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
+	LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+	IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+	WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
 
 namespace nfuse;
 
@@ -52,50 +74,96 @@ class Response
 	private $contentType;
 	private $body;
 	
+	/**
+	 * Constructs a new response
+	 *
+	 */
 	public function __construct()
 	{
 		$this->code = 200;
 	}
 	
+	/**
+	 * Sets the HTTP status code for the response
+	 *
+	 * @param int $code
+	 */
 	public function setCode( $code )
 	{
 		$this->code = $code;
 	}
 	
+	/**
+	 * Gets the HTTP status code for the response
+	 * 
+	 * @return int code
+	 */
 	public function getCode()
 	{
 		return $this->code;
 	}
 	
+	/**
+	 * Sets the response body.
+	 *
+	 * @param string $body
+	 */
 	public function setBody( $body )
 	{
 		$this->body = $body;
 	}
 	
+	/**
+	 * Gets the response body
+	 *
+	 * @return string
+	 */
 	public function getBody()
 	{
 		return $this->body;
 	}
 	
+	/**
+	 * Convenience method to send a JSON response.
+	 *
+	 * @param object $obj object to be encoded
+	 */
 	public function setBodyJson( $obj )
 	{
 		$this->setBody( json_encode( $obj ) );
 		$this->contentType = 'application/json';
 	}
 	
+	/**
+	 * Gets the content type of the response.
+	 *
+	 * @return string content type
+	 */
 	public function getContentType()
 	{
 		return $this->contentType;
 	}
 	
+	/**
+	 * Sets the content type of the request.
+	 *
+	 * @param string $contentType content type
+	 */
 	public function setContentType( $contentType )
 	{
 		$this->contentType = $contentType;
 	}
 	
+	/**
+	 * Renders a template using the view engine and puts the result in the body.
+	 *
+	 * @param string $template template to render
+	 * @param array $parameters parameters to pass to the template
+	 */
 	public function render( $template, $parameters = array() )
 	{
 		$parameters[ 'currentUser' ] = \nfuse\models\User::currentUser();
+		$parameters[ 'baseUrl' ] = ((Config::value('site','ssl-enabled'))?'https':'http') . '://' . Config::value('site','host-name') . '/';
 	
 		$engine = ViewEngine::engine();
 		
@@ -104,6 +172,11 @@ class Response
 		$this->body = $engine->fetch( $template );
 	}
 	
+	/**
+	 * Performs a 302 redirect to a given URL. NOTE: this will exit the script.
+	 *
+	 * @param string $url URL to redirect to
+	 */
 	public function redirect( $url )
 	{
 		if( substr( $url, 0, 7 ) != 'http://' && substr( $url, 0, 8 ) != 'https://' )
@@ -118,8 +191,16 @@ class Response
 		exit;
 	}
 
-	public function send( $req )
+	/**
+	 * Sends the response using the given information.
+	 *
+	 * @param Request $req request object associated with the response
+	 */
+	public function send( $req = null )
 	{
+		if( !$req )
+			$req = new Request();
+	
 		$contentType = $this->contentType;
 		
 		if( empty( $contentType ) )
@@ -135,7 +216,7 @@ class Response
 			else if( $req->isXml() )
 				$contentType = 'application/xml';			
 		}
-	
+		
 		// set the status
 		header('HTTP/1.1 ' . $this->code . ' ' . self::$codes[$this->code]);
 		// set the content type
@@ -187,7 +268,6 @@ class Response
 			}
 		}
 		
-		session_write_close();
 		exit;
 	}
 }
