@@ -128,7 +128,7 @@ class CronJob extends \nfuse\Model
 		if( !self::validateCronTimePiece( val( $data, 'week' ), 0, 6 ) )
 			return false;
 		
-		$data[ 'next_run' ] = Cron::calcNextRun( $data[ 'minute' ], $data[ 'hour' ], $data[ 'day' ],$data[ 'month' ],$data[ 'week' ] );
+		$data[ 'next_run' ] = self::calcNextRun( $data[ 'minute' ], $data[ 'hour' ], $data[ 'day' ],$data[ 'month' ],$data[ 'week' ] );
 
 		return parent::create( $data );
 	}

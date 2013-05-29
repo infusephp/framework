@@ -337,15 +337,7 @@ function parseValue(value, field)
 	else if (field.type == 'date')
 	{
 		var date = new Date(value*1000);
-		var year = date.getFullYear();
-		var month = date.getMonth();
-		var day = date.getDate();
-		var hours = date.getHours();
-		var minutes = date.getMinutes();
-		var seconds = date.getSeconds();
-		
-		// will display time in Jan 2, 2013 10:30:23 format
-		value = year + '-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds;	
+		value = date.toLocaleDateString() + ' ' + formatAMPM(date);
 	}
 	else
 		value = String(value);
@@ -601,6 +593,17 @@ function randStrings(howMany, howLong) {
 		}
 	}
 	return word;
+}
+
+function formatAMPM(date) {
+	var hours = date.getHours();
+	var minutes = date.getMinutes();
+	var ampm = hours >= 12 ? 'pm' : 'am';
+	hours = hours % 12;
+	hours = hours ? hours : 12; // the hour '0' should be '12'
+	minutes = minutes < 10 ? '0'+minutes : minutes;
+	var strTime = hours + ':' + minutes + ' ' + ampm;
+	return strTime;
 }
 
 $(function() {
