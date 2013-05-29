@@ -188,7 +188,7 @@ class Validate
 	*/
 	static function boolean_( &$val, $parameters = array() )
 	{
-		$val = isset($val) && ( $val === true || $val === 1 || $val == 'y' || $val == 'yes' || $val == 'on' );
+		$val = isset($val) && ( $val === true || $val === 1 || $val === '1' || $val == 'y' || $val == 'yes' || $val == 'on' );
 		return true;
 	}
 	
