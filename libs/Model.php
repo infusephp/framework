@@ -226,7 +226,7 @@ abstract class Model extends Acl
 	static function hasProperty( $property )
 	{
 		foreach( static::$properties as $prop ) {
-			if( $property == $prop[ 'name' ] )
+			if( $property == val( $prop, 'name' ) )
 				return true;
 		}
 		
@@ -667,7 +667,9 @@ abstract class Model extends Acl
 		$propertyIndices = array();
 		foreach( static::$properties as $key => $property )
 		{
-			$name = (is_array( $property )) ? $property['name'] : $property;;
+			$name = (is_array( $property )) ? val( $property, 'name' ) : $property;
+			if( empty( $name ) )
+				continue;
 			$propertyNames[] = $name;
 			$propertyIndices[$name] = $key;
 		}
