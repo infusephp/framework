@@ -694,7 +694,7 @@ class User extends \nfuse\Model
 			}
 		}
 		
-		if( $passwordRequired && !$passwordValidated ) {
+		if( $passwordRequired && !$passwordValidated && !self::currentUser()->isAdmin() ) {
 			ErrorStack::add( 'Oops, looks like the password is incorrect.', __CLASS__, 'current-password' );
 			return false;
 		}
