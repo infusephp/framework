@@ -338,7 +338,7 @@ class User extends \nfuse\Model
 		
 		return Database::select(
 			'Group_Members',
-			'count(*)',			
+			'count(*)',
 			array(
 				'where' => array(
 					'gid' => $gid,
@@ -526,12 +526,12 @@ class User extends \nfuse\Model
 	
 		$uid =  Database::select(
 			'Users NATURAL JOIN User_Links',
-			'uid',
+			'*',
 			array(
 				'where' => array(
 					'user_email' => $email,
-					'link_type = 1 OR link_type = 2' ),
-			'single' => true ) );
+					'(link_type = 1 OR link_type = 2)' ),
+				'single' => true ) );
 
 		if( Database::numrows() == 1 )
 			return new User( $uid );
@@ -539,17 +539,17 @@ class User extends \nfuse\Model
 			return false;
 	}
 	
-	static function emailTaken( $email )
+	static function emailTaken( $email, $exclude = null )
 	{
-		$uid = (isset($this) && get_class($this) == __CLASS__) ? 'uid <> ' . $this->id : '';
-		
+		$excludeStr = ($exclude) ? 'user_email <> "' . $exclude . '"' : null;
+	
 		return Database::select(
 			'Users',
 			'count(uid)',
 			array(
 				'where' => array(
 					'user_email' => $email,
-					$uid ),
+					$excludeStr ),
 				'single' => true ) ) > 0;
 	}
 	

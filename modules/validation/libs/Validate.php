@@ -72,7 +72,7 @@ class Validate
 		{
 			$emailTaken = false;
 			if( isset( $parameters[ 'model' ] ) )
-				$emailTaken = $parameters[ 'model' ]::emailTaken( $email );
+				$emailTaken = $parameters[ 'model' ]::emailTaken( $email, $parameters[ 'model' ]->getProperty( 'user_email' ) );
 			else
 				$emailTaken = User::emailTaken( $email );
 			
@@ -97,7 +97,7 @@ class Validate
 	*/
 	static function username( &$username, $parameters = array() )
 	{
-		if (!(strlen($username) >= 2) || !preg_match( '/^[A-Za-z0-9]+(?:[_-][A-Za-z0-9]+)*$/', $username ) )
+		if (!(strlen($username) >= 1) || !preg_match( '/^[A-Za-z0-9]+(?:[_-][A-Za-z0-9]+)*$/', $username ) )
 		{ // Check if user name is at least 2 characters long.
 			ErrorStack::add( Messages::VALIDATE_INVALID_USER_NAME, __CLASS__, __FUNCTION__ );
 			return false;
