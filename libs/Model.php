@@ -257,9 +257,9 @@ abstract class Model extends Acl
 		// get the names of all the properties
 		foreach( static::$properties as $property )
 		{
-			$name = (is_array( $property )) ? $property['name'] : $property;
+			$name = (is_array( $property )) ? val( $property, 'name' ) : $property;
 
-			if( !in_array( $name, $exclude ) )
+			if( !empty( $name ) && !in_array( $name, $exclude ) )
 				$properties[] = $name;
 		}
 				
@@ -310,7 +310,7 @@ abstract class Model extends Acl
 			$w = array();
 			foreach( static::$properties as $property )
 			{
-				if( !isset( $where[ $property['name'] ] ) )
+				if( isset( $property[ 'name' ] ) && !isset( $where[ $property['name'] ] ) )
 				{
 					$name = (is_array( $property )) ? $property['name'] : $property;
 					$w[] = "$name LIKE '%$search%'";
