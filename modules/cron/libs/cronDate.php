@@ -1,16 +1,8 @@
 <?php
-/**
- * Represents a cron date
- * @author Jared King
- * @version
- * @package Cron
- * @copyright 2012 Groupr
- * @license
- */
- 
+
 namespace nfuse\libs;
  
-class cronDate
+class CronDate
 {
 	///////////////////////////
 	// Private Class Variables
@@ -86,4 +78,3 @@ class cronDate
 		return $this->myTimestamp = strtotime($how, $this->myTimestamp);
 	}
 }
-?>

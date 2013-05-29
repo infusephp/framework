@@ -29,7 +29,7 @@ spl_autoload_register( function( $class ) {
 	$classPaths = explode('\\', $class);
 	if( $classPaths[ 0 ] == 'nfuse' && count( $classPaths ) == 2 )
 	{
-		$path = NFUSE_BASE_DIR . '/libs/' . $classPaths[1] . '.php';		
+		$path = NFUSE_BASE_DIR . '/libs/' . $classPaths[1] . '.php';
 		if( file_exists($path) && is_readable($path) )
 			include_once $path;
 	}

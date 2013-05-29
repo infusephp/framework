@@ -3,171 +3,89 @@
 namespace nfuse\libs;
 
 use \nfuse\Modules as Modules;
+use \nfuse\models\CronJob as CronJob;
+use \nfuse\Database as Database;
+use \nfuse\Config as Config;
 
 class Cron
 {
-	//////////////////////////////
-	// Private Class Variables
-	//////////////////////////////
-	
 	/**
-	* Generates a timestamp from cron date parameters
-	* @param string $minute minute
-	* @param string $hour hour
-	* @param string $day day
-	* @param string $dow day of week
-	* @return int timestamp
-	*/
-	static function calcNextRun( $minute, $hour, $day, $month, $dow )
+	 * Runs a specific cron task
+	 *
+	 * @param int $id task id
+	 *
+	 * @return boolean result
+	 */
+	static function runTask( $id, $echoOutput = false )
 	{
-		$cron_date = new \nfuse\libs\cronDate(time());
-		$cron_date->second = 0;
-		
-		if ($minute == '*') $minute = null;
-		if ($hour == '*') $hour = null;
-		if ($day == '*') $day = null;
-		if ($month == '*') $month = null;
-		if ($dow == '*') $dow = null;
-		
-		$Job = array(
-					'Minute' => $minute,
-					'Hour' => $hour,
-					'Day' => $day,
-					'Month' => $month,
-					'DOW' => $dow
-		);
-	
-		$done = 0;
-		while ($done < 100) {
-			if (!is_null($Job['Minute']) && ($cron_date->minute != $Job['Minute'])) {
-		                if ($cron_date->minute > $Job['Minute']) {
-		                        $cron_date->modify('+1 hour');
-		                }
-		                $cron_date->minute = $Job['Minute'];
-		        }
-		        if (!is_null($Job['Hour']) && ($cron_date->hour != $Job['Hour'])) {
-		                if ($cron_date->hour > $Job['Hour']) {
-		                        $cron_date->modify('+1 day');
-		                }
-		                $cron_date->hour = $Job['Hour'];
-		                $cron_date->minute = 0;
-		        }
-		        if (!is_null($Job['DOW']) && ($cron_date->dow != $Job['DOW'])) {
-		                $cron_date->dow = $Job['DOW'];
-		                $cron_date->hour = 0;
-		                $cron_date->minute = 0;
-		        }
-		        if (!is_null($Job['Day']) && ($cron_date->day != $Job['Day'])) {
-		                if ($cron_date->day > $Job['Day']) {
-		                        $cron_date->modify('+1 month');
-		                }
-		                $cron_date->day = $Job['Day'];
-		                $cron_date->hour = 0;
-		                $cron_date->minute = 0;
-		        }
-		        if (!is_null($Job['Month']) && ($cron_date->month != $Job['Month'])) {
-		                if ($cron_date->month > $Job['Month']) {
-		                        $cron_date->modify('+1 year');
-		                }
-		                $cron_date->month = $Job['Month'];
-		                $cron_date->day = 1;
-		                $cron_date->hour = 0;
-		                $cron_date->minute = 0;
-		        }
-		
-		        $done = (is_null($Job['Minute']) || $Job['Minute'] == $cron_date->minute) &&
-		                (is_null($Job['Hour']) || $Job['Hour'] == $cron_date->hour) &&
-		                (is_null($Job['Day']) || $Job['Day'] == $cron_date->day) &&
-		                (is_null($Job['Month']) || $Job['Month'] == $cron_date->month) &&
-		                (is_null($Job['DOW']) || $Job['DOW'] == $cron_date->dow)?100:($done+1);
-		} // while
-	
-		return $cron_date->timestamp;
-	}
-	
-	/**
-	* Runs a specific cron task
-	*
-	* @param int $id task id
-	*
-	* @return boolean result
-	*/
-	static function runTask( $id )
-	{
-		if (!isset($id) || !is_numeric($id))
+		if( !isset( $id ) || !is_numeric( $id ) )
 			return false;
+		
+		$success = false;
 		
 		try
-		{	
-			$task = \nfuse\Database::select(
-				'Cron',
-				'minute,hour,day,month,week,command,module',
-				array(
-					'where' => array(
-						'id' => $id ),
-					'singleRow' => true ) );
-			
-			$command = $task[ 'command' ];
-
-			if( !\nfuse\Modules::exists($task[ 'module' ]) )
-				return false;
-				
-			\nfuse\Modules::load( $task[ 'module' ] );
-	
-			$next_run = self::calcNextRun($task[ 'minute' ], $task[ 'hour' ], $task[ 'day' ], $task[ 'month' ], $task[ 'week' ]);
-	
-			return \nfuse\Modules::controller( $task[ 'module' ] )->cron( $command ) &&
-				\nfuse\Database::update(
-					'Cron',
-					array(
-						'id' => $id,
-						'last_ran' => time(),
-						'next_run' => $next_run ),
-					array( 'id' ) );
-		}
-		catch( Exception $e )
 		{
-			return false;
-		}
+			$task = new CronJob( $id );
+			$task->loadProperties();
+			$info = $task->toArray();
 			
-		return false;
+			if( !Modules::exists( $info[ 'module' ] ) )
+				return false;
+			
+			if( $echoOutput )
+				echo "Starting {$info['module']}/{$info['command']}:\n";
+			
+			Modules::load( $info[ 'module' ] );
+			
+			try
+			{
+				 $success = Modules::controller( $info[ 'module' ] )->cron( $info[ 'command' ] );
+			}
+			catch( \Exception $e )
+			{
+				// uh oh
+			}
+			
+			$task->saveRun( $success );
+		}
+		catch( \Exception $e )
+		{
+			// uh oh again
+		}
+		
+		if( $echoOutput )
+			echo ( $success ) ? "\tFinished Successfully\n" : "\tFailed\n";
+		
+		return $success;
 	}
-
+	
 	/**
-	* Checks the cron schedule and runs tasks
-	* @param boolean $ecoOutput echoes output
-	* @return boolean true if all tasks ran successfully
-	*/
+	 * Checks the cron schedule and runs tasks
+	 *
+	 * @param boolean $echoOutput echos output
+	 *
+	 * @return boolean true if all tasks ran successfully
+	 */
 	static function scheduleCheck( $echoOutput = false )
 	{
 		if( $echoOutput )
-			echo "-- Starting Cron on " . \nfuse\Config::value('site', 'title') . "\n";
-			 
-		$tasks = \nfuse\Database::select(
+			echo "-- Starting Cron on " . Config::value('site', 'title') . "\n";
+		
+		$tasks =  Database::select(
 			'Cron',
-			'id,next_run,last_ran,module,command' );
+			'id',
+			array(
+				'where' => array(
+					'next_run <= ' . time() ),
+				'fetchStyle' => 'singleColumn' ) );
 
 		$success = true;
-
-		if( \nfuse\Database::numrows() > 0)
+		
+		foreach( $tasks as $id )
 		{
-			foreach ($tasks as $t)
-			{
-				Modules::load( $t[ 'module' ] );
-				
-				if ((time() - $t['next_run']) > 0 )//&& $t['last_ran'] < $t['next_run'])
-				{
-					if( $echoOutput )
-						echo "Starting {$t['module']}/{$t['command']}:\n";
-
-					$result = self::runTask( $t['id'] );
-					
-					$success = $success & $result;
-
-					if( $echoOutput )
-						echo ( $result ) ? "\tFinished Successfully\n" : "\tFailed\n";
-				}
-			}
+			$taskSuccess = self::runTask( $id, $echoOutput );
+			
+			$success = $success & $taskSuccess;
 		}
 		
 		return $success;

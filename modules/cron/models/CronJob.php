@@ -25,6 +25,7 @@
 namespace nfuse\models;
 
 use \nfuse\libs\Cron as Cron;
+use \nfuse\libs\CronDate as CronDate;
 
 class CronJob extends \nfuse\Model
 {
@@ -49,6 +50,12 @@ class CronJob extends \nfuse\Model
 			'title' => 'Last Ran',
 			'name' => 'last_ran',
 			'type' => 'date'
+		),
+		array(
+			'title' => 'Last Run Success',
+			'name' => 'last_run_result',
+			'type' => 'boolean',
+			'default' => 0
 		),
 		array(
 			'title' => 'Module',
@@ -135,31 +142,123 @@ class CronJob extends \nfuse\Model
 	*/
 	function edit( $data )
 	{
-		if( !$this->can( 'edit' ) )
-		{
-			ErrorStack::add( ERROR_NO_PERMISSION );			
-			return false;
-		}
-
-		if( !self::validateCronTimePiece( val( $data, 'minute' ), 0, 59 ) )
+		if( isset( $data[ 'minute' ] ) && !self::validateCronTimePiece( $data[ 'minute' ], 0, 59 ) )
 			return false;
 		
-		if( !self::validateCronTimePiece( val( $data, 'hour' ), 0, 23 ) )
+		if( isset( $data[ 'hour' ] ) && !self::validateCronTimePiece( $data[ 'hour' ], 0, 23 ) )
 			return false;
 		
-		if( !self::validateCronTimePiece( val( $data, 'day' ), 1, 31 ) )
+		if( isset( $data[ 'day' ] ) && !self::validateCronTimePiece( $data[ 'day' ], 1, 31 ) )
 			return false;
 		
-		if( !self::validateCronTimePiece( val( $data, 'month' ), 1, 12 ) )
+		if( isset( $data[ 'month' ] ) && !self::validateCronTimePiece( $data[ 'month' ], 1, 12 ) )
 			return false;
 		
-		if( !self::validateCronTimePiece( val( $data, 'week' ), 0, 6 ) )
+		if( isset( $data[ 'week' ] ) && !self::validateCronTimePiece( $data[ 'week' ], 0, 6 ) )
 			return false;
 
-		$data[ 'next_run' ] = Cron::calcNextRun( $data[ 'minute' ], $data[ 'hour' ], $data[ 'day' ],$data[ 'month' ],$data[ 'week' ] );
+		if( isset( $data[ 'minute' ] ) && isset( $data[ 'hour' ] ) && isset( $data[ 'day' ] ) && isset( $data[ 'month' ] ) && isset( $data[ 'week' ] ) )
+			$data[ 'next_run' ] = self::calcNextRun( $data[ 'minute' ], $data[ 'hour' ], $data[ 'day' ], $data[ 'month' ], $data[ 'week' ] );
 
 		return parent::edit( $data );
 	}
+	
+	/**
+	 * Updates the job with the results from the latest run
+	 *
+	 * @return boolean
+	 */
+	function saveRun( $result )
+	{
+		$nextRun = self::calcNextRun(
+			$this->getProperty( 'minute' ),
+			$this->getProperty( 'hour' ),
+			$this->getProperty( 'day' ),
+			$this->getProperty( 'month' ),
+			$this->getProperty( 'week' ) );
+		
+		return $this->edit( array(
+			'next_run' => $nextRun,
+			'last_ran' => time(),
+			'last_run_result' => $result ) );
+	}
+	
+	/**
+	 * Generates a timestamp from cron date parameters
+	 *
+	 * @param string $minute minute
+	 * @param string $hour hour
+	 * @param string $day day
+	 * @param string $dow day of week
+	 *
+	 * @return int timestamp
+	 */
+	private static function calcNextRun( $minute, $hour, $day, $month, $dow )
+	{
+		$cron_date = new CronDate( time() );
+		$cron_date->second = 0;
+		
+		if ($minute == '*') $minute = null;
+		if ($hour == '*') $hour = null;
+		if ($day == '*') $day = null;
+		if ($month == '*') $month = null;
+		if ($dow == '*') $dow = null;
+		
+		$Job = array(
+					'Minute' => $minute,
+					'Hour' => $hour,
+					'Day' => $day,
+					'Month' => $month,
+					'DOW' => $dow
+		);
+		
+		$done = 0;
+		while ($done < 100) {
+			if (!is_null($Job['Minute']) && ($cron_date->minute != $Job['Minute'])) {
+		                if ($cron_date->minute > $Job['Minute']) {
+		                        $cron_date->modify('+1 hour');
+		                }
+		                $cron_date->minute = $Job['Minute'];
+		        }
+		        if (!is_null($Job['Hour']) && ($cron_date->hour != $Job['Hour'])) {
+		                if ($cron_date->hour > $Job['Hour']) {
+		                        $cron_date->modify('+1 day');
+		                }
+		                $cron_date->hour = $Job['Hour'];
+		                $cron_date->minute = 0;
+		        }
+		        if (!is_null($Job['DOW']) && ($cron_date->dow != $Job['DOW'])) {
+		                $cron_date->dow = $Job['DOW'];
+		                $cron_date->hour = 0;
+		                $cron_date->minute = 0;
+		        }
+		        if (!is_null($Job['Day']) && ($cron_date->day != $Job['Day'])) {
+		                if ($cron_date->day > $Job['Day']) {
+		                        $cron_date->modify('+1 month');
+		                }
+		                $cron_date->day = $Job['Day'];
+		                $cron_date->hour = 0;
+		                $cron_date->minute = 0;
+		        }
+		        if (!is_null($Job['Month']) && ($cron_date->month != $Job['Month'])) {
+		                if ($cron_date->month > $Job['Month']) {
+		                        $cron_date->modify('+1 year');
+		                }
+		                $cron_date->month = $Job['Month'];
+		                $cron_date->day = 1;
+		                $cron_date->hour = 0;
+		                $cron_date->minute = 0;
+		        }
+		
+		        $done = (is_null($Job['Minute']) || $Job['Minute'] == $cron_date->minute) &&
+		                (is_null($Job['Hour']) || $Job['Hour'] == $cron_date->hour) &&
+		                (is_null($Job['Day']) || $Job['Day'] == $cron_date->day) &&
+		                (is_null($Job['Month']) || $Job['Month'] == $cron_date->month) &&
+		                (is_null($Job['DOW']) || $Job['DOW'] == $cron_date->dow)?100:($done+1);
+		}
+	
+		return $cron_date->timestamp;
+	}	
 	
 	private static function validateCronTimePiece( $p, $lower, $upper )
 	{

@@ -115,7 +115,7 @@ class Request
 		{
 			$body = file_get_contents( 'php://input' );
 			$contentType = $this->contentType();
-			
+
 			// parse json
 			if( strpos( $contentType, 'application/json') !== false )
 				$this->request = json_decode( $body, true );
