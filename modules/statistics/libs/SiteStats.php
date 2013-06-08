@@ -7,18 +7,56 @@ use \nfuse\Database as Database;
 
 class SiteStats
 {
+	static $historyMetrics = array(
+		'database.size',
+		'database.numTables',
+		'users.numUsers',
+		'users.numGroups',
+		'users.dailySignups'
+	);
+
 	/**
 	 * Generates a snapshot from the current stats
 	 *
+	 * @return array
 	 */
 	static function generateSnapshot()
 	{
 		$return = array();
 		
+		/* PHP Statistics */
+		$return['php'] = array();
+		
+		// php version
+		$return['php']['version'] = phpversion();		
+				
+		/* Site Statistics */
+		$return['site'] = array();
+		
+		// site title
+		$return['site']['title'] = Config::value( 'site', 'title' );
+
+		// site status
+		$return['site']['status'] = !Config::value( 'site', 'disabled' );
+
+		// site mode
+		$return['site']['mode'] = Config::value( 'site', 'production-level' );
+		
+		// site email
+		$return['site']['email'] = Config::value( 'site', 'email' );
+		
+		// session adapter
+		$return['site']['session'] = Config::value( 'session', 'adapter' );		
+		
 		/* Database Statistics */
 		$return['Database'] = array();
+
+		// DB Type
+		$query = Database::sql( 'SELECT VERSION()' );
+		$return['database']['version'] = $query->fetchColumn( 0 );		
 		
-		$query = Database::sql("SHOW table STATUS"); // Get table information.
+		// Get table information.
+		$query = Database::sql("SHOW table STATUS");
 		
 		$status = $query->fetchAll( \PDO::FETCH_ASSOC );
 		
@@ -48,21 +86,6 @@ class SiteStats
 			'count(*)',
 			array(
 				'single' => true ) );
-		
-		return $return;
-	}
-	
-	/**
-	 * Gets all of the real-time stats (i.e. active users, current sw versions)
-	 *
-	 *
-	 */
-	static function generateRealtimeStats()
-	{
-		$return = array();
-		
-		/* User Statistics */
-		$return['users'] = array();
 						
 		// newest user
 		$return['users']['newestUser'] = Database::select(
@@ -80,65 +103,14 @@ class SiteStats
 				'where' => array(
 					'registered_timestamp > ' . strtotime('today') ),
 				'single' => true ) );
-
-		/* Database Statistics */
-		$return['database'] = array();
-		
-		// DB Type
-		$query = Database::sql( 'SELECT VERSION()' );
-		$return['database']['version'] = $query->fetchColumn( 0 );
-		
-		/* PHP Statistics */
-		$return['php'] = array();
-		
-		// php version
-		$return['php']['version'] = phpversion();
-		
-		/* Site Statistics */
-		$return['site'] = array();
-		
-		// site title
-		$return['site']['title'] = Config::value( 'site', 'title' );
-
-		// site status
-		$return['site']['status'] = !Config::value( 'site', 'disabled' );
-
-		// site mode
-		$return['site']['mode'] = Config::value( 'site', 'production-level' );
-		
-		// site email
-		$return['site']['email'] = Config::value( 'site', 'email' );
-		
-		// session adapter
-		$return['site']['session'] = Config::value( 'session', 'adapter' );
 		
 		return $return;
-	}	
-	
-	/**
-	 * Captures a screenshot of the current stats
-	 *
-	 *
-	 */
-	static function captureSnapshot()
-	{
-		// generate a snapshot
-		$stats = self::generateSnapshot();
-		
-		// save it in the DB
-		return Database::insert(
-			'Site_Stats_History',
-			array(
-				'timestamp' => time(),
-				'stats' => json_encode( $stats )
-			)
-		);
 	}
 	
 	/**
 	 * Gets the latest stats snapshot
 	 *
-	 *
+	 * @return array
 	 */
 	static function getLatestSnapshot()
 	{
@@ -151,4 +123,79 @@ class SiteStats
 				'limit' => '0,1'
 		)), true);
 	}
+	
+	/**
+	 * Gets the history for a given metric
+	 *
+	 * @param string $metric
+	 * @param string $start
+	 * @param string $end
+	 *
+	 * @return false|array
+	 */
+	static function history( $metric, $start, $end )
+	{
+		if( !in_array( $metric, self::$historyMetrics ) )
+			return false;
+			
+		$stats = Database::select(
+			'Site_Stats_History',
+			'stats,timestamp',
+			array(
+				'where' => array(
+					"`timestamp` >= '$start'",
+					"`timestamp` <= '$end'" ),
+				'orderBy' => 'timestamp ASC' ) );
+		
+		$series = array();
+		
+		foreach( $stats as $day )
+		{
+			$decoded = json_decode( $day[ 'stats' ], true );
+			
+			$series[ date( 'm/d/Y', $day[ 'timestamp' ] ) ] = self::getNestedVar( $decoded, $metric );
+		}
+		
+		return $series;
+	}
+	
+	/**
+	 * Captures a screenshot of the current stats
+	 *
+	 * @return boolean
+	 */
+	static function captureSnapshot()
+	{
+		// generate a snapshot
+		$snapshot = self::generateSnapshot();
+		
+		// only save the history metrics
+		// TODO
+		
+		// save it in the DB
+		return Database::insert(
+			'Site_Stats_History',
+			array(
+				'timestamp' => time(),
+				'stats' => json_encode( $stats )
+			)
+		);
+	}
+	
+	/**
+	 * Looks up an element in an array using dot notation (i.e. fruit.apples.qty => ['fruit']['apples']['qty']
+	 *
+	 */
+	private static function getNestedVar(&$context, $name)
+	{
+	    $pieces = explode('.', $name);
+	    foreach ($pieces as $piece) {
+	        if (!is_array($context) || !array_key_exists($piece, $context)) {
+	            // error occurred
+	            return null;
+	        }
+	        $context = &$context[$piece];
+	    }
+	    return $context;
+	}			
 }

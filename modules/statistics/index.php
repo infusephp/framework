@@ -24,6 +24,9 @@
  
 namespace nfuse\controllers;
 
+use \nfuse\libs\SiteStats as SiteStats;
+use \nfuse\Modules as Modules;
+
 class Statistics extends \nfuse\Controller
 {
 	function adminHome( $req, $res )
@@ -47,16 +50,64 @@ class Statistics extends \nfuse\Controller
 			return $file_size_info;
 		}
 		
-		$stats = array_merge_recursive( \nfuse\libs\SiteStats::generateSnapshot(), \nfuse\libs\SiteStats::generateRealtimeStats() );
-		
+		$stats = SiteStats::generateSnapshot();
 	
-		$stats['users']['newestUser'] = new  \nfuse\models\User( $stats['users']['newestUser'] );
+		$stats['users']['newestUser'] = new \nfuse\models\User( $stats['users']['newestUser'] );
 		
 		$dbsize = file_size( $stats['database']['size'] );
 		$stats['database']['size'] =  $dbsize['size'] . " " . $dbsize['type'];
 		
 		$res->render( $this->adminTemplateDir() . 'index.tpl', array(
 			'stats' => $stats
+		) );
+	}
+	
+	function adminHistoryDefault( $req, $res )
+	{
+		$mInfo = Modules::info( 'statistics' );
+		
+		$res->redirect( '/4dm1n/statistics/history/' . $mInfo[ 'defaultHistoryMetric' ] );
+	}
+	
+	function adminHistory( $req, $res )
+	{
+		if( !$this->can( 'view-admin' ) )
+			return $res->setCode( 401 );
+
+		$metric = $req->params( 'metric' );
+		$start = $req->query( 'start' );
+		$end = $req->query( 'end' );
+		
+		function beginOfDay( $time )
+		{
+			list( $y, $m, $d ) = explode( '-', date( 'Y-m-d', $time ) );
+			return mktime( 0, 0, 0, $m, $d, $y );
+		}
+		
+		function endOfDay( $time )
+		{
+			list( $y, $m, $d ) = explode( '-', date( 'Y-m-d', $time ) );
+			return mktime( 0, 0, 0, $m, $d + 1, $y ) - 1;
+		}
+		
+		if( !$start )
+			$start = beginOfDay( strtotime( '-7 days' ) );
+		else
+			$start = strtotime( $start );
+
+		if( !$end )
+			$end = endOfDay( time() );
+		else
+			$end = strtotime( $end ) + 3600*24 - 1;
+		
+		$history = SiteStats::history( $metric, $start, $end );
+
+		$res->render( $this->adminTemplateDir() . 'history.tpl', array(
+			'metrics' => SiteStats::$historyMetrics,
+			'history' => $history,
+			'metric' => $metric,
+			'start' => date('m/d/Y', $start),
+			'end' => date('m/d/Y', $end)
 		) );
 	}
 
