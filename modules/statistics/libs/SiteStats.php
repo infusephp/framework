@@ -170,7 +170,10 @@ class SiteStats
 		$snapshot = self::generateSnapshot();
 		
 		// only save the history metrics
-		// TODO
+		$stats = array();
+		
+		foreach( self::$historyMetrics as $metric )
+			self::setNestedVar( $stats, $metric, self::getNestedVar( $snapshot, $metric ) );
 		
 		// save it in the DB
 		return Database::insert(
@@ -197,5 +200,18 @@ class SiteStats
 	        $context = &$context[$piece];
 	    }
 	    return $context;
-	}			
+	}
+	
+	/**
+	 * Sets an element in an array using dot notation (i.e. fruit.apples.qty sets ['fruit']['apples']['qty']
+	 *
+	 */
+	private static function setNestedVar(&$context, $name, $value)
+	{
+	    $pieces = explode('.', $name);
+	    foreach ($pieces as $k => $piece)
+	        $context = &$context[$piece];
+	    
+	    return $context = $value;
+	}
 }
