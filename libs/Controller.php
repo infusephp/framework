@@ -466,6 +466,8 @@ abstract class Controller extends Acl
 	*/
 	function cron( $command )
 	{
+		$name = self::name();
+		echo "$name\-\>cron($command) does not exist\n";
 		return false;
 	}
 	

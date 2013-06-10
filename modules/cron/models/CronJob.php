@@ -91,7 +91,14 @@ class CronJob extends \nfuse\Model
 			'title' => 'Week',
 			'name' => 'week',
 			'type' => 'text'
-		)
+		),
+		array(
+			'title' => 'Last Run Output',
+			'name' => 'last_run_output',
+			'type' => 'text',
+			'filter' => '<pre>{last_run_output}</pre>',
+			'truncate' => false
+		)		
 	);
 	
 	/**
@@ -166,9 +173,12 @@ class CronJob extends \nfuse\Model
 	/**
 	 * Updates the job with the results from the latest run
 	 *
+	 * @param boolean $result
+	 * @param string $output
+	 *
 	 * @return boolean
 	 */
-	function saveRun( $result )
+	function saveRun( $result, $output )
 	{
 		$nextRun = self::calcNextRun(
 			$this->getProperty( 'minute' ),
@@ -180,7 +190,8 @@ class CronJob extends \nfuse\Model
 		return $this->edit( array(
 			'next_run' => $nextRun,
 			'last_ran' => time(),
-			'last_run_result' => $result ) );
+			'last_run_result' => $result,
+			'last_run_output' => $output ) );
 	}
 	
 	/**

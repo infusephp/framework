@@ -22,39 +22,42 @@ class Cron
 			return false;
 		
 		$success = false;
+		$output = '';
 		
+		$task = new CronJob( $id );
+		$task->loadProperties();
+		$info = $task->toArray();
+
 		try
 		{
-			$task = new CronJob( $id );
-			$task->loadProperties();
-			$info = $task->toArray();
-			
-			if( !Modules::exists( $info[ 'module' ] ) )
-				return false;
-			
-			if( $echoOutput )
-				echo "Starting {$info['module']}/{$info['command']}:\n";
-			
-			Modules::load( $info[ 'module' ] );
-			
-			try
+			if( Modules::exists( $info[ 'module' ] ) )
 			{
-				 $success = Modules::controller( $info[ 'module' ] )->cron( $info[ 'command' ] );
+				if( $echoOutput )
+					echo "Starting {$info['module']}/{$info['command']}:\n";
+				
+				ob_start();
+				
+				Modules::load( $info[ 'module' ] );
+				
+				$success = Modules::controller( $info[ 'module' ] )->cron( $info[ 'command' ] );
+				
+				$output = ob_get_clean();
 			}
-			catch( \Exception $e )
+			else
 			{
-				// uh oh
+				$output = "{$info['module']} does not exist.";
 			}
-			
-			$task->saveRun( $success );
 		}
 		catch( \Exception $e )
 		{
-			// uh oh again
+			// uh oh
+			$output .= "\n" . $e->getMessage();
 		}
 		
+		$task->saveRun( $success, $output );
+		
 		if( $echoOutput )
-			echo ( $success ) ? "\tFinished Successfully\n" : "\tFailed\n";
+			echo $output . (( $success ) ? "\tFinished Successfully\n" : "\tFailed\n");
 		
 		return $success;
 	}

@@ -24,22 +24,103 @@
  
 namespace nfuse\controllers;
 
-use \nfuse\models\User as User;
+use \nfuse\libs\SiteStats as SiteStats;
+use \nfuse\Modules as Modules;
 
-class Cron extends \nfuse\Controller
+class Statistics extends \nfuse\Controller
 {
-	function checkSchedule( $req, $res )
+	function adminHome( $req, $res )
 	{
-		if( !$req->isCli() )
-			return $res->setCode( 404 );
+		if( !$this->can( 'view-admin' ) )
+			return $res->setCode( 401 );
+	
+		function file_size ($filesize)
+		{
+			$bytes = array('KB', 'KB', 'MB', 'GB', 'TB');
 		
-		\nfuse\libs\Cron::scheduleCheck(true);
+			if ($filesize < 1024) $filesize = 1; // Values are always displayed.
+		
+			for ($i = 0; $filesize > 1024; $i++)  { // In KB at least.
+				$filesize /= 1024;
+			} // for
+		
+			$file_size_info['size'] = ceil($filesize);
+			$file_size_info['type'] = $bytes[$i];
+		
+			return $file_size_info;
+		}
+		
+		$stats = SiteStats::generateSnapshot();
+	
+		$stats['users']['newestUser'] = new \nfuse\models\User( $stats['users']['newestUser'] );
+		
+		$dbsize = file_size( $stats['database']['size'] );
+		$stats['database']['size'] =  $dbsize['size'] . " " . $dbsize['type'];
+		
+		$res->render( $this->adminTemplateDir() . 'index.tpl', array(
+			'stats' => $stats
+		) );
 	}
 	
-	function install()
+	function adminHistoryDefault( $req, $res )
 	{
-		Database::sql("CREATE TABLE IF NOT EXISTS `Cron` (`id` INT NOT NULL AUTO_INCREMENT ,`name` VARCHAR( 255 ) NOT NULL ,`module` VARCHAR( 100 ) NOT NULL ,
-					`command` VARCHAR( 100 ) NOT NULL ,`minute` VARCHAR( 10 ) NOT NULL ,`hour` VARCHAR( 10 ) NOT NULL ,`day` VARCHAR( 10 ) NOT NULL ,`week` VARCHAR( 10 ) NOT NULL ,
-					`month` VARCHAR( 10 ) NOT NULL ,`last_ran` INT( 10 ) NULL,`next_run` INT ( 10 ) NULL ,PRIMARY KEY ( `id` ))");
+		$mInfo = Modules::info( 'statistics' );
+		
+		$res->redirect( '/4dm1n/statistics/history/' . $mInfo[ 'defaultHistoryMetric' ] );
+	}
+	
+	function adminHistory( $req, $res )
+	{
+		if( !$this->can( 'view-admin' ) )
+			return $res->setCode( 401 );
+
+		$metric = $req->params( 'metric' );
+		$start = $req->query( 'start' );
+		$end = $req->query( 'end' );
+		
+		function beginOfDay( $time )
+		{
+			list( $y, $m, $d ) = explode( '-', date( 'Y-m-d', $time ) );
+			return mktime( 0, 0, 0, $m, $d, $y );
+		}
+		
+		function endOfDay( $time )
+		{
+			list( $y, $m, $d ) = explode( '-', date( 'Y-m-d', $time ) );
+			return mktime( 0, 0, 0, $m, $d + 1, $y ) - 1;
+		}
+		
+		if( !$start )
+			$start = beginOfDay( strtotime( '-7 days' ) );
+		else
+			$start = strtotime( $start );
+
+		if( !$end )
+			$end = endOfDay( time() );
+		else
+			$end = strtotime( $end ) + 3600*24 - 1;
+		
+		$history = SiteStats::history( $metric, $start, $end );
+
+		$res->render( $this->adminTemplateDir() . 'history.tpl', array(
+			'metrics' => SiteStats::$historyMetrics,
+			'history' => $history,
+			'metric' => $metric,
+			'start' => date('m/d/Y', $start),
+			'end' => date('m/d/Y', $end)
+		) );
+	}
+
+	function cron( $command )
+	{
+		if( $command == 'capture-snapshot' ) {
+			if( SiteStats::captureSnapshot() ) {
+				echo "Successfully captured snapshot\n";
+				return true;
+			} else {
+				echo "Failed to capture snapshot\n";
+				return false;
+			}
+		}
 	}
 }
