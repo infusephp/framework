@@ -24,6 +24,9 @@
  
 namespace nfuse;
 
+use \nfuse\Database as Database;
+use \nfuse\models\User as User;
+
 class DatabaseSession
 {
 	/**
@@ -73,8 +76,14 @@ class DatabaseSession
 	function _write( $id, $data )
 	{
 		Database::delete( 'Sessions', array( 'id' => $id ) );
-		$uid = ( isset(Globals::$currentUser) && Globals::$currentUser->logged_in() ) ? Globals::$currentUser->id() : null;
-		return Database::insert( 'Sessions', array( 'id' => $id, 'access' => time(), 'session_data' => $data, 'logged_in' => $uid ) );
+		$uid = ( isset(User::$currentUser) && User::$currentUser->logged_in() ) ? User::$currentUser->id() : null;
+		return Database::insert(
+			'Sessions',
+			array(
+				'id' => $id,
+				'access' => time(),
+				'session_data' => $data,
+				'logged_in' => $uid ) );
 	}
 
 	/**

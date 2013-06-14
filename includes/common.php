@@ -107,7 +107,6 @@ else
 		// session handler
 		if( Config::value( 'session', 'adapter' ) == 'redis' )
 		{
-			require_once "libs/RedisSession.php";
 			\nfuse\RedisSession::start(array(
     			'scheme' => Config::value('redis','scheme'),
     			'host'   => Config::value('redis','host'),
@@ -117,8 +116,7 @@ else
 		// default: database
 		else
 		{
-			require_once "libs/DatabaseSession.php";
-			$session = New DatabaseSession();
+			$session = New \nfuse\DatabaseSession();
 			
 			session_set_save_handler ( array (&$session, "_open"),
 			                           array (&$session, "_close"),
