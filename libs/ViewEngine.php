@@ -96,8 +96,8 @@ class ViewEngine Extends \Smarty
 			$newCache = $less->cachedCompile($cache);
 			
 			if( !is_array( $cache ) || $newCache[ 'updated' ] > $cache[ 'updated' ] ) {
-				file_put_contents( $cacheFile, serialize( $newCache ) );
-				file_put_contents( $outputFile, $newCache[ 'compiled' ] );
+				if( file_put_contents( $outputFile, $newCache[ 'compiled' ] ) )
+					file_put_contents( $cacheFile, serialize( $newCache ) );
 			}
 		}
 		catch( \Exception $ex )
@@ -147,8 +147,8 @@ class ViewEngine Extends \Smarty
 			}
 			
 			// write the js and cache to the output file
-			file_put_contents( $cacheFile, serialize( $newCache ) );
-			file_put_contents( $outputFile, $js );
+			if( file_put_contents( $outputFile, $js ) )
+				file_put_contents( $cacheFile, serialize( $newCache ) );
 		}
 	}
 	
