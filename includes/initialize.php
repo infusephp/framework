@@ -28,7 +28,7 @@ set_include_path( get_include_path() . PATH_SEPARATOR . NFUSE_BASE_DIR );
 
 // load configuration
 require_once 'libs/Config.php';
-\nfuse\Config::load( NFUSE_BASE_DIR . '/includes/config.yml' );
+\nfuse\Config::load( NFUSE_BASE_DIR . '/config.yml' );
 
 // error reporting
 if( \nfuse\Config::value( 'site', 'production-level' ) )
