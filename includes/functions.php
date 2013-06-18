@@ -170,7 +170,7 @@ function oauthCredentialsSupplied()
 	
 	if (function_exists("apache_request_headers"))
 	{
-		$auth_header = apache_request_headers();
+		$headers = apache_request_headers();
 	
 		if (array_key_exists("Authorization", $headers))
 			$auth_header = $headers["Authorization"];
