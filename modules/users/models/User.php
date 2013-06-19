@@ -299,11 +299,7 @@ class User extends \infuse\Model
 		// evreryone
 		if( $gid == -1 )
 			return true;
-		
-		// following
-		if( $gid == 2 && $this->id() > 0 && $this->isFollowing( $inRelationTo ) )
-			return true;
-		
+				
 		/* database */
 		
 		return Database::select(
