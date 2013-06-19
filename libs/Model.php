@@ -502,9 +502,11 @@ abstract class Model extends Acl
 	 *
 	 * The output of this follows the same format as Database::listColumns( 'tablename' )
 	 *
+	 * @param array $currentSchema current schema
+	 *
 	 * @return array
 	 */
-	static function suggestSchema()
+	static function suggestSchema( $currentSchema )
 	{
 		$schmea = array();
 		
@@ -558,7 +560,6 @@ abstract class Model extends Acl
 			break;
 			}
 			
-			// TODO support multiple primary keys
 			if( $name == static::$idFieldName || in_array( $name, static::$supplementaryIds ) )
 			{
 				$column[ 'Key' ] = 'PRI';
@@ -566,11 +567,80 @@ abstract class Model extends Acl
 				if( $property[ 'type' ] == 'id' )
 					$column[ 'Extra' ] = 'auto_increment';
 			}
+
+			// does the column exist in the current schema?
+			foreach( $currentSchema as $c )
+			{
+				if( $column[ 'Field' ] == $c[ 'Field' ] )
+				{
+					$column[ 'Exists' ] = true;
+					break;
+				}
+			}
 			
 			$schema[] = $column;
 		}
 		
 		return $schema;
+	}
+
+	/**
+	 * Converts a schema into SQL statements
+	 *
+	 * @param array $schema
+	 * @param boolean $newTable true if a new table should be created
+	 *
+	 * @return string sql
+	 */
+	static function schemaToSql( $schema, $newTable = true )
+	{
+		if( count( $schema ) == 0 )
+			return false;
+
+		$sql = '';
+
+		$tablename = static::tablename();
+
+		if( $newTable )
+			$sql .= "CREATE TABLE IF NOT EXISTS `$tablename` (\n";
+		else
+			$sql .= "ALTER TABLE `$tablename`\n";
+
+		$cols = array();
+		foreach( $schema as $column )
+		{
+			$col = "\t";
+
+			if( !$newTable )
+				$col .= ( val( $column, 'Exists' ) ) ? 'MODIFY ' : 'ADD ';
+
+			$col .= "`{$column['Field']}` {$column['Type']} ";
+
+			$col .= ( $column['Null'] == 'Yes' ) ? 'NULL' : 'NOT NULL';
+			
+			if( $column['Default'] )
+				$col .= " DEFAULT '{$column['Default']}'";
+
+			if( $column['Extra'] )
+				$col .= " {$column['Extra']}";
+
+			if( $column['Key'] && $newTable )
+				$col .= ($column['Key'] == 'PRI') ? ' PRIMARY KEY' : ' ' . $column['Key'];
+
+			$cols[] = $col;
+		}
+
+		// TODO support multiple primary keys
+		// TODO support changing primary key when altering table
+
+		$sql .= implode( ",\n", $cols);
+
+		if( $newTable )
+			$sql .= "\n) ;";
+		else
+			$sql .= "\n ;";
+
+		return $sql;
 	}
 	
 	/////////////////////////////

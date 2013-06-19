@@ -439,19 +439,42 @@ abstract class Controller extends Acl
 		$paths = $req->paths();
 		
 		if( count( $paths ) >= 3 && $paths[ 2 ] == 'schema' )
-		{
-			$params[ 'schema' ] = true;
-			
+		{			
 			// get tablename for model
 			$tablename = $modelObj::tablename();
-			$params[ 'tablename' ] = $tablename;
 			
 			// look up current schema
 			$currentSchema = Database::listColumns( $tablename );			
-			$params[ 'currentSchema' ] = $currentSchema;
+
+			// are we creating a new table or altering?
+			$newTable = count( $currentSchema ) == 0;			
 			
 			// suggest a schema based on properties
-			$params[ 'suggestedSchema' ] = $modelObj::suggestSchema();
+			$suggestedSchema = $modelObj::suggestSchema( $currentSchema );
+			$suggestedSchemaSql = $modelObj::schemaToSql( $suggestedSchema, $newTable );
+
+			// update the schema?
+			if( val( $paths, 3 ) == 'update' )
+			{
+				try
+				{
+					$params[ 'success' ] = Database::sql( $suggestedSchemaSql );
+
+					if( $params[ 'success' ] )
+					{
+						// refresh current schema
+						$currentSchema = Database::listColumns( $tablename );			
+					}
+				}
+				catch( \Exception $e )
+				{
+					$params[ 'error' ] = $e->getMessage();
+				}
+			}
+
+			$params[ 'schema' ] = true;
+			$params[ 'currentSchema' ] = $modelObj::schemaToSql( $currentSchema, true );
+			$params[ 'suggestedSchema' ] = $suggestedSchemaSql;			
 		}
 		else
 		{

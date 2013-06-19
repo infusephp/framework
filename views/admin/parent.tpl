@@ -60,7 +60,7 @@
 		{block name=main}{/block}
 		<hr />
 		<footer>
-			<p>Powered by <a href="https://github.com/jaredtking/nfuse" target="_blank">nfuse framework</a></p>
+			<p>Powered by <a href="https://github.com/jaredtking/infuse" target="_blank">infuse framework</a></p>
 		</footer>
 	</div>
 </body>

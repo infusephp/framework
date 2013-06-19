@@ -39,11 +39,11 @@ class Permission extends \infuse\Model
 			'type' => 'id',
 			'null' => true
 		),
-		'user' => array(
+		'uid' => array(
 			'type' => 'id',
 			'null' => true
 		),	
-		'group_' => array(
+		'gid' => array(
 			'type' => 'id',
 			'null' => true
 		),	
