@@ -317,17 +317,6 @@ class User extends \infuse\Model
 	}
 	
 	/**
-	 * Checks if the user has connected with Facebook
-	 *
-	 * @param boolean connected?
-	 */
-	function fbConnected()
-	{
-		// WARNING: this does not mean we still have permission, check with FB for that
-		return $this->get('fbid') != '';
-	}
-	
-	/**
 	* Gets the URL of the profile for the user
 	* @return string URL
 	*/
@@ -353,138 +342,6 @@ class User extends \infuse\Model
 		// use Gravatar
 		$hash = md5( strtolower( trim( $this->get('user_email') ) ) );
 		return "https://secure.gravatar.com/avatar/$hash?s=$size&d=mm";
-	}	
-	
-	/**
-	* Gets the user's followers
-	*
-	* @return array(User) followers
-	*/
-	function followers()
-	{
-		$uids = Database::select(
-			'Followers',
-			'follower',
-			array(
-				'where' => array(
-					'following' => $this->id ),
-				'fetchStyle' => 'singleColumn' ) );
-		
-		$followers = array();
-		foreach( $uids as $uid )
-		{
-			$follower = new User( $uid );
-			if( $follower->registered() && $follower->public_() )
-				$followers[] = $follower;
-		}
-		
-		return $followers;
-	}
-	
-	/**
-	* Gets the people the user follows
-	*
-	* @return array(User) following
-	*/
-	function following()
-	{
-		$uids = Database::select(
-			'Followers',
-			'following',
-			array(
-				'where' => array(
-					'follower' => $this->id ),
-				'fetchStyle' => 'singleColumn' ) );
-		
-		$following = array();
-		foreach( $uids as $uid )
-		{
-			$person = new User( $uid );
-			if( $person->registered() && $person->public_() )
-				$following[] = $person;
-		}
-		
-		return $following;
-	}
-	
-	/**
-	* Checks if the user is following someone
-	*
-	* @param int $uid user ID
-	*
-	* @return boolean true if following
-	*/
-	function isFollowing( $uid )
-	{
-		if( $uid == $this->id || $uid < 0 )
-			return false;
-			
-		$value = Database::select(
-			'Followers',
-			'count(*)',
-			array(
-				'where' => array(
-					'following' => $uid,
-					'follower' => $this->id ),
-			'single' => true ) ) > 0;
-		
-		return $value;
-	}
-	
-	/**
-	* Checks if the user is followed by someone
-	*
-	* @param int $uid user ID
-	*
-	* @return boolean true if followed
-	*/
-	function isFollowedBy( $uid )
-	{
-		if( $uid == $this->id || $uid < 0 )
-			return false;
-			
-		$value = Database::select(
-			'Followers',
-			'count(*)',
-			array(
-				'where' => array(
-					'follower' => $uid,
-					'following' => $this->id ),
-			'single' => true ) ) > 0;
-		
-		return $value;
-	}
-		
-	/**
-	* Gets the number of followers
-	*
-	* @return int number of followers
-	*/
-	function followerCount()
-	{
-		return Database::select(
-			'Followers',
-			'count(*)',
-			array(
-				'where' => array(
-					'following' => $this->id ),
-			'single' => true ) );
-	}
-	
-	/**
-	* Gets the number of people the user follows
-	*
-	* @return int number following
-	*/
-	function followingCount()
-	{
-		return Database::select(
-			'Followers',
-			'count(*)',
-			array(
-				'where' => array(
-					'follower' => $this->id ),
-			'single' => true ) );
 	}
 	
 	static function getTemporaryUser( $email )
@@ -876,39 +733,6 @@ class User extends \infuse\Model
 				array(
 					'uid' => $user->id,
 					'link_type' => 0 ) );
-	}
-	
-	/**
-	 * Follow a user
-	 *
-	 * @param int $uid User to follow
-	 *
-	 * @return boolean success
-	 */
-	function follow( $uid )
-	{
-		return Database::insert(
-			'Followers',
-			array(
-				'follower' => $this->id,
-				'following' => $uid,
-				'timestamp' => time() ) );
-	}
-	
-	/**
-	 * Stop following a user
-	 *
-	 * @param int $uid User to stop following
-	 *
-	 * @return boolean success
-	 */
-	function unfollow( $uid )
-	{
-		return Database::delete(
-			'Followers',
-			array(
-				'follower' => $this->id,
-				'following' => $uid ) );
 	}
 	
 	///////////////////////////////////
