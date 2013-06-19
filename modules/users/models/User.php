@@ -23,99 +23,69 @@
 	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
  
-namespace nfuse\models;
+namespace infuse\models;
 
-use \nfuse\Database as Database;
-use \nfuse\Modules as Modules;
-use \nfuse\ErrorStack as ErrorStack;
-use \nfuse\libs\Validate as Validate;
-use \nfuse\Config as Config;
-use \nfuse\Messages as Messages;
+use \infuse\Database as Database;
+use \infuse\Modules as Modules;
+use \infuse\ErrorStack as ErrorStack;
+use \infuse\libs\Validate as Validate;
+use \infuse\Config as Config;
+use \infuse\Messages as Messages;
 
-class User extends \nfuse\Model
+class User extends \infuse\Model
 {
 	/////////////////////////////////////
 	// Model Properties
 	/////////////////////////////////////
 	
-	protected static $tablename = 'Users';
 	public static $idFieldName = 'uid';
-	protected static $escapedFields = array( 'website', 'about' );
+	
+	protected static $escapedFields = array();
+	
 	public static $properties = array(
-		array(
-			'title' => 'User ID',
-			'name' => 'uid',
+		'uid' =>  array(
 			'type' => 'text',
 			'filter' => '<a href="/users/{uid}" target="_blank">{uid}</a>'
 		),
-		array(
-			'title' => 'User Email',
-			'name' => 'user_email',
+		'user_email' => array(
 			'type' => 'text',
 			'filter' => '<a href="mailto:{user_email}">{user_email}</a>',
-			'validation' => array('\nfuse\libs\Validate','email'),
+			'validation' => array('\infuse\libs\Validate','email'),
 			'required' => true
 		),
-		array(
-			'title' => 'First Name',
-			'name' => 'first_name',
+		'first_name' => array(
 			'type' => 'text',
-			'validation' => array('\nfuse\libs\Validate','firstName'),
+			'validation' => array('\infuse\libs\Validate','firstName'),
 			'required' => true
 		),
-		array(
-			'title' => 'Last Name',
+		'last_name' => array(
 			'name' => 'last_name',
 			'type' => 'text',
-			'validation' => array('\nfuse\libs\Validate','lastName')
+			'validation' => array('\infuse\libs\Validate','lastName')
 		),
-		array(
-			'title' => 'User Password',
-			'name' => 'user_password',
+		'user_password' => array(
 			'type' => 'password',
-			'validation' => array('\nfuse\libs\Validate','password'),
+			'validation' => array('\infuse\libs\Validate','password'),
 			'required' => true			
 		),
-		array(
-			'title' => 'Registration Date',
-			'name' => 'registered_timestamp',
+		'registered_timestamp' => array(
 			'type' => 'date',
 			'required' => true,
 			'nowrap' => true
 		),
-		array(
-			'title' => 'IP',
-			'name' => 'ip',
+		'ip' => array(
 			'type' => 'text',
 			'filter' => '<a href="http://www.infobyip.com/ip-{ip}.html" target="_blank">{ip}</a>',
 			'required' => true
 		),
-		array(
-			'title' => 'Enabled',
-			'name' => 'enabled',
+		'enabled' => array(
 			'type' => 'boolean',
-			'validation' => array('\nfuse\libs\Validate','boolean_'),
+			'validation' => array('\infuse\libs\Validate','boolean_'),
 			'required' => true,
 			'default' => true
-		),
-		array(
-			'title' => 'Time Zone',
-			'name' => 'time_zone',
-			'type' => 'enum',
-			'enum' => array(
-				'America/New_York' => 'EST (GMT - 5)',
-				'America/Chicago' => 'CST (GMT - 6)',
-				'America/Denver' => 'MST (GMT - 7)',
-				'America/Los_Angeles' => 'PST (GMT - 8)',
-				'America/Anchorage' => 'AST (GMT - 9)',
-				'America/Honolulu' => 'HST (GMT - 10)'
-			),
-			'nowrap' => true,
-			'validation' => array('\nfuse\libs\Validate','timeZone'),
-			'required' => true			
 		)
 	);
-
+					
 	/////////////////////////////////////
 	// Private Class Variables
 	/////////////////////////////////////
@@ -211,7 +181,7 @@ class User extends \nfuse\Model
 		if( $this->id == -1 )
 			return false;
 			
-		return $this->getProperty('uid') == $this->id;
+		return $this->get('uid') == $this->id;
 	}
 	
 	/**
@@ -239,7 +209,7 @@ class User extends \nfuse\Model
 			if( !$this->registered() )
 				return '(no longer registered)';
 				
-			$names = $this->getProperty( array( 'first_name', 'last_name', 'user_email' ) );
+			$names = $this->get( array( 'first_name', 'last_name', 'user_email' ) );
 			if( $names[ 'first_name' ] != '' )
 				return $names[ 'first_name' ] . ( ($full) ? ' ' . $names[ 'last_name' ] : '' );
 			else
@@ -307,7 +277,7 @@ class User extends \nfuse\Model
 	 */
 	function registerDate( $format = 'F j, Y' )
 	{
-		return date( $format, $this->getProperty( 'registered_timestamp' ) );
+		return date( $format, $this->get( 'registered_timestamp' ) );
 	}
 	
 	/**
@@ -354,7 +324,7 @@ class User extends \nfuse\Model
 	function fbConnected()
 	{
 		// WARNING: this does not mean we still have permission, check with FB for that
-		return $this->getProperty('fbid') != '';
+		return $this->get('fbid') != '';
 	}
 	
 	/**
@@ -381,7 +351,7 @@ class User extends \nfuse\Model
 	function profilePicture( $size = 200 )
 	{
 		// use Gravatar
-		$hash = md5( strtolower( trim( $this->getProperty('user_email') ) ) );
+		$hash = md5( strtolower( trim( $this->get('user_email') ) ) );
 		return "https://secure.gravatar.com/avatar/$hash?s=$size&d=mm";
 	}	
 	
@@ -521,7 +491,7 @@ class User extends \nfuse\Model
 	{
 		Modules::load( 'validation' );
 		
-		if( !\nfuse\libs\Validate::email( $email, array( 'skipRegisteredCheck' => true ) ) )
+		if( !Validate::email( $email, array( 'skipRegisteredCheck' => true ) ) )
 			return false;
 	
 		$uid =  Database::select(
@@ -659,15 +629,19 @@ class User extends \nfuse\Model
 	}	
 	
 	/**
-	* Edits the user's information
-	*
-	* @param array $data data (mapped field to values)
-	*
-	* @return boolean true if successful
-	*/
-	function edit( $data )
+	 * Updates the model
+	 *
+	 * @param array|string $data key-value properties or name of property
+	 * @param string new $value value to set if name supplied
+	 *
+	 * @return boolean
+	 */
+	function set( $data, $value = false )
 	{
 		ErrorStack::setContext( 'edit' );
+		
+		if( !is_array( $data ) )
+			$data = array( $data => $value );
 		
 		$params = array();
 		$protectedFields = array( 'user_email', 'user_password' );
@@ -677,7 +651,7 @@ class User extends \nfuse\Model
 		$passwordRequired = false;
 		
 		if( isset( $data[ 'current_password' ] ) ) {
-			if( encryptPassword( $data[ 'current_password' ] ) == $this->getProperty( 'user_password' ) || self::$currentUser->isAdmin() )
+			if( encryptPassword( $data[ 'current_password' ] ) == $this->get( 'user_password' ) || self::$currentUser->isAdmin() )
 				$passwordValidated = true;
 		}
 
@@ -699,7 +673,7 @@ class User extends \nfuse\Model
 			return false;
 		}
 		
-		return parent::edit( $params );
+		return parent::set( $params );
 	}
 	
 	/**
@@ -711,7 +685,7 @@ class User extends \nfuse\Model
 	 */
 	function upgradeFromTemporary( $data )
 	{
-		\nfuse\ErrorStack::setContext( 'create' );
+		ErrorStack::setContext( 'create' );
 		
 		if( !$this->isTemporary() )
 			return true;
@@ -850,7 +824,7 @@ class User extends \nfuse\Model
 			}
 			else
 			// Could not make a match.
-				ErrorStack::add( Messages::USER_FORGOT_EMAIL_NO_MATCH, '\nfuse\libs\Validate', 'email' );
+				ErrorStack::add( Messages::USER_FORGOT_EMAIL_NO_MATCH, '\infuse\libs\Validate', 'email' );
 		}
 
 		ErrorStack::clearContext();		
@@ -869,7 +843,7 @@ class User extends \nfuse\Model
 	static function forgotStep2( $token, $password )
 	{
 		// set the context
-		\nfuse\ErrorStack::setContext( 'forgot' );
+		ErrorStack::setContext( 'forgot' );
 			
 		if( !$uid = Database::select(
 			'User_Links',
@@ -968,18 +942,18 @@ class User extends \nfuse\Model
 		if( $this->logged_in )
 			return true;
 			
-		\nfuse\ErrorStack::setContext('login');
+		ErrorStack::setContext('login');
 			
 		if( empty( $email ) ) // Validate the email.
 		{
 			// TODO: update this message
-			\nfuse\ErrorStack::add( \nfuse\Messages::USER_BAD_EMAIL, __CLASS__, __FUNCTION__ );
+			ErrorStack::add( Messages::USER_BAD_EMAIL, __CLASS__, __FUNCTION__ );
 			return false;
 		}
 
 		if( empty( $password ) && $fbid == 0 ) // Validate the password.
 		{
-			\nfuse\ErrorStack::add( \nfuse\Messages::USER_BAD_PASSWORD, __CLASS__, __FUNCTION__ );
+			ErrorStack::add( Messages::USER_BAD_PASSWORD, __CLASS__, __FUNCTION__ );
 			return false;
 		}
 		
@@ -1017,7 +991,7 @@ class User extends \nfuse\Model
 			$banned = false; // TODO: user bans
 			if( $userInfo[ 'enabled' ] != 1 || $banned ) // check if disabled or banned
 			{
-				\nfuse\ErrorStack::add( \nfuse\Messages::USER_LOGIN_BANNED, __CLASS__, __FUNCTION__ );
+				ErrorStack::add( Messages::USER_LOGIN_BANNED, __CLASS__, __FUNCTION__ );
 				return false;
 			}
 			// success
@@ -1069,7 +1043,7 @@ class User extends \nfuse\Model
 		}
 		else // No match was made.
 		{
-			\nfuse\ErrorStack::add( \nfuse\Messages::USER_LOGIN_NO_MATCH, __CLASS__, __FUNCTION__ );
+			ErrorStack::add( Messages::USER_LOGIN_NO_MATCH, __CLASS__, __FUNCTION__ );
 			return false;
 		}
 	}
@@ -1082,7 +1056,7 @@ class User extends \nfuse\Model
 	{
 		if( $this->isLoggedIn() )
 		{
-			Database::Delete( 'Persistent_Sessions', array( 'user_email' => $this->getProperty( 'user_email' ) ) ); // Delete all persistent sessions
+			Database::Delete( 'Persistent_Sessions', array( 'user_email' => $this->get( 'user_email' ) ) ); // Delete all persistent sessions
 		    $params = session_get_cookie_params(); // empty the session cookie
 			setcookie(session_name(), '', time() - 42000,
 				$params["path"], $params["domain"],
@@ -1113,7 +1087,7 @@ class User extends \nfuse\Model
 	
 		// check for the confirm and password
 		// only the current user can delete their account
-		if( $this->id > 1 && self::currentUser()->id() == $this->id && encryptPassword( $password ) == $this->getProperty( 'user_password' ) )
+		if( $this->id > 1 && self::currentUser()->id() == $this->id && encryptPassword( $password ) == $this->get( 'user_password' ) )
 		{
 			// delete the user
 			Database::delete(
@@ -1163,9 +1137,6 @@ class User extends \nfuse\Model
 			$subject = 'Password change request on ' . Config::value( 'site', 'title' );
 			$details[ 'forgotLink' ] = "{$details['baseUrl']}users/forgot/{$details['forgot']}";
 		break;
-		case 'invite-confirmation':
-			$subject = 'Your invite request has been received';
-		break;
 		default:
 			return false;
 		break;
@@ -1177,7 +1148,7 @@ class User extends \nfuse\Model
 			
 			// load the Mail module
 			Modules::load( 'mail' );
-			$mail = new \nfuse\libs\Mail;
+			$mail = new \infuse\libs\Mail;
 			
 			// basic e-mail info
 			$mail->From = SMTP_FROM_ADDRESS;
@@ -1185,9 +1156,9 @@ class User extends \nfuse\Model
 			$mail->Subject = $subject;
 			
 			// generate the body
-			$engine = \nfuse\ViewEngine::engine();
+			$engine = \infuse\ViewEngine::engine();
 			$engine->assignData( $details );
-			$body = $engine->fetch( Modules::$moduleDirectory . 'users/templates/emails.tpl' );
+			$body = $engine->fetch( Modules::$moduleDirectory . 'users/views/emails.tpl' );
 		
 			// text body
 			$mail->AltBody = $body;
@@ -1206,7 +1177,7 @@ class User extends \nfuse\Model
 			
 			if( $errors )
 			{
-				\nfuse\ErrorStack::add( $errors, __CLASS__, __FUNCTION__ );
+				\infuse\ErrorStack::add( $errors, __CLASS__, __FUNCTION__ );
 				return false;
 			}
 			else

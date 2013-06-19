@@ -1,6 +1,6 @@
 <?php
 /*
- * @package nFuse
+ * @package Infuse
  * @author Jared King <j@jaredtking.com>
  * @link http://jaredtking.com
  * @version 1.0
@@ -22,7 +22,7 @@
 	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-namespace nfuse;
+namespace infuse;
 
 abstract class Controller extends Acl
 {
@@ -66,7 +66,7 @@ abstract class Controller extends Acl
 	*/
 	static function name()
 	{
-		return strtolower( str_replace( 'nfuse\\controllers\\', '', get_called_class() ) );
+		return strtolower( str_replace( 'infuse\\controllers\\', '', get_called_class() ) );
 	}
 	
 	/**
@@ -79,12 +79,12 @@ abstract class Controller extends Acl
 	public static function loadClass( $class )
 	{
 		// look in modules/MODULE/CLASS.php
-		// i.e. /nfuse/models/User -> modules/users/models/User.php
+		// i.e. /infuse/models/User -> modules/users/models/User.php
 		
 		$module = static::name();
 		if( $module != 'Module' || $module != '' )
 		{
-			$name = str_replace( '\\', '/', str_replace( 'nfuse\\', '', $class ) );
+			$name = str_replace( '\\', '/', str_replace( 'infuse\\', '', $class ) );
 			$path = Modules::$moduleDirectory . "$module/$name.php";
 
 			if (file_exists($path) && is_readable($path))
@@ -106,7 +106,7 @@ abstract class Controller extends Acl
 	function can( $permission, $requestor = null )
 	{
 		if( $requestor === null )
-			$requestor = \nfuse\models\User::currentUser();
+			$requestor = \infuse\models\User::currentUser();
 		
 		// everyone in ADMIN group can view admin panel
 		if( $permission == 'view-admin' && $requestor->isMemberOf( ADMIN ) )
@@ -150,7 +150,7 @@ abstract class Controller extends Acl
 		if( !$req->isJson() )
 			return $res->setCode( 406 );
 
-		$modelClassName = "\\nfuse\\models\\$model";
+		$modelClassName = "\\infuse\\models\\$model";
 		$modelObj = new $modelClassName( ACL_NO_ID );
 		
 		// permission?
@@ -237,7 +237,7 @@ abstract class Controller extends Acl
 		if( !$moduleInfo[ 'api' ] || empty( $model ) )
 			return $res->setCode( 404 );
 
-		$modelClassName = "\\nfuse\\models\\$model";
+		$modelClassName = "\\infuse\\models\\$model";
 		$modelObj = new $modelClassName( $req->params( 'id' ) );
 		
 		// exists?
@@ -277,7 +277,7 @@ abstract class Controller extends Acl
 		if( !$req->isJson() )
 			return $res->setCode( 406 );
 
-		$modelClassName = "\\nfuse\\models\\$model";
+		$modelClassName = "\\infuse\\models\\$model";
 		$modelObj = new $modelClassName( ACL_NO_ID );
 		
 		// permission?
@@ -324,7 +324,7 @@ abstract class Controller extends Acl
 		if( !$req->isJson() )
 			return $res->setCode( 406 );
 
-		$modelClassName = "\\nfuse\\models\\$model";
+		$modelClassName = "\\infuse\\models\\$model";
 		$modelObj = new $modelClassName( $req->params( 'id' ) );
 		
 		// permission?
@@ -332,7 +332,7 @@ abstract class Controller extends Acl
 			return $res->setCode( 401 );
 		
 		// update the model
-		$success = $modelObj->edit( $req->request() );
+		$success = $modelObj->set( $req->request() );
 		
 		if( $success )
 			$res->setBodyJson( array(
@@ -370,7 +370,7 @@ abstract class Controller extends Acl
 		if( !$req->isJson() )
 			return $res->setCode( 406 );
 
-		$modelClassName = "\\nfuse\\models\\$model";
+		$modelClassName = "\\infuse\\models\\$model";
 		$modelObj = new $modelClassName( $req->params( 'id' ) );
 		
 		// permission?
@@ -412,7 +412,7 @@ abstract class Controller extends Acl
 		if( !$this->can( 'view-admin' ) )
 			return $res->setCode( 401 );
 		
-		$modelClassName = "\\nfuse\\models\\$model";
+		$modelClassName = "\\infuse\\models\\$model";
 		$modelObj = new $modelClassName( ACL_NO_ID );
 		
 		$modelInfo = new \stdClass;
@@ -429,8 +429,15 @@ abstract class Controller extends Acl
 			'truncate' => true,
 			'nowrap' => true
 		);
-		foreach( $modelClassName::$properties as $property )
-			$modelInfo->fields[] = array_merge( $default, $property );
+		foreach( $modelClassName::$properties as $name => $property )
+		{
+			$modelInfo->fields[] = array_merge(
+				$default,
+				array(
+					'name' => $name,
+					'title' => Inflector::humanize( $name ) ),
+				$property );
+		}
 		
 		$res->render( 'admin/model.tpl', array(
 			'modelJSON' => json_encode( $modelInfo )
@@ -488,7 +495,7 @@ abstract class Controller extends Acl
 	*/
 	protected function templateDir()
 	{
-		return Modules::$moduleDirectory . static::name() . '/templates/';
+		return Modules::$moduleDirectory . static::name() . '/views/';
 	}
 	
 	/**

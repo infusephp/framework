@@ -1,6 +1,6 @@
 <?php
 /**
- * @package nFuse
+ * @package Infuse
  * @author Jared King <j@jaredtking.com>
  * @link http://jaredtking.com
  * @version 1.0
@@ -22,7 +22,7 @@
 	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-namespace nfuse;
+namespace infuse;
 
 class Router
 {
@@ -66,7 +66,7 @@ class Router
 		$routeMethodStr = strtolower( $req->method() ) . ' ' . $req->basePath();
 		$routeGenericStr = $req->basePath();
 
-		$routes = \nfuse\Config::get( 'routes' );
+		$routes = \infuse\Config::get( 'routes' );
 		
 		$staticRoutes = array();
 		$dynamicRoutes = array();
@@ -155,7 +155,7 @@ class Router
 			
 			/* Redirect /4dm1n -> /4dm1n/:default */
 			
-			if( empty( $controller ) && $default = \nfuse\Config::value( 'site', 'default-admin-module' ) )
+			if( empty( $controller ) && $default = \infuse\Config::value( 'site', 'default-admin-module' ) )
 				$res->redirect( '/4dm1n/' . $default );
 						
 			if( Modules::exists( $controller ) )
@@ -259,7 +259,7 @@ class Router
 		$moduleInfo = Modules::info( $route[ 'controller' ] );
 	
 		ViewEngine::engine()->assignData( array(
-			'modulesWithAdmin' => \nfuse\Modules::modulesWithAdmin(),
+			'modulesWithAdmin' => \infuse\Modules::modulesWithAdmin(),
 			'selectedModule' => $route[ 'controller' ],
 			'title' => $moduleInfo[ 'title' ] ) );
 

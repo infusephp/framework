@@ -1,11 +1,11 @@
 <?php
 
-namespace nfuse\libs;
+namespace infuse\libs;
 
-use \nfuse\Modules as Modules;
-use \nfuse\models\CronJob as CronJob;
-use \nfuse\Database as Database;
-use \nfuse\Config as Config;
+use \infuse\Modules as Modules;
+use \infuse\models\CronJob as CronJob;
+use \infuse\Database as Database;
+use \infuse\Config as Config;
 
 class Cron
 {
@@ -75,7 +75,7 @@ class Cron
 			echo "-- Starting Cron on " . Config::value('site', 'title') . "\n";
 		
 		$tasks =  Database::select(
-			'Cron',
+			'CronJobs',
 			'id',
 			array(
 				'where' => array(

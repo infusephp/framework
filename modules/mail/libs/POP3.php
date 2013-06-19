@@ -59,7 +59,7 @@
  * @author Richard Davey
  */
  
-namespace nfuse\libs;
+namespace infuse\libs;
 
 class POP3 {
   /**

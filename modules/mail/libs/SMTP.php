@@ -46,7 +46,7 @@
  * original author: Chris Ryan
  */
 
-namespace nfuse\libs;
+namespace infuse\libs;
 
 class SMTP {
   /**

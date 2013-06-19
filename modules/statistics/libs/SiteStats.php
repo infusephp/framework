@@ -1,9 +1,9 @@
 <?php
 
-namespace nfuse\libs;
+namespace infuse\libs;
 
-use \nfuse\Config as Config;
-use \nfuse\Database as Database;
+use \infuse\Config as Config;
+use \infuse\Database as Database;
 
 class SiteStats
 {
@@ -102,8 +102,8 @@ class SiteStats
 			array(
 				'where' => array(
 					'registered_timestamp > ' . strtotime('today') ),
-				'single' => true ) );
-		
+				'single' => true ) );		
+
 		return $return;
 	}
 	

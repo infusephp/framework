@@ -2,7 +2,7 @@
 /**
  * Base class for models
  * 
- * @package nFuse
+ * @package Infuse
  * @author Jared King <j@jaredtking.com>
  * @link http://jaredtking.com
  * @version 1.0
@@ -62,7 +62,7 @@
  * 
  */
  
-namespace nfuse;
+namespace infuse;
 
 abstract class Model extends Acl
 {
@@ -72,14 +72,14 @@ abstract class Model extends Acl
 
 	public static $properties = array();
 	public static $idFieldName = 'id';
-	protected static $tablename;
-	protected static $escapeFields = array(); // specifies fields that should be escaped with htmlspecialchars()
 
 	/////////////////////////////
 	// Protected class variables
 	/////////////////////////////
 
 	protected $supplementaryIds = array(); // additional key columns
+	protected static $escapeFields = array(); // specifies fields that should be escaped with htmlspecialchars()
+	protected static $tablename = false;
 
 	/////////////////////////////
 	// Private class variables
@@ -138,10 +138,28 @@ abstract class Model extends Acl
 
 		$this->cacheInitialized = true;
 	}
-	
+		
 	/////////////////////////////
 	// GETTERS
 	/////////////////////////////
+
+	/**
+	 * Gets the tablename for the model
+	 *
+	 * @return string
+	 */
+	static function tablename()
+	{
+		// get model name
+		$modelClassName = get_called_class();
+		
+		// strip namespacing
+		$paths = explode( '\\', $modelClassName );
+		$modelName = end( $paths );
+		
+		// pluralize and camelize model name
+		return Inflector::camelize( Inflector::pluralize( $modelName ) );
+	}
 
 	/**
 	 * Gets the model ID
@@ -152,7 +170,7 @@ abstract class Model extends Acl
 	{
 		return $this->id;
 	}	
-		
+	
 	/**
 	 * Fetches properties from the model. If caching is enabled, then look there first. When
 	 * properties are not found in the cache then it will fall through to the Database layer.
@@ -161,7 +179,7 @@ abstract class Model extends Acl
 	 *
 	 * @return array|string|null requested info or not found
 	 */
-	function getProperty( $whichProperties )
+	function get( $whichProperties )
 	{
 		$properties = (is_string( $whichProperties )) ? explode(',', $whichProperties) : (array)$whichProperties;
 
@@ -195,8 +213,8 @@ abstract class Model extends Acl
 					static::$idFieldName => $this->id ),
 				$this->supplementaryIds );
 
-			$values = Database::select(
-				static::$tablename,
+ 			$values = Database::select(
+				static::tablename(),
 				implode(',', $properties),
 				array(
 					'where' => $where,
@@ -217,6 +235,14 @@ abstract class Model extends Acl
 	}
 	
 	/**
+	 * @deprecated
+	 */
+	function getProperty( $whichProperties )
+	{
+		return $this->get( $whichProperties );
+	}
+	
+	/**
 	 * Checks if the model has a property.
 	 *
 	 * @param string $property property
@@ -225,12 +251,7 @@ abstract class Model extends Acl
 	 */
 	static function hasProperty( $property )
 	{
-		foreach( static::$properties as $prop ) {
-			if( $property == val( $prop, 'name' ) )
-				return true;
-		}
-		
-		return false;
+		return isset( static::$properties[ $property ] );
 	}
 	
 	/**
@@ -255,10 +276,8 @@ abstract class Model extends Acl
 		$properties = array();
 		
 		// get the names of all the properties
-		foreach( static::$properties as $property )
+		foreach( static::$properties as $name => $property )
 		{
-			$name = (is_array( $property )) ? val( $property, 'name' ) : $property;
-
 			if( !empty( $name ) && !in_array( $name, $exclude ) )
 				$properties[] = $name;
 		}
@@ -266,7 +285,7 @@ abstract class Model extends Acl
 		// get the values of all the properties
 		return array_merge( array(
 			static::$idFieldName => $this->id ),
-			(array)$this->getProperty( $properties ) );
+			(array)$this->get( $properties ) );
 	}
 	
 	/**
@@ -308,13 +327,10 @@ abstract class Model extends Acl
 		if( !empty( $search ) )
 		{
 			$w = array();
-			foreach( static::$properties as $property )
+			foreach( static::$properties as $name => $property )
 			{
-				if( isset( $property[ 'name' ] ) && !isset( $where[ $property['name'] ] ) )
-				{
-					$name = (is_array( $property )) ? $property['name'] : $property;
+				if( val( $property, 'type' ) != 'custom' )
 					$w[] = "$name LIKE '%$search%'";
-				}
 			}
 			
 			$where[] = '(' . implode( ' OR ', $w ) . ')';
@@ -330,22 +346,11 @@ abstract class Model extends Acl
 			
 			if( count( $c ) != 2 )
 				continue;
+			
+			$propertyName = $c[ 0 ];
 						
 			// validate property
-			$propertyName = $c[ 0 ];
-			
-			$found = false;
-			foreach( static::$properties as $property )
-			{
-				$name = (is_array( $property )) ? $property['name'] : $property;
-				if( $name == $propertyName )
-				{
-					$found = true;
-					break;
-				}
-			}
-			
-			if( !$found )
+			if( !isset( static::$properties[ $propertyName ] ) )
 				continue;
 
 			// validate direction
@@ -357,7 +362,7 @@ abstract class Model extends Acl
 		}
 		
 		$count = (int)Database::select(
-			static::$tablename,
+			static::tablename(),
 			'count(*)',
 			array(
 				'where' => $where,
@@ -374,7 +379,7 @@ abstract class Model extends Acl
 			$filter[ 'orderBy' ] = $sortStr;
 
 		$models = Database::select(
-			static::$tablename,
+			static::tablename(),
 			'*',
 			$filter );
 		
@@ -401,7 +406,7 @@ abstract class Model extends Acl
 	static function totalRecords( $where = array() )
 	{
 		return (int)Database::select(
-			static::$tablename,
+			static::tablename(),
 			'count(*)',
 			array(
 				'where' => $where,
@@ -421,7 +426,7 @@ abstract class Model extends Acl
 			$this->supplementaryIds );
 
 		return Database::select(
-			static::$tablename,
+			static::tablename(),
 			'count(*)',
 			array(
 				'where' => $where,
@@ -448,7 +453,7 @@ abstract class Model extends Acl
 			$this->supplementaryIds );
 
 		$info = Database::select(
-			static::$tablename,
+			static::tablename(),
 			'*',
 			array(
 				'where' => $where,
@@ -544,15 +549,12 @@ abstract class Model extends Acl
 
 		$validated = true;
 		
-		// get the property names, indices mapping, and required properties
+		// get the property names, and required properties
 		$propertyNames = array();
-		$propertyIndices = array();
 		$requiredProperties = array();
-		foreach( static::$properties as $key => $property )
+		foreach( static::$properties as $name => $property )
 		{
-			$name = (is_array( $property )) ? $property['name'] : $property;;
 			$propertyNames[] = $name;
-			$propertyIndices[$name] = $key;
 			if( val( $property, 'required' ) )
 				$requiredProperties[] = $property;
 		}
@@ -566,7 +568,7 @@ abstract class Model extends Acl
 			else
 				continue;
 
-			$property = static::$properties[ $propertyIndices[ $field ] ];
+			$property = static::$properties[ $field ];
 
 			// cannot insert keys, unless explicitly allowed
 			if( $field == static::$idFieldName && ( !is_array( $property ) || !val( $property, 'canSetKey' ) ) )
@@ -604,10 +606,10 @@ abstract class Model extends Acl
 		}
 		
 		// add in default values
-		foreach( static::$properties as $fieldInfo )
+		foreach( static::$properties as $name => $fieldInfo )
 		{
-			if( isset( $fieldInfo[ 'default' ] ) && !isset( $insertArray[ $fieldInfo[ 'name' ] ] ) ) {
-				$insertArray[ $fieldInfo[ 'name' ] ] = $fieldInfo[ 'default' ];
+			if( isset( $fieldInfo[ 'default' ] ) && !isset( $insertArray[ $name ] ) ) {
+				$insertArray[ $name ] = $fieldInfo[ 'default' ];
 			}
 		}
 		
@@ -618,7 +620,7 @@ abstract class Model extends Acl
 			return false;
 
 		if( Database::insert(
-			static::$tablename,
+			static::tablename(),
 			$insertArray ) )
 		{
 			// create new model
@@ -636,11 +638,12 @@ abstract class Model extends Acl
 	/**
 	 * Updates the model
 	 *
-	 * @param array $data key-value properties
+	 * @param array|string $data key-value properties or name of property
+	 * @param string new $value value to set if name supplied
 	 *
 	 * @return boolean
 	 */
-	function edit( $data )
+	function set( $data, $value = false )
 	{
 		ErrorStack::setContext( 'edit' );
 	
@@ -650,7 +653,10 @@ abstract class Model extends Acl
 			ErrorStack::add( ERROR_NO_PERMISSION );
 			return false;
 		}
-			
+		
+		if( !is_array( $data ) )
+			$data = array( $data => $value );
+		
 		// not updating anything?
 		if( count( $data ) == 0 )
 			return true;
@@ -662,16 +668,13 @@ abstract class Model extends Acl
 			$this->supplementaryIds );
 		$updateKeys = array_keys( $updateArray );
 		
-		// get the property names and indices mapping
+		// get the property names
 		$propertyNames = array();
-		$propertyIndices = array();
-		foreach( static::$properties as $key => $property )
+		foreach( static::$properties as $name => $property )
 		{
-			$name = (is_array( $property )) ? val( $property, 'name' ) : $property;
 			if( empty( $name ) )
 				continue;
 			$propertyNames[] = $name;
-			$propertyIndices[$name] = $key;
 		}
 		
 		// loop through each supplied field and validate, if setup
@@ -686,7 +689,7 @@ abstract class Model extends Acl
 			else
 				continue;
 
-			$property = static::$properties[ $propertyIndices[ $field ] ];
+			$property = static::$properties[ $field ];
 
 			if( is_array( $property ) )
 			{
@@ -723,7 +726,7 @@ abstract class Model extends Acl
 			return false;
 
 		if( Database::update(
-			static::$tablename,
+			static::tablename(),
 			$updateArray,
 			$updateKeys ) )
 		{
@@ -754,7 +757,7 @@ abstract class Model extends Acl
 		
 		// delete the model
 		return Database::delete(
-			static::$tablename,
+			static::tablename(),
 			array_merge( array(
 				static::$idFieldName => $this->id ),
 				$this->supplementaryIds ) );

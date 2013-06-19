@@ -1,6 +1,6 @@
 <?php
 /**
- * @package nFuse
+ * @package Infuse
  * @author Jared King <j@jaredtking.com>
  * @link http://jaredtking.com
  * @version 1.0
@@ -22,7 +22,7 @@
 	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-namespace nfuse;
+namespace infuse;
 
 require_once "libs/Smarty/Smarty.class.php";
 
@@ -42,11 +42,11 @@ class ViewEngine Extends \Smarty
 		parent::__construct();
 		
 		$this->error_reporting = 1;
-		$this->base_template_dir = NFUSE_BASE_DIR . '/templates';
+		$this->base_template_dir = INFUSE_BASE_DIR . '/views';
 		$this->template_dir = $this->base_template_dir . '/';
-		$this->compile_dir = NFUSE_TEMP_DIR . '/smarty/';
-		$this->cache_dir = NFUSE_TEMP_DIR . '/smarty/cache/';
-		$this->functions_dir = NFUSE_BASE_DIR . '/libs/Smarty/functions';
+		$this->compile_dir = INFUSE_TEMP_DIR . '/smarty/';
+		$this->cache_dir = INFUSE_TEMP_DIR . '/smarty/cache/';
+		$this->functions_dir = INFUSE_BASE_DIR . '/libs/Smarty/functions';
         $this->assign('app_name', SITE_TITLE);
         
         if( isset( $options[ 'nocache' ] ) )
@@ -64,10 +64,10 @@ class ViewEngine Extends \Smarty
         }
 		
 		// minify CSS
-		$this->autoCompileLess( NFUSE_BASE_DIR . '/css/styles.less', 'styles.css');
+		$this->autoCompileLess( INFUSE_BASE_DIR . '/css/styles.less', 'styles.css');
 		
 		// minify JS
-		$this->autoCompileJs( NFUSE_BASE_DIR . '/js', 'header.js' );
+		$this->autoCompileJs( INFUSE_BASE_DIR . '/js', 'header.js' );
 	}
 	
 	/**
@@ -79,9 +79,9 @@ class ViewEngine Extends \Smarty
 	 */
 	function autoCompileLess( $inputFile, $outputFileName )
 	{
-		$cacheFile = NFUSE_TEMP_DIR . '/css/' . $outputFileName . ".cache";
+		$cacheFile = INFUSE_TEMP_DIR . '/css/' . $outputFileName . ".cache";
 		
-		$outputFile = NFUSE_APP_DIR . '/css/' . $outputFileName;
+		$outputFile = INFUSE_APP_DIR . '/css/' . $outputFileName;
 		
 		// load the cache
 		if( file_exists( $cacheFile ) ) {
@@ -90,7 +90,7 @@ class ViewEngine Extends \Smarty
 			$cache = $inputFile;
 		}
 		
-		$less = new \nfuse\lessc;
+		$less = new \infuse\lessc;
 		try
 		{
 			$newCache = $less->cachedCompile($cache);
@@ -119,9 +119,9 @@ class ViewEngine Extends \Smarty
 		// NOTE js files get appended in order by filename
 		// to change the order of js files, change the filename
 		
-		$cacheFile = NFUSE_TEMP_DIR . '/js/' . $outputFileName . ".cache";
+		$cacheFile = INFUSE_TEMP_DIR . '/js/' . $outputFileName . ".cache";
 		
-		$outputFile = NFUSE_APP_DIR . '/js/' . $outputFileName;
+		$outputFile = INFUSE_APP_DIR . '/js/' . $outputFileName;
 
 		$cache = false;
 		if( file_exists( $cacheFile ) ) {

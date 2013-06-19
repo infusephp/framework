@@ -8,21 +8,16 @@
  * @license
  */
 
-namespace nfuse\models;
+namespace infuse\models;
 
-class Group extends \nfuse\Model
+class Group extends \infuse\Model
 {
-	protected static $tablename = 'Groups';
 	protected static $escapeFields = array( 'website', 'about' );
 	public static $properties = array(
-		array(
-			'title' => 'ID',
-			'name' => 'id',
+		'id' => array(
 			'type' => 'text'
 		),
-		array(
-			'title' => 'Name',
-			'name' => 'group_name',
+		'group_name' => array(
 			'type' => 'text'
 		)
 	);
@@ -97,7 +92,7 @@ class Group extends \nfuse\Model
 	*/
 	function exists( )
 	{
-		return $this->primitive() || (\nfuse\Database::select( 'Groups', 'count(*)', array( 'where' => array( 'id' => $this->id ), 'single' => true ) ) == 1);
+		return $this->primitive() || (\infuse\Database::select( 'Groups', 'count(*)', array( 'where' => array( 'id' => $this->id ), 'single' => true ) ) == 1);
 	}
 	
 	/**
@@ -127,7 +122,7 @@ class Group extends \nfuse\Model
 			switch( $this->id )
 			{
 			case -1:
-				$users = \nfuse\Database::select( 'Users', 'uid', array( 'fetchStyle' => 'singleColumn', 'orderBy' => 'first_name ASC, last_name ASC' ) );
+				$users = \infuse\Database::select( 'Users', 'uid', array( 'fetchStyle' => 'singleColumn', 'orderBy' => 'first_name ASC, last_name ASC' ) );
 			break;
 			case 2:
 				if( Globals::$currentUser->logged_in() )
@@ -140,7 +135,7 @@ class Group extends \nfuse\Model
 		}
 		else
 		{
-			$users = \nfuse\Database::select(
+			$users = \infuse\Database::select(
 				'Users',
 				'uid',
 				array(
@@ -201,6 +196,11 @@ class Group extends \nfuse\Model
 			return false;
 		}
 
-		return \nfuse\Database::update( 'Groups', array( 'id' => $this->id, 'group_name' => $name ), array( 'id' ) );
+		return \infuse\Database::update(
+			'Groups',
+			array(
+				'id' => $this->id,
+				'group_name' => $name ),
+			array( 'id' ) );
 	}	
 }

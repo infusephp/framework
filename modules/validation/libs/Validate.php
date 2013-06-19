@@ -2,7 +2,7 @@
 /**
  * This class provides validation functions for commonly used fields, such as names, e-mail addresses, IP addresses, etc.
  * 
- * @package nFuse
+ * @package Infuse
  * @author Jared King <j@jaredtking.com>
  * @link http://jaredtking.com
  * @version 1.0
@@ -24,13 +24,12 @@
 	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
  
-namespace nfuse\libs;
+namespace infuse\libs;
 
-use \nfuse\ErrorStack as ErrorStack;
-use \nfuse\Modules as Modules;
-use \nfuse\models\User as User;
-use \nfuse\Messages as Messages;
-
+use \infuse\ErrorStack as ErrorStack;
+use \infuse\Modules as Modules;
+use \infuse\models\User as User;
+use \infuse\Messages as Messages;
 
 class Validate
 {
@@ -61,7 +60,7 @@ class Validate
 		if( !val( $parameters, 'skipBanCheck' ) )
 		{
 			Modules::load('bans');
-			if( \nfuse\models\Ban::isBanned( $email, BAN_TYPE_EMAIL ) )
+			if( \infuse\models\Ban::isBanned( $email, BAN_TYPE_EMAIL ) )
 			{
 				ErrorStack::add( Messages::VALIDATE_EMAIL_ADDRESS_BANNED, __CLASS__, __FUNCTION__ );
 				return false;
@@ -72,7 +71,7 @@ class Validate
 		{
 			$emailTaken = false;
 			if( isset( $parameters[ 'model' ] ) )
-				$emailTaken = $parameters[ 'model' ]::emailTaken( $email, $parameters[ 'model' ]->getProperty( 'user_email' ) );
+				$emailTaken = $parameters[ 'model' ]::emailTaken( $email, $parameters[ 'model' ]->get( 'user_email' ) );
 			else
 				$emailTaken = User::emailTaken( $email );
 			
@@ -106,7 +105,7 @@ class Validate
 		if( !val( $parameters, 'skipBanCheck' ) )
 		{
 			Modules::load('bans');
-			if( \nfuse\models\Ban::isBanned( $username, BAN_TYPE_USERNAME ) )
+			if( \infuse\models\Ban::isBanned( $username, BAN_TYPE_USERNAME ) )
 			{
 				ErrorStack::add( Messages::VALIDATE_USER_NAME_BANNED, __CLASS__, __FUNCTION__ );
 				return false;

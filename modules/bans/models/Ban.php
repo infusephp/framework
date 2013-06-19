@@ -2,7 +2,7 @@
 /**
  * This class represents a ban. Bans may be on IP addresses, e-mail addressses, or user name
  *
- * @package nFuse
+ * @package Infuse
  * @author Jared King <j@jaredtking.com>
  * @link http://jaredtking.com
  * @version 1.0
@@ -24,40 +24,31 @@
 	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
  
-namespace nfuse\models;
+namespace infuse\models;
 
-use \nfuse\Database as Database;
+use \infuse\Database as Database;
 
 define( 'BAN_TYPE_IP', 1 );
 define( 'BAN_TYPE_USERNAME', 2 );
 define( 'BAN_TYPE_EMAIL', 3 );
 
-class Ban extends \nfuse\Model
+class Ban extends \infuse\Model
 {
-	protected static $tablename = 'Ban';
 	public static $properties = array(
-		array(
-			'title' => 'ID',
-			'name' => 'id',
+		'id' => array(
 			'type' => 'text'
 		),	
-		array(
-			'title' => 'Type',
-			'name' => 'type',
+		'type' => array(
 			'type' => 'enum',
 			'enum' => array (
 				1 => 'IP',
 				2 => 'Username',
 				3 => 'E-mail Address' )
 		),	
-		array(
-			'title' => 'Value',
-			'name' => 'value',
+		'value' => array(
 			'type' => 'text'
 		),	
-		array(
-			'title' => 'Reason',
-			'name' => 'reason',
+		'reason' => array(
 			'type' => 'text'
 		)
 	);
@@ -77,7 +68,7 @@ class Ban extends \nfuse\Model
 			return false;
 		
 		return Database::select(
-			'Ban',
+			static::tablename(),
 			'count(*)',
 			array(
 				'where' => array(

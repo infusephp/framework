@@ -2,7 +2,7 @@
 /**
  * This class represents a permission in the global ACL.
  *
- * @package nFuse
+ * @package Infuse
  * @author Jared King <j@jaredtking.com>
  * @link http://jaredtking.com
  * @version 1.0
@@ -24,43 +24,30 @@
 	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-namespace nfuse\models;
+namespace infuse\models;
 
-class Permission extends \nfuse\Model
+class Permission extends \infuse\Model
 {
-	protected static $tablename = 'ACL';
 	public static $properties = array(
-		array(
-			'title' => 'ID',
-			'name' => 'id',
+		'id' => array(
 			'type' => 'text'
 		),	
-		array(
-			'title' => 'Model',
-			'name' => 'model',
+		'model' => array(
 			'type' => 'text'
 		),
-		array(
-			'title' => 'Model ID',
-			'name' => 'model_id',
+		'model_id' => array(
+			'type' => 'text',
+			'null' => true
+		),
+		'user' => array(
 			'type' => 'text',
 			'null' => true
 		),	
-		array(
-			'title' => 'User',
-			'name' => 'user',
+		'group_' => array(
 			'type' => 'text',
 			'null' => true
 		),	
-		array(
-			'title' => 'Group',
-			'name' => 'group_',
-			'type' => 'text',
-			'null' => true
-		),	
-		array(
-			'title' => 'Permission',
-			'name' => 'permission',
+		'permission' => array(
 			'type' => 'text'
 		)
 	);

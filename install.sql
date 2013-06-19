@@ -1,9 +1,9 @@
-DROP TABLE IF EXISTS `ACL`;
-CREATE TABLE `ACL` (`id` int(11) NOT NULL auto_increment, PRIMARY KEY (`id`), `model` varchar(255) NOT NULL, `model_id` int(11) NULL, `uid` int(11) NOT NULL, `gid` int(11) NOT NULL, `permission` varchar(255) NOT NULL);
-DROP TABLE IF EXISTS `Ban`;
-CREATE TABLE `Ban` (`id` int(11) NOT NULL auto_increment, PRIMARY KEY (`id`), `type` int(1) NOT NULL, `value` varchar(40) NULL, `reason` varchar(255) NULL);
-DROP TABLE IF EXISTS `Cron`;
-CREATE TABLE `Cron` ( `id` int(11) NOT NULL AUTO_INCREMENT, `name` varchar(255) NOT NULL, `module` varchar(100) NOT NULL, `command` varchar(100) NOT NULL, `minute` char(2) NOT NULL, `hour` char(2) NOT NULL, `day` char(2) NOT NULL, `week` char(2) NOT NULL, `month` char(2) NOT NULL, `last_ran` int(10) DEFAULT NULL, `next_run` int(10) DEFAULT NULL, `last_run_result` tinyint(1) NOT NULL DEFAULT '0', `last_run_output` text NOT NULL, PRIMARY KEY (`id`), KEY `module` (`module`) );
+DROP TABLE IF EXISTS `Permissions`;
+CREATE TABLE `Permissions` (`id` int(11) NOT NULL auto_increment, PRIMARY KEY (`id`), `model` varchar(255) NOT NULL, `model_id` int(11) NULL, `uid` int(11) NOT NULL, `gid` int(11) NOT NULL, `permission` varchar(255) NOT NULL);
+DROP TABLE IF EXISTS `Bans`;
+CREATE TABLE `Bans` (`id` int(11) NOT NULL auto_increment, PRIMARY KEY (`id`), `type` int(1) NOT NULL, `value` varchar(40) NULL, `reason` varchar(255) NULL);
+DROP TABLE IF EXISTS `CronJobs`;
+CREATE TABLE `CronJobs` ( `id` int(11) NOT NULL AUTO_INCREMENT, `name` varchar(255) NOT NULL, `module` varchar(100) NOT NULL, `command` varchar(100) NOT NULL, `minute` char(2) NOT NULL, `hour` char(2) NOT NULL, `day` char(2) NOT NULL, `week` char(2) NOT NULL, `month` char(2) NOT NULL, `last_ran` int(10) DEFAULT NULL, `next_run` int(10) DEFAULT NULL, `last_run_result` tinyint(1) NOT NULL DEFAULT '0', `last_run_output` text NOT NULL, PRIMARY KEY (`id`), KEY `module` (`module`) );
 DROP TABLE IF EXISTS `Group_Members`;
 CREATE TABLE `Group_Members` (`gid` int(11) NOT NULL, `uid` int(11) NOT NULL, PRIMARY KEY (`gid`,`uid`));
 DROP TABLE IF EXISTS `Groups`;

@@ -1,6 +1,6 @@
 <?php
 
-namespace nfuse\libs;
+namespace infuse\libs;
  
 class CronDate
 {

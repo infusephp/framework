@@ -1,6 +1,6 @@
 <?php
 /*
- * @package nFuse
+ * @package Infuse
  * @author Jared King <j@jaredtking.com>
  * @link http://jaredtking.com
  * @version 1.0
@@ -22,14 +22,14 @@
 	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-use \nfuse\Config as Config;
+use \infuse\Config as Config;
 
 // register autoloader
 spl_autoload_register( function( $class ) {
 	$classPaths = explode('\\', $class);
-	if( $classPaths[ 0 ] == 'nfuse' && count( $classPaths ) == 2 )
+	if( $classPaths[ 0 ] == 'infuse' && count( $classPaths ) == 2 )
 	{
-		$path = NFUSE_BASE_DIR . '/libs/' . $classPaths[1] . '.php';
+		$path = INFUSE_BASE_DIR . '/libs/' . $classPaths[1] . '.php';
 		if( file_exists($path) && is_readable($path) )
 			include_once $path;
 	}
@@ -45,23 +45,23 @@ if( Config::value( 'site', 'disabled' ) && urlParam( 0 ) != '4dm1n' )
 // load site constants
 require_once "includes/constants.php";
 
-$req = new \nfuse\Request();
-$res = new \nfuse\Response();
+$req = new \infuse\Request();
+$res = new \infuse\Response();
 
 if( $req->isCli() )
 {
 	// load required modules
-	\nfuse\Modules::loadRequired();
+	\infuse\Modules::loadRequired();
 	
 	if( $argc >= 2 ) {
 		$req->setPath( $argv[ 1 ] );
 	}
 	
 	// super user permissions
-	\nfuse\models\User::elevateToSuperUser();
+	\infuse\models\User::elevateToSuperUser();
 
 	//route request
-	\nfuse\Router::route( $req, $res );
+	\infuse\Router::route( $req, $res );
 		
 	echo $res->getBody();
 }
@@ -69,8 +69,8 @@ else
 {
 	// TODO this could be middleware
 	// check if ip is banned
-	if( \nfuse\Database::select(
-		'Ban',
+	if( \infuse\Database::select(
+		'Bans',
 		'count(*)',
 		array(
 			'where' => array(
@@ -107,7 +107,7 @@ else
 		// session handler
 		if( Config::value( 'session', 'adapter' ) == 'redis' )
 		{
-			\nfuse\RedisSession::start(array(
+			\infuse\RedisSession::start(array(
     			'scheme' => Config::value('redis','scheme'),
     			'host'   => Config::value('redis','host'),
 		    	'port'   => Config::value('redis','port')
@@ -116,7 +116,7 @@ else
 		// default: database
 		else
 		{
-			$session = New \nfuse\DatabaseSession();
+			$session = New \infuse\DatabaseSession();
 			
 			session_set_save_handler ( array (&$session, "_open"),
 			                           array (&$session, "_close"),
@@ -133,13 +133,13 @@ else
 	}
 	
 	// load required modules
-	\nfuse\Modules::loadRequired();	
+	\infuse\Modules::loadRequired();	
 	
 	// middleware
-	\nfuse\Modules::middleware( $req, $res );
+	\infuse\Modules::middleware( $req, $res );
 	
 	//route request
-	\nfuse\Router::route( $req, $res );
+	\infuse\Router::route( $req, $res );
 	
 	// send the response
 	$res->send( $req );

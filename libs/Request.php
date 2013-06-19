@@ -1,6 +1,6 @@
 <?php
 /**
- * @package nFuse
+ * @package Infuse
  * @author Jared King <j@jaredtking.com>
  * @link http://jaredtking.com
  * @version 1.0
@@ -22,7 +22,7 @@
 	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-namespace nfuse;
+namespace infuse;
 
 class Request
 {
@@ -74,7 +74,7 @@ class Request
             'SERVER_NAME' => 'localhost',
             'SERVER_PORT' => 80,
             'HTTP_HOST' => 'localhost',
-            'HTTP_USER_AGENT' => 'nFuse/1.X',
+            'HTTP_USER_AGENT' => 'infuse/1.X',
             'HTTP_ACCEPT' => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
             'HTTP_ACCEPT_LANGUAGE' => 'en-us,en;q=0.5',
             'HTTP_ACCEPT_CHARSET' => 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
@@ -378,7 +378,7 @@ class Request
 	}
 	
 	/**
-	 * Checks if the request is an API call. Note, this is specific to nfuse framework.
+	 * Checks if the request is an API call. Note, this is specific to infuse framework.
 	 *
 	 * @return boolean
 	 */

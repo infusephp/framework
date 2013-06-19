@@ -54,7 +54,7 @@
  * @link http://code.google.com/p/jsmin-php/
  */
 
-namespace nfuse;
+namespace infuse;
 
 class JSMin {
     const ORD_LF            = 10;

@@ -1,6 +1,6 @@
 <?php
 	
-namespace nfuse;
+namespace infuse;
 
 if(!class_exists('\Predis\Client'))
 {

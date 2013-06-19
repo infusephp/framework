@@ -1,6 +1,6 @@
 <?php
 /**
- * @package nFuse
+ * @package Infuse
  * @author Jared King <j@jaredtking.com>
  * @link http://jaredtking.com
  * @version 1.0
@@ -22,7 +22,7 @@
 	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-namespace nfuse;
+namespace infuse;
 
 class Response
 {
@@ -162,7 +162,7 @@ class Response
 	 */
 	public function render( $template, $parameters = array() )
 	{
-		$parameters[ 'currentUser' ] = \nfuse\models\User::currentUser();
+		$parameters[ 'currentUser' ] = \infuse\models\User::currentUser();
 		$parameters[ 'baseUrl' ] = ((Config::value('site','ssl-enabled'))?'https':'http') . '://' . Config::value('site','host-name') . '/';
 	
 		$engine = ViewEngine::engine();
@@ -185,7 +185,7 @@ class Response
 			$url = '//' . preg_replace('/\/{2,}/','/', $url);
 		}
 		
-		header('X-Powered-By: nfuse');
+		header('X-Powered-By: infuse');
 		header ("Location: " . $url);
 
 		exit;
@@ -222,7 +222,7 @@ class Response
 		// set the content type
 		header('Content-type: ' . $contentType . '; charset=utf-8');
 		// set the powered by
-		header('X-Powered-By: nfuse');
+		header('X-Powered-By: infuse');
 		
 		if( !empty( $this->body ) )
 		{

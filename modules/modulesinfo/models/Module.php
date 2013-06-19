@@ -1,6 +1,6 @@
 <?php
 /*
- * @package nFuse
+ * @package Infuse
  * @author Jared King <j@jaredtking.com>
  * @link http://jaredtking.com
  * @version 1.0
@@ -22,40 +22,28 @@
 	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-namespace nfuse\models;
+namespace infuse\models;
 
-class Module extends \nfuse\Model
+class Module extends \infuse\Model
 {
 	public static $properties = array(
-		array(
-			'title' => 'Module',
-			'name' => 'title',
+		'title' => array(
 			'type' => 'text'
 		),
-		array(
-			'title' => 'Version',
-			'name' => 'version',
+		'version' => array(
 			'type' => 'text'
 		),
-		array(
-			'title' => 'Description',
-			'name' => 'description',
+		'description' => array(
 			'type' => 'text'
 		),
-		array(
-			'title' => 'Author',
-			'name' => 'author',
+		'author' => array(
 			'type' => 'text',
 			'truncate' => false
 		),
-		array(
-			'title' => 'Auto API',
-			'name' => 'api',
+		'api' => array(
 			'type' => 'boolean'
 		),
-		array(
-			'title' => 'Auto Admin',
-			'name' => 'admin',
+		'admin' => array(
 			'type' => 'boolean'
 		)
 	);
@@ -64,7 +52,7 @@ class Module extends \nfuse\Model
 	{
 		$return = array('models'=>array());
 		
-		$modules = \nfuse\Modules::all();
+		$modules = \infuse\Modules::all();
 		foreach( $modules as $info )
 			$return['models'][] = new Module( $info[ 'name' ] );
 		
@@ -75,12 +63,12 @@ class Module extends \nfuse\Model
 	
 	static function totalRecords( $where = array() )
 	{
-		return count( \nfuse\Modules::all() );
+		return count( \infuse\Modules::all() );
 	}
 	
 	function toArray( $exclude = array() )
 	{
-		$info = \nfuse\Modules::info( $this->id );
+		$info = \infuse\Modules::info( $this->id );
 		
 		$author = $info['author'];
 		

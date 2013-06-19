@@ -1,6 +1,6 @@
 <?php
 /*
- * @package nFuse
+ * @package Infuse
  * @author Jared King <j@jaredtking.com>
  * @link http://jaredtking.com
  * @version 1.0
@@ -22,10 +22,10 @@
 	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
  
-namespace nfuse;
+namespace infuse;
 
-use \nfuse\Database as Database;
-use \nfuse\models\User as User;
+use \infuse\Database as Database;
+use \infuse\models\User as User;
 
 class DatabaseSession
 {

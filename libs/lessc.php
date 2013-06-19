@@ -38,7 +38,7 @@
  * handling things like indentation.
  */
  
-namespace nfuse;
+namespace infuse;
  
 class lessc {
 	static public $VERSION = "v0.3.9";
@@ -1810,11 +1810,11 @@ class lessc {
 	}
 
 	protected function newFormatter() {
-		$className = "\\nfuse\\lessc_formatter_lessjs";
+		$className = "\\infuse\\lessc_formatter_lessjs";
 		if (!empty($this->formatterName)) {
 			if (!is_string($this->formatterName))
 				return $this->formatterName;
-			$className = "\\nfuse\\lessc_formatter_$this->formatterName";
+			$className = "\\infuse\\lessc_formatter_$this->formatterName";
 		}
 
 		return new $className;
@@ -2096,7 +2096,7 @@ class lessc_parser {
 
 		if (!self::$operatorString) {
 			self::$operatorString =
-				'('.implode('|', array_map(array('\\nfuse\\lessc', 'preg_quote'),
+				'('.implode('|', array_map(array('\\infuse\\lessc', 'preg_quote'),
 									array_keys(self::$precedence))).')';
 
 			$commentSingle = lessc::preg_quote(self::$commentSingle);
@@ -2326,7 +2326,7 @@ class lessc_parser {
 	protected function isDirective($dirname, $directives) {
 		// TODO: cache pattern in parser
 		$pattern = implode("|",
-			array_map(array("\\nfuse\\lessc", "preg_quote"), $directives));
+			array_map(array("\\infuse\\lessc", "preg_quote"), $directives));
 		$pattern = '/^(-[a-z-]+-)?(' . $pattern . ')$/i';
 
 		return preg_match($pattern, $dirname);
@@ -2614,7 +2614,7 @@ class lessc_parser {
 		$this->eatWhiteDefault = false;
 
 		$stop = array("'", '"', "@{", $end);
-		$stop = array_map(array("\\nfuse\\lessc", "preg_quote"), $stop);
+		$stop = array_map(array("\\infuse\\lessc", "preg_quote"), $stop);
 		// $stop[] = self::$commentMulti;
 
 		if (!is_null($rejectStrs)) {

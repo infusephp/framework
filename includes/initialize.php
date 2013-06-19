@@ -1,6 +1,6 @@
 <?php
 /*
- * @package nFuse
+ * @package Infuse
  * @author Jared King <j@jaredtking.com>
  * @link http://jaredtking.com
  * @version 1.0
@@ -23,15 +23,15 @@
 */
 
 // set the root app directory
-define( 'NFUSE_BASE_DIR', dirname(__DIR__));
-set_include_path( get_include_path() . PATH_SEPARATOR . NFUSE_BASE_DIR );
+define( 'INFUSE_BASE_DIR', dirname(__DIR__));
+set_include_path( get_include_path() . PATH_SEPARATOR . INFUSE_BASE_DIR );
 
 // load configuration
 require_once 'libs/Config.php';
-\nfuse\Config::load( NFUSE_BASE_DIR . '/config.yml' );
+\infuse\Config::load( INFUSE_BASE_DIR . '/config.yml' );
 
 // error reporting
-if( \nfuse\Config::value( 'site', 'production-level' ) )
+if( \infuse\Config::value( 'site', 'production-level' ) )
 {
 	ini_set("display_errors", 0);
 	ini_set("log_errors", 1);

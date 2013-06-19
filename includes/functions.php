@@ -1,6 +1,6 @@
 <?php
 /*
- * @package nFuse
+ * @package Infuse
  * @author Jared King <j@jaredtking.com>
  * @link http://jaredtking.com
  * @version 1.0
@@ -190,7 +190,7 @@ function oauthCredentialsSupplied()
 
 function encryptPassword( $password, $nonce = '' )
 { // nonce currently not used
-	return hash_hmac('sha512', $password . $nonce, \nfuse\Config::value( 'site', 'salt' ));
+	return hash_hmac('sha512', $password . $nonce, \infuse\Config::value( 'site', 'salt' ));
 }
 
 function json_decode_array($d)

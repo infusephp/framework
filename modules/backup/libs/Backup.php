@@ -1,6 +1,6 @@
 <?php
 
-namespace nfuse\libs;
+namespace infuse\libs;
 
 class Backup
 {
@@ -29,13 +29,13 @@ class Backup
 		// open the file
 		$file = fopen( $filename, "w" );
 		
-		$tables = \nfuse\Database::listTables();
+		$tables = \infuse\Database::listTables();
 	
 		foreach( $tables as $table_name )
 		{
 			$sql_string = "DROP TABLE IF EXISTS `$table_name`;\n";
 	
-			$columns = \nfuse\Database::listColumns( $table_name );
+			$columns = \infuse\Database::listColumns( $table_name );
 
 			$sql_string .= "CREATE TABLE `$table_name` (";
 	
@@ -68,7 +68,7 @@ class Backup
 	
 			self::writeFile($file, $sql_string);
 			
-			$tableData = \nfuse\Database::select( $table_name, '*' );
+			$tableData = \infuse\Database::select( $table_name, '*' );
 					
 			foreach( $tableData as $row )
 			{	
@@ -110,7 +110,7 @@ class Backup
 	
 			if ($query != null) {
 				$line_count++;
-				\nfuse\Database::sql( $query );
+				\infuse\Database::sql( $query );
 			}
 	
 		}
@@ -120,10 +120,10 @@ class Backup
 	
 	static function optimizeDatabase()
 	{
-		$tables = \nfuse\Database::listTables();
+		$tables = \infuse\Database::listTables();
 	
 		foreach( $tables as $table )
-			\nfuse\Database::sql( "OPTIMIZE TABLE `$table`;" );
+			\infuse\Database::sql( "OPTIMIZE TABLE `$table`;" );
 			
 		return true;
 	}

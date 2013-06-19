@@ -3,7 +3,7 @@
 /**
  * Abstraction layer between the database and application. Uses PHP's PDO extension.
 /*
- * @package nFuse
+ * @package Infuse
  * @author Jared King <j@jaredtking.com>
  * @link http://jaredtking.com
  * @version 1.0
@@ -25,7 +25,7 @@
 	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
  
-namespace nfuse;
+namespace infuse;
  
 class Database
 {
@@ -60,13 +60,13 @@ class Database
 		}
 		catch(PDOException $e)
 		{
-			\nfuse\ErrorStack::add( $e->getMessage(), __CLASS__, __FUNCTION__ );
+			\infuse\ErrorStack::add( $e->getMessage(), __CLASS__, __FUNCTION__ );
 			die( 'Could not connect to database.' );
 			return false;
 		}
 		
 		// Set error level
-		if( \nfuse\Config::value( 'site', 'production-level' ) )
+		if( \infuse\Config::value( 'site', 'production-level' ) )
 			self::$DBH->setAttribute( \PDO::ATTR_ERRMODE, \PDO::ERRMODE_WARNING );
 		else
 			self::$DBH->setAttribute( \PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION );
@@ -224,7 +224,7 @@ class Database
 		}
 		catch(PDOException $e)
 		{
-			\nfuse\ErrorStack::add( $e->getMessage(), __CLASS__, __FUNCTION__ );
+			\infuse\ErrorStack::add( $e->getMessage(), __CLASS__, __FUNCTION__ );
 			return false;
 		}
 	}
@@ -278,7 +278,7 @@ class Database
 		}
 		catch(PDOException $e)
 		{
-			\nfuse\ErrorStack::add( $e->getMessage(), __CLASS__, __FUNCTION__ );
+			\infuse\ErrorStack::add( $e->getMessage(), __CLASS__, __FUNCTION__ );
 			return null;
 		}
 	}
@@ -384,7 +384,7 @@ class Database
 		}
 		catch(PDOException $e)
 		{
-			\nfuse\ErrorStack::add( $e->getMessage(), __CLASS__, __FUNCTION__ );
+			\infuse\ErrorStack::add( $e->getMessage(), __CLASS__, __FUNCTION__ );
 			return false;
 		}
 		
@@ -447,7 +447,7 @@ class Database
 		}
 		catch(PDOException $e)
 		{
-			\nfuse\ErrorStack::add( $e->getMessage(), __CLASS__, __FUNCTION__ );
+			\infuse\ErrorStack::add( $e->getMessage(), __CLASS__, __FUNCTION__ );
 			return false;
 		}
 		
@@ -491,7 +491,7 @@ class Database
 		}
 		catch(PDOException $e)
 		{  
-			\nfuse\ErrorStack::add( $e->getMessage(), __CLASS__, __FUNCTION__ );
+			\infuse\ErrorStack::add( $e->getMessage(), __CLASS__, __FUNCTION__ );
 			return false;
 		}
 		
@@ -546,7 +546,7 @@ class Database
 		}
 		catch(PDOException $e)
 		{
-			\nfuse\ErrorStack::add( $e->getMessage(), __CLASS__, __FUNCTION__ );
+			\infuse\ErrorStack::add( $e->getMessage(), __CLASS__, __FUNCTION__ );
 			return false;
 		}
 		

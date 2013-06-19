@@ -38,7 +38,7 @@
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
 
-namespace nfuse\libs;
+namespace infuse\libs;
 
 if (version_compare(PHP_VERSION, '5.0.0', '<') ) exit("Sorry, this version of PHPMailer will only run on PHP version 5 or greater!\n");
 
@@ -58,7 +58,7 @@ class Mail {
    * Sets the CharSet of the message.
    * @var string
    */
-  public $CharSet           = 'iso-8859-1';
+  public $CharSet           = 'utf-8';
 
   /**
    * Sets the Content-type of the message.

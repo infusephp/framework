@@ -1,6 +1,6 @@
 <?php
 /*
- * @package nFuse
+ * @package Infuse
  * @author Jared King <j@jaredtking.com>
  * @link http://jaredtking.com
  * @version 1.0
@@ -22,79 +22,53 @@
 	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
  
-namespace nfuse\models;
+namespace infuse\models;
 
-use \nfuse\libs\Cron as Cron;
-use \nfuse\libs\CronDate as CronDate;
+use \infuse\libs\Cron as Cron;
+use \infuse\libs\CronDate as CronDate;
+use \infuse\ErrorStack as ErrorStack;
 
-class CronJob extends \nfuse\Model
+class CronJob extends \infuse\Model
 {
-	protected static $tablename = 'Cron';
 	public static $properties = array(
-		array(
-			'title' => 'ID',
-			'name' => 'id',
+		'id' => array(
 			'type' => 'text'
 		),
-		array(
-			'title' => 'Name',
-			'name' => 'name',
+		'name' => array(
 			'type' => 'text'
 		),
-		array(
-			'title' => 'Next Run',
-			'name' => 'next_run',
+		'next_run' => array(
 			'type' => 'date'
 		),
-		array(
-			'title' => 'Last Ran',
-			'name' => 'last_ran',
+		'last_ran' => array(
 			'type' => 'date'
 		),
-		array(
-			'title' => 'Last Run Success',
-			'name' => 'last_run_result',
+		'last_run_result' => array(
 			'type' => 'boolean',
 			'default' => 0
 		),
-		array(
-			'title' => 'Module',
-			'name' => 'module',
+		'module' => array(
 			'type' => 'text'
 		),
-		array(
-			'title' => 'Command',
-			'name' => 'command',
+		'command' => array(
 			'type' => 'text'
 		),
-		array(
-			'title' => 'Minute',
-			'name' => 'minute',
+		'minute' => array(
 			'type' => 'text'
 		),
-		array(
-			'title' => 'Hour',
-			'name' => 'hour',
+		'hour' => array(
 			'type' => 'text'
 		),
-		array(
-			'title' => 'Day',
-			'name' => 'day',
+		'day' => array(
 			'type' => 'text'
 		),
-		array(
-			'title' => 'month',
-			'name' => 'month',
+		'month' => array(
 			'type' => 'text'
 		),
-		array(
-			'title' => 'Week',
-			'name' => 'week',
+		'week' => array(
 			'type' => 'text'
 		),
-		array(
-			'title' => 'Last Run Output',
-			'name' => 'last_run_output',
+		'last_run_output' => array(
 			'type' => 'text',
 			'filter' => '<pre>{last_run_output}</pre>',
 			'truncate' => false
@@ -141,14 +115,20 @@ class CronJob extends \nfuse\Model
 	}
 		
 	/**
-	* Edits a cron job
-	* 
-	* @param array $data
-	*
-	* @return boolean success
-	*/
-	function edit( $data )
+	 * Updates the model
+	 *
+	 * @param array|string $data key-value properties or name of property
+	 * @param string new $value value to set if name supplied
+	 *
+	 * @return boolean
+	 */
+	function set( $data, $value = false )
 	{
+		ErrorStack::setContext( 'edit' );
+		
+		if( !is_array( $data ) )
+			$data = array( $data => $value );
+
 		if( isset( $data[ 'minute' ] ) && !self::validateCronTimePiece( $data[ 'minute' ], 0, 59 ) )
 			return false;
 		
@@ -167,7 +147,7 @@ class CronJob extends \nfuse\Model
 		if( isset( $data[ 'minute' ] ) && isset( $data[ 'hour' ] ) && isset( $data[ 'day' ] ) && isset( $data[ 'month' ] ) && isset( $data[ 'week' ] ) )
 			$data[ 'next_run' ] = self::calcNextRun( $data[ 'minute' ], $data[ 'hour' ], $data[ 'day' ], $data[ 'month' ], $data[ 'week' ] );
 
-		return parent::edit( $data );
+		return parent::set( $data );
 	}
 	
 	/**
@@ -181,13 +161,13 @@ class CronJob extends \nfuse\Model
 	function saveRun( $result, $output )
 	{
 		$nextRun = self::calcNextRun(
-			$this->getProperty( 'minute' ),
-			$this->getProperty( 'hour' ),
-			$this->getProperty( 'day' ),
-			$this->getProperty( 'month' ),
-			$this->getProperty( 'week' ) );
+			$this->get( 'minute' ),
+			$this->get( 'hour' ),
+			$this->get( 'day' ),
+			$this->get( 'month' ),
+			$this->get( 'week' ) );
 		
-		return $this->edit( array(
+		return $this->set( array(
 			'next_run' => $nextRun,
 			'last_ran' => time(),
 			'last_run_result' => $result,

@@ -1,6 +1,6 @@
 <?php
 /*
- * @package nFuse
+ * @package Infuse
  * @author Jared King <j@jaredtking.com>
  * @link http://jaredtking.com
  * @version 1.0
@@ -22,7 +22,7 @@
 	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
  
-namespace nfuse;
+namespace infuse;
   
 abstract class Acl
 {
@@ -67,7 +67,7 @@ abstract class Acl
 	function can( $permission, $requestor = null )
 	{
 		if( $requestor === null )
-			$requestor = \nfuse\models\User::currentUser();
+			$requestor = \infuse\models\User::currentUser();
 		
 		// check cache
 		$cache = $this->cachedResult( $permission, $requestor );
@@ -126,7 +126,7 @@ abstract class Acl
 		
 		// setup objects ACL
 		$acl_db = (array)Database::select(
-			'ACL',
+			'Permissions',
 			'uid,gid,permission',
 			array(
 				'where' => $where ) );

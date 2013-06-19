@@ -1,6 +1,6 @@
 <?php
 /*
- * @package nFuse
+ * @package Infuse
  * @author Jared King <j@jaredtking.com>
  * @link http://jaredtking.com
  * @version 1.0
@@ -22,7 +22,7 @@
 	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-namespace nfuse;
+namespace infuse;
 
 class Modules
 {
@@ -63,7 +63,7 @@ class Modules
 	static function exists( $module )
 	{
 		$module = strtolower( $module );
-		return strlen( $module ) > 0 && file_exists( self::$moduleDirectory . $module . '/index.php');
+		return strlen( $module ) > 0 && file_exists( self::$moduleDirectory . $module . '/controller.php');
 	}
 	
 	/**
@@ -99,7 +99,7 @@ class Modules
 	*/
 	static function controllerName( $module )
 	{
-		return '\\nfuse\\Controllers\\' . ucfirst( strtolower( $module ) );	
+		return '\\infuse\\Controllers\\' . ucfirst( strtolower( $module ) );	
 	}
 	
 	/**
@@ -270,7 +270,7 @@ class Modules
 		self::initialize( $module );
 
 		// load module code
-		include_once self::$moduleDirectory . $module . '/' . 'index.php';
+		include_once self::$moduleDirectory . $module . '/' . 'controller.php';
 
 		// create a new instance of the module
 		$class = self::controllerName( $module );
@@ -393,7 +393,7 @@ class Modules
 				return false;
 
 			// load module code
-			if( !include_once self::$moduleDirectory . $module . '/' . 'index.php' )
+			if( !include_once self::$moduleDirectory . $module . '/' . 'controller.php' )
 				return false;
 				
 			self::load( $module );
@@ -431,4 +431,4 @@ class Modules
 }
 
 // hack
-Modules::$moduleDirectory = NFUSE_MODULES_DIR . '/';
+Modules::$moduleDirectory = INFUSE_MODULES_DIR . '/';

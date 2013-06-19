@@ -1,6 +1,6 @@
 <?php
 /*
- * @package nFuse
+ * @package Infuse
  * @author Jared King <j@jaredtking.com>
  * @link http://jaredtking.com
  * @version 1.0
@@ -24,20 +24,20 @@
 
 // site configuration
 if( !defined('SITE_TITLE') )
-	define ('SITE_TITLE', \nfuse\Config::value( 'site', 'title' ) );
+	define ('SITE_TITLE', \infuse\Config::value( 'site', 'title' ) );
 if( !defined( 'SMTP_HOST' ) )
 {
-	define( 'SMTP_HOST', \nfuse\Config::value( 'smtp', 'host' ) );
-	define( 'SMTP_USERNAME', \nfuse\Config::value( 'smtp', 'username' ) );
-	define( 'SMTP_PASSWORD', \nfuse\Config::value( 'smtp', 'password' ) );
-	define( 'SMTP_PORT', \nfuse\Config::value( 'smtp', 'port' ) );
-	define( 'SMTP_FROM_ADDRESS', \nfuse\Config::value( 'smtp', 'from' ) );
+	define( 'SMTP_HOST', \infuse\Config::value( 'smtp', 'host' ) );
+	define( 'SMTP_USERNAME', \infuse\Config::value( 'smtp', 'username' ) );
+	define( 'SMTP_PASSWORD', \infuse\Config::value( 'smtp', 'password' ) );
+	define( 'SMTP_PORT', \infuse\Config::value( 'smtp', 'port' ) );
+	define( 'SMTP_FROM_ADDRESS', \infuse\Config::value( 'smtp', 'from' ) );
 }
-if( !defined( 'NFUSE_BASE_DIR' ) )
-	define( 'NFUSE_BASE_DIR', dirname( __DIR__ ) );
-define( 'NFUSE_APP_DIR', NFUSE_BASE_DIR . '/app' );
-define( 'NFUSE_MODULES_DIR', NFUSE_BASE_DIR . '/modules' );
-define( 'NFUSE_TEMP_DIR', NFUSE_BASE_DIR . '/temp' );
+if( !defined( 'INFUSE_BASE_DIR' ) )
+	define( 'INFUSE_BASE_DIR', dirname( __DIR__ ) );
+define( 'INFUSE_APP_DIR', INFUSE_BASE_DIR . '/app' );
+define( 'INFUSE_MODULES_DIR', INFUSE_BASE_DIR . '/modules' );
+define( 'INFUSE_TEMP_DIR', INFUSE_BASE_DIR . '/temp' );
 
 // user levels
 define( 'SUPER_USER', -2 );
