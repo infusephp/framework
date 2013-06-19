@@ -15,7 +15,7 @@ class Group extends \infuse\Model
 	protected static $escapeFields = array( 'website', 'about' );
 	public static $properties = array(
 		'id' => array(
-			'type' => 'text'
+			'type' => 'id'
 		),
 		'group_name' => array(
 			'type' => 'text'

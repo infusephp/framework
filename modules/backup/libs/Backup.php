@@ -41,24 +41,24 @@ class Backup
 	
 			foreach( $columns as $column )
 			{
-				$sql_string .= "`{$column[0]}` {$column[1]}";
-				if ($column[2] == "NO") {
+				$sql_string .= "`{$column['Field']}` {$column['Type']}";
+				if ($column['Null'] == "NO") {
 					$sql_string .= " NOT NULL";
 				} else {
 					$sql_string .= " NULL";
 				}
 	
-				if ($column[4] != NULL) {
-					$sql_string .= " DEFAULT '{$column[4]}'";
+				if ($column['Default'] != NULL) {
+					$sql_string .= " DEFAULT '{$column['Default']}'";
 				}
 	
-				if ($column[5] != null) {
-					$sql_string .= " {$column[5]}";
+				if ($column['Extra'] != null) {
+					$sql_string .= " {$column['Extra']}";
 				}
 				$sql_string .= ", ";
 	
-				if ($column[3] == "PRI") {
-					$sql_string .= "PRIMARY KEY (`{$column[0]}`), ";
+				if ($column['Key'] == "PRI") {
+					$sql_string .= "PRIMARY KEY (`{$column['Field']}`), ";
 				}
 	
 			}

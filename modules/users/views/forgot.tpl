@@ -1,5 +1,6 @@
-{extends file='parent.tpl'}
+{extends file="parent.tpl"}
 {block name=content}
+
 <h1>Forgot Password</h1>
 
 {foreach from=$forgotErrors item=error}
@@ -31,8 +32,10 @@
 					<input type="password" name="user_password[]" />
 				</div>
 			</div>
-			<div class="form-actions">
-				<input type="submit" name="Submit" value="Submit" class="btn btn-primary" />
+			<div class="control-group">
+				<div class="controls">
+					<input type="submit" name="Submit" value="Submit" class="btn btn-primary btn-large" />
+				</div>
 			</div>
 		</form>
 	{/if}
@@ -56,8 +59,10 @@
 					<label class="help-inline">{$emailError}</label>
 				</div>
 			</div>
-			<div class="form-actions">
-				<input type="submit" name="Submit" value="Submit" class="btn btn-primary" />
+			<div class="control-group">
+				<div class="controls">
+					<input type="submit" name="Submit" value="Submit" class="btn btn-primary btn-large" />
+				</div>
 			</div>
 		</form>
 	{/if}

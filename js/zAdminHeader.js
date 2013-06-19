@@ -11,17 +11,19 @@ Header Params:
 	enum
 
 Types:
-	'system' - reserved for arbitrary fields (edit, delete, etc.)
-	'hidden'
-	'text'
-	'longtext'
-	'boolean'
-	'enum' = [db value, string value, keys array, values array]
-	'file' = [value, url]
-	'password'
-	'date'
-	'custom' = [value, html]
-	'html' - no form field, just static html
+	system - reserved for arbitrary fields (edit, delete, etc.)
+	id
+	text
+	longtext
+	number
+	boolean
+	enum = [db value, string value, keys array, values array]
+	password
+	date
+	hidden
+	file = [value, url]
+	custom = [value, html]
+	html - no form field, just static html
 
 Filter i.e. <a href='mailto:![value[email_address]!'>![value[name]]!</a>
 
@@ -229,6 +231,7 @@ function generateCell(field, row, editing)
 		case 'hidden':
 			html = '<input type="hidden" name="' + field.name + '" value="' + value + '" />';
 		break;
+		default:
 		case 'text':
 			html = '<input class="input-xlarge" type="text" name="' + field.name + '" value="' + value + '" />';
 		break;

@@ -30,21 +30,21 @@ class Permission extends \infuse\Model
 {
 	public static $properties = array(
 		'id' => array(
-			'type' => 'text'
+			'type' => 'id'
 		),	
 		'model' => array(
 			'type' => 'text'
 		),
 		'model_id' => array(
-			'type' => 'text',
+			'type' => 'id',
 			'null' => true
 		),
 		'user' => array(
-			'type' => 'text',
+			'type' => 'id',
 			'null' => true
 		),	
 		'group_' => array(
-			'type' => 'text',
+			'type' => 'id',
 			'null' => true
 		),	
 		'permission' => array(

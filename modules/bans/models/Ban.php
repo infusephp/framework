@@ -36,17 +36,20 @@ class Ban extends \infuse\Model
 {
 	public static $properties = array(
 		'id' => array(
-			'type' => 'text'
-		),	
+			'type' => 'id'
+		),
 		'type' => array(
 			'type' => 'enum',
 			'enum' => array (
 				1 => 'IP',
 				2 => 'Username',
-				3 => 'E-mail Address' )
-		),	
+				3 => 'E-mail Address' ),
+			'enumType' => 'tinyint',
+			'length' => 1
+		),
 		'value' => array(
-			'type' => 'text'
+			'type' => 'text',
+			'length' => 40
 		),	
 		'reason' => array(
 			'type' => 'text'

@@ -44,7 +44,7 @@ class User extends \infuse\Model
 	
 	public static $properties = array(
 		'uid' =>  array(
-			'type' => 'text',
+			'type' => 'id',
 			'filter' => '<a href="/users/{uid}" target="_blank">{uid}</a>'
 		),
 		'user_email' => array(
@@ -65,8 +65,9 @@ class User extends \infuse\Model
 		),
 		'user_password' => array(
 			'type' => 'password',
+			'length' => 128,
 			'validation' => array('\infuse\libs\Validate','password'),
-			'required' => true			
+			'required' => true
 		),
 		'registered_timestamp' => array(
 			'type' => 'date',
@@ -76,13 +77,33 @@ class User extends \infuse\Model
 		'ip' => array(
 			'type' => 'text',
 			'filter' => '<a href="http://www.infobyip.com/ip-{ip}.html" target="_blank">{ip}</a>',
-			'required' => true
+			'required' => true,
+			'length' => 16
 		),
 		'enabled' => array(
 			'type' => 'boolean',
 			'validation' => array('\infuse\libs\Validate','boolean_'),
 			'required' => true,
 			'default' => true
+		),
+		'invite' => array(
+			'type' => 'custom',
+			'filter' => '<a href="/users/invite/{uid}" target="_blank">Invite</a>'
+		),
+		'invited' => array(
+			'type' => 'boolean',
+			'default' => false
+		),
+		'time_zone' => array(
+			'type' => 'text',
+			'length' => 20,
+			'required' => true,
+			'default' => 'America/Chicago',
+			'nowrap' => true,
+			'validation' => array('\infuse\libs\Validate','timeZone')
+		),
+		'defaultCompany' => array(
+			'type' => 'id'
 		)
 	);
 					
@@ -310,6 +331,17 @@ class User extends \infuse\Model
 					'gid' => $gid,
 					'uid' => $this->id ),
 				'single' => true ) ) == 1;
+	}
+	
+	/**
+	 * Checks if the user has connected with Facebook
+	 *
+	 * @param boolean connected?
+	 */
+	function fbConnected()
+	{
+		// WARNING: this does not mean we still have permission, check with FB for that
+		return $this->get('fbid') != '';
 	}
 	
 	/**
@@ -934,78 +966,77 @@ class User extends \infuse\Model
 	 */
 	function sendEmail( $message, $details = array() )
 	{
-		$email = $this->getProperty( 'user_email' );
+		$email = $this->get( 'user_email' );
 	
-		$subject = 'Message from ' . Config::value( 'site', 'title' );
+		$template = '';
 		
 		$details[ 'message' ] = $message;
-		$details[ 'user' ] = $this;
 		$details[ 'baseUrl' ] = ((Config::value( 'site', 'ssl-enabled' )) ? 'https://' : 'http://') . Config::value( 'site', 'host-name' ) . '/';
 		$details[ 'siteEmail' ] = Config::value( 'site', 'email' );
 		$details[ 'email' ] = $email;
+		$details[ 'username' ] = $this->name( true );
 
 		switch ($message)
 		{
 		case 'registration-welcome':
-			$subject = 'Welcome to ' . Config::value( 'site', 'title' );
+			$template = 'invoiced-welcome-e-mail';
 		break;
 		case 'email-verification':
-			$subject = 'Please validate your e-mail address';
+			$template = 'invoiced-verification-e-mail';
 			$details[ 'verifyLink' ] = "{$details['baseUrl']}users/verifyEmail/{$details['verify']}";
 		break;
 		case 'forgot-password':
-			$subject = 'Password change request on ' . Config::value( 'site', 'title' );
+			$template = 'invoiced-forgot-password-e-mail';
 			$details[ 'forgotLink' ] = "{$details['baseUrl']}users/forgot/{$details['forgot']}";
+		break;
+		case 'invite-confirmation':
+			$template = 'invoiced-invite-confirmation-e-mail';
+		break;
+		case 'invite-ready':
+			$template = 'invoiced-invitation-ready-e-mail';
+			$details[ 'inviteLink' ] = "{$details['baseUrl']}users/signupFromInvite?user_email=$email";
 		break;
 		default:
 			return false;
 		break;
 		}
-				
+		
 		try
 		{
-			ob_start();
+			Modules::load( 'mandrill' );
 			
-			// load the Mail module
-			Modules::load( 'mail' );
-			$mail = new \infuse\libs\Mail;
+			$mandrill = new \Mandrill( Config::value( 'mandrill', 'key' ) );
 			
-			// basic e-mail info
-			$mail->From = SMTP_FROM_ADDRESS;
-			$mail->FromName = Config::value( 'site', 'title' );
-			$mail->Subject = $subject;
+			$template_content = array();
+
+			$mergeVars = array();
+			foreach( $details as $key => $detail )
+				$mergeVars[] = array(
+					'name' => $key,
+					'content' => $detail );
+
+			$message = array(
+				'to' => array(
+					array(
+						'email' => $email,
+						'name' => $this->name( true )
+					)
+				),
+				'global_merge_vars' => $mergeVars
+			);
+						
+			$result = $mandrill->messages->sendTemplate( $template, $template_content, $message, false, '' );
 			
-			// generate the body
-			$engine = \infuse\ViewEngine::engine();
-			$engine->assignData( $details );
-			$body = $engine->fetch( Modules::$moduleDirectory . 'users/views/emails.tpl' );
-		
-			// text body
-			$mail->AltBody = $body;
-			
-			// html body
-			$mail->MsgHTML( nl2br($body) );
-			
-			// send it to the user
-			$mail->AddAddress( $email );
-			
-			// send the e-mail
-			$success = $mail->Send();
-			
-			$errors = ob_get_contents();
-			ob_end_clean();
-			
-			if( $errors )
-			{
-				\infuse\ErrorStack::add( $errors, __CLASS__, __FUNCTION__ );
+			if( in_array( $result[ 0 ][ 'status' ], array( 'sent', 'queued' ) ) )
+				return true;
+			else {
+				ErrorStack::add( $result[ 0 ][ 'reject_reason' ], __CLASS__, __FUNCTION__ );
 				return false;
 			}
-			else
-				return $success;
 		}
-		catch( Exception $ex )
+		catch( \Mandrill_Error $e )
 		{
-			ErrorStack::add( $ex->getMessage(), __CLASS__, __FUNCTION__ );
+			ErrorStack::add( $e->getMessage(), __CLASS__, __FUNCTION__ );
 			return false;
 		}
 	}

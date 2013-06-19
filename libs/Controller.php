@@ -429,19 +429,46 @@ abstract class Controller extends Acl
 			'truncate' => true,
 			'nowrap' => true
 		);
-		foreach( $modelClassName::$properties as $name => $property )
+		
+		$params = array(
+			'moduleName' => $module,
+			'modelName' => $model,
+			'modelNamePlural' => Inflector::humanize( Inflector::underscore( Inflector::pluralize( $model ) ) )
+		);
+		
+		$paths = $req->paths();
+		
+		if( count( $paths ) >= 3 && $paths[ 2 ] == 'schema' )
 		{
-			$modelInfo->fields[] = array_merge(
-				$default,
-				array(
-					'name' => $name,
-					'title' => Inflector::humanize( $name ) ),
-				$property );
+			$params[ 'schema' ] = true;
+			
+			// get tablename for model
+			$tablename = $modelObj::tablename();
+			$params[ 'tablename' ] = $tablename;
+			
+			// look up current schema
+			$currentSchema = Database::listColumns( $tablename );			
+			$params[ 'currentSchema' ] = $currentSchema;
+			
+			// suggest a schema based on properties
+			$params[ 'suggestedSchema' ] = $modelObj::suggestSchema();
+		}
+		else
+		{
+			foreach( $modelClassName::$properties as $name => $property )
+			{
+				$modelInfo->fields[] = array_merge(
+					$default,
+					array(
+						'name' => $name,
+						'title' => Inflector::humanize( $name ) ),
+					$property );
+			}
+			
+			$params[ 'modelJSON' ] = json_encode( $modelInfo );
 		}
 		
-		$res->render( 'admin/model.tpl', array(
-			'modelJSON' => json_encode( $modelInfo )
-		) );
+		$res->render( 'admin/model.tpl', $params );
 	}
 	
 	/**

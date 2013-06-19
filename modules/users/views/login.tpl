@@ -1,9 +1,7 @@
 {extends file="parent.tpl"}
 {block name="content"}
 	<div class="body login-holder">
-		<header class="clearfix">
-			<h1>Login</h1>
-		</header>
+		<h1>Login</h1>
 		{if $currentUser->isLoggedIn()}
 			<pre>Authenticated.</pre>
 		{else}

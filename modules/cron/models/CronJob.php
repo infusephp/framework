@@ -32,10 +32,38 @@ class CronJob extends \infuse\Model
 {
 	public static $properties = array(
 		'id' => array(
-			'type' => 'text'
+			'type' => 'id'
 		),
 		'name' => array(
 			'type' => 'text'
+		),
+		'module' => array(
+			'type' => 'text',
+			'length' => 100
+		),
+		'command' => array(
+			'type' => 'text',
+			'length' => 100
+		),
+		'minute' => array(
+			'type' => 'text',
+			'length' => 2
+		),
+		'hour' => array(
+			'type' => 'text',
+			'length' => 2
+		),
+		'day' => array(
+			'type' => 'text',
+			'length' => 2
+		),
+		'month' => array(
+			'type' => 'text',
+			'length' => 2
+		),
+		'week' => array(
+			'type' => 'text',
+			'length' => 2
 		),
 		'next_run' => array(
 			'type' => 'date'
@@ -45,31 +73,10 @@ class CronJob extends \infuse\Model
 		),
 		'last_run_result' => array(
 			'type' => 'boolean',
-			'default' => 0
-		),
-		'module' => array(
-			'type' => 'text'
-		),
-		'command' => array(
-			'type' => 'text'
-		),
-		'minute' => array(
-			'type' => 'text'
-		),
-		'hour' => array(
-			'type' => 'text'
-		),
-		'day' => array(
-			'type' => 'text'
-		),
-		'month' => array(
-			'type' => 'text'
-		),
-		'week' => array(
-			'type' => 'text'
+			'default' => false
 		),
 		'last_run_output' => array(
-			'type' => 'text',
+			'type' => 'longtext',
 			'filter' => '<pre>{last_run_output}</pre>',
 			'truncate' => false
 		)		

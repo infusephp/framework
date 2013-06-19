@@ -22,43 +22,107 @@
 	IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 	WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
+ */
+ 
+/**
  *
  * The properties array looks like this:
- * 		title:
- * 		name: property name
- * 		type: (required)
- * 			'hidden'
- * 			'text'
- * 			'longtext'
- * 			'boolean'
- * 			'enum' = [db value, string value, keys array, values array]
- * 			'file' = [value, url]
- * 			'password'
- * 			'date'
- * 			'custom' = [value, html]
- * 			'html' - no form field, just static html
- * 		select_keys: Array of keys (actual value being input into database) for dropdowns in the data cell in admin.
- *		select_values: Array of values (value to the end user) corresponding to keys for dropdowns in the data cell in admin.
- * 		filter: Filter for data cell in admin.
- * 		nosort: Prevent the data cell from sorting in admin.
- * 		nowrap: Prevents the data cell from wrapping in admin. (Default: false)
- * 		truncate: Prevents the data cell from truncating in admin. (Default: true)
- * 		validation: Function reference to validate the input of the field (i.e. user creation, editing a user), returns true if valid.
- *		The function should look like: function validate_email( &$property_value, $parameters )
- *		The validation function is allowed to modify the property value
- *		validation_params: An array of extra parameters to pass to the validation function. Comes through the second argument in an array. (default: null)
- *		required: (default: false)
+ 	'name' => array(
+  		type:
+  			The type of the property.
+  			Accepted Types:
+  				id
+	  			text
+	  			longtext
+	  			number
+	  			boolean
+	  			enum
+	  			password
+	  			date
+	  			hidden
+	  			custom
+	  			html
+	  		String
+	  		Required
+	  	default:
+	  		The default value to be used when creating new models.
+	  		String
+	  		Optional
+	  	number:
+	  		The type of number when the property type = number
+	  		String
+	  		Default: int
+	  		Required if specifying number type
+  		enum:
+  			A key-value map of acceptable values for the enum type.
+  			Array
+  			Required if specifying enum type
+  		enumType:
+  			Type of the database column for the enum
+  			Default: varchar
+  			Required if specifying enum type
+  		length:
+  			Overrides the default maximum length of the column values in the database. Use this when a different value is needed besides the one specified
+  			Integer|String
+  			Default: Chosen according to type
+  			Optional
+  		null:
+  			Specifies whether the column is allowed to have null values.
+  			Boolean
+  			Default: false
+  			Optional
+  		filter:
+  			An HTML string that will have values from the model injected. Only used in the admin panel.
+  			String
+  			Example: <a href="/users/profile/{uid}">{username}</a>
+  			Optional
+ 		required:
+ 			Specifies whether the field is required
+ 			Boolean
+ 			Default: false
+ 			Optional
+ 		validation:
+ 			Function reference to validate the input of the field (i.e. user creation, editing a user), returns true if valid.
+ 			The function should look like: function validate_email( &$property_value, $parameters )
+ 			The validation function is allowed to modify the property value
+ 			Array
+ 			Optional
+ 		validation_params:
+ 			An array of extra parameters to pass to the validation function. Comes through the second argument in an array.
+ 			Array
+ 			Default: null
+ 			Optional
+  		nosort:
+  			Prevents the column from being sortable in the admin panel.
+  			Boolean
+  			Default: false
+  			Optional
+  		nowrap:
+  			Prevents the column from wrapping in the admin panel.
+  			Boolean
+  			Default: false
+  			Optional
+  		truncate:
+  			Prevents the column from truncating values in the admin panel.
+  			Boolean
+  			Default: true
+  			Optional
+  		title:
+  			Title of the property that shows up in admin panel
+  			String
+  			Default: Derived from property name
+  			Optional
+  	)
  *
  *
  * The model looks for data in this order Local Cache -> Memcache (if enabled) -> Database
  *
  * The local cache is just a static array laid out as follows:
- *	<class_name> : array(
- *		<id> : array(
- *			<property_name> : <value>
- *			<property_name> : <value>
- *		)
+ 	<class_name> : array(
+ 		<id> : array(
+ 			<property_name> : <value>
+ 			<property_name> : <value>
+ 		)
  * 
  */
  
@@ -77,7 +141,7 @@ abstract class Model extends Acl
 	// Protected class variables
 	/////////////////////////////
 
-	protected $supplementaryIds = array(); // additional key columns
+	protected static $supplementaryIds = array(); // additional key columns
 	protected static $escapeFields = array(); // specifies fields that should be escaped with htmlspecialchars()
 	protected static $tablename = false;
 
@@ -104,7 +168,7 @@ abstract class Model extends Acl
 			return;
 	
 		$class = get_class($this);
-		$cacheKey = $this->id . implode('-',array_keys($this->supplementaryIds)) . implode('-',$this->supplementaryIds);
+		$cacheKey = $this->id . implode('-',array_keys(static::$supplementaryIds)) . implode('-',static::$supplementaryIds);
 
 		// use a local object cache as the first line of defense
 		if( !isset( self::$globalCache[ $class ] ) )
@@ -211,7 +275,7 @@ abstract class Model extends Acl
 			$where = array_merge(
 				array(
 					static::$idFieldName => $this->id ),
-				$this->supplementaryIds );
+				static::$supplementaryIds );
 
  			$values = Database::select(
 				static::tablename(),
@@ -423,7 +487,7 @@ abstract class Model extends Acl
 		$where = array_merge(
 			array(
 				static::$idFieldName => $this->id ),
-			$this->supplementaryIds );
+			static::$supplementaryIds );
 
 		return Database::select(
 			static::tablename(),
@@ -431,6 +495,82 @@ abstract class Model extends Acl
 			array(
 				'where' => $where,
 				'single' => true ) ) == 1;
+	}
+	
+	/**
+	 * Suggests a schema given the model's properties
+	 *
+	 * The output of this follows the same format as Database::listColumns( 'tablename' )
+	 *
+	 * @return array
+	 */
+	static function suggestSchema()
+	{
+		$schmea = array();
+		
+		foreach( static::$properties as $name => $property )
+		{
+			if( in_array( $property[ 'type' ], array( 'custom' ) ) )
+				continue;
+		
+			$column = array(
+				'Field' => $name,
+				'Type' => 'varchar(255)',
+				'Null' => (val( $property, 'null' )) ? 'YES' : 'NO',
+				'Key' => '',
+				'Default' => val( $property, 'default' ),
+				'Extra' => ''
+			);
+						
+			switch( $property[ 'type' ] )
+			{
+			case 'id':
+				$column[ 'Type' ] = 'int(11)';
+			break;
+			case 'boolean':
+				$column[ 'Type' ] = 'tinyint(1)';
+				
+				$column[ 'Default' ] = (val($property, 'default')) ? '1' : 0;
+			break;
+			case 'date':
+				$column[ 'Type' ] = 'int(11)';
+			break;
+			case 'number':
+				$type = (isset($property['number'])) ? $property['number'] : 'int';
+				$length = (isset($property['length'])) ? $property['length'] : 11;
+				
+				$column[ 'Type' ] = "$type($length)";
+			break;
+			case 'enum':
+				$type = (isset($property['enumType'])) ? $property['enumType'] : 'varchar';
+				$length = (isset($property['length'])) ? $property['length'] : 255;
+				
+				$column[ 'Type' ] = "$type($length)";
+			break;
+			case 'longtext':
+				$length = (isset($property['length'])) ? $property['length'] : 65535;
+			
+				$column[ 'Type' ] = "text($length)";
+			break;
+			default:
+				$length = (isset($property['length'])) ? $property['length'] : 255;
+				$column[ 'Type' ] = "varchar($length)";
+			break;
+			}
+			
+			// TODO support multiple primary keys
+			if( $name == static::$idFieldName || in_array( $name, static::$supplementaryIds ) )
+			{
+				$column[ 'Key' ] = 'PRI';
+				
+				if( $property[ 'type' ] == 'id' )
+					$column[ 'Extra' ] = 'auto_increment';
+			}
+			
+			$schema[] = $column;
+		}
+		
+		return $schema;
 	}
 	
 	/////////////////////////////
@@ -450,7 +590,7 @@ abstract class Model extends Acl
 		$where = array_merge(
 			array(
 				static::$idFieldName => $this->id ),
-			$this->supplementaryIds );
+			static::$supplementaryIds );
 
 		$info = Database::select(
 			static::tablename(),
@@ -665,7 +805,7 @@ abstract class Model extends Acl
 		$updateArray = array_merge(
 			array(
 				static::$idFieldName => $this->id ),
-			$this->supplementaryIds );
+			static::$supplementaryIds );
 		$updateKeys = array_keys( $updateArray );
 		
 		// get the property names
@@ -760,6 +900,6 @@ abstract class Model extends Acl
 			static::tablename(),
 			array_merge( array(
 				static::$idFieldName => $this->id ),
-				$this->supplementaryIds ) );
+				static::$supplementaryIds ) );
 	}
 }

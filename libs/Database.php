@@ -310,7 +310,7 @@ class Database
 	
 		$result = self::$DBH->query("SHOW COLUMNS FROM `$table`");
 		
-		return $result->fetchAll( \PDO::FETCH_NUM );
+		return $result->fetchAll( \PDO::FETCH_ASSOC );
 	}
 		
 	/**
