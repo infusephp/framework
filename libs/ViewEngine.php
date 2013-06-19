@@ -62,6 +62,12 @@ class ViewEngine Extends \Smarty
 			//$this->setCaching( Smarty::CACHING_LIFETIME_CURRENT);
 			//$this->compile_check = false;
         }
+
+        // create temp and output dirs
+        @mkdir( INFUSE_TEMP_DIR . '/css' );
+        @mkdir( INFUSE_TEMP_DIR . '/js' );
+        @mkdir( INFUSE_APP_DIR . '/css' );
+        @mkdir( INFUSE_APP_DIR . '/js' );
 		
 		// minify CSS
 		$this->autoCompileLess( INFUSE_BASE_DIR . '/css/styles.less', 'styles.css');
