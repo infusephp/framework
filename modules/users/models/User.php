@@ -86,14 +86,6 @@ class User extends \infuse\Model
 			'required' => true,
 			'default' => true
 		),
-		'invite' => array(
-			'type' => 'custom',
-			'filter' => '<a href="/users/invite/{uid}" target="_blank">Invite</a>'
-		),
-		'invited' => array(
-			'type' => 'boolean',
-			'default' => false
-		),
 		'time_zone' => array(
 			'type' => 'text',
 			'length' => 20,
@@ -101,9 +93,6 @@ class User extends \infuse\Model
 			'default' => 'America/Chicago',
 			'nowrap' => true,
 			'validation' => array('\infuse\libs\Validate','timeZone')
-		),
-		'defaultCompany' => array(
-			'type' => 'id'
 		)
 	);
 					
