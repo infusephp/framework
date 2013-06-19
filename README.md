@@ -35,15 +35,19 @@ An installer is on the way. Until then, there are a couple of steps to take befo
 
 ### Database setup
 
-To get started for now, run the included `insall.sql` script.
+The database can be setup by running the included `insall.sql` script.
 
 ### Configuration
  
-The framework configuration can be found in `includes/config.yml`.
+The framework configuration can be found in `config.yml`. At the least you must setup a database.
 
 ### Web Server
 
 The app is actually served through the `/app` directory to prevent the framework files from being publicly accessible. Whether using apache or nginx, make sure to set the site directory to `{FRAMEWORK_PATH}/app` or else the URL routing will not work properly.
+
+## Documentation
+
+Learn more about Infuse in the [wiki](https://github.com/jaredtking/infuse/wiki).
 
 ## Contributing
 
