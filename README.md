@@ -1,15 +1,15 @@
-nfuse
+infuse
 =====
 
 PHP MVC framework for rapid development of web applications
 
-## What is nfuse?
+## What is Infuse?
 
-Nfuse is a node.js inspired framework to make developing web applications quick and fun. In addition to MVC goodness, the framework also gives you a free REST API and administrator dashboard for models. This makes nfuse framework an incredibly powerful tool for building a modern web application today. Nfuse does not take long to learn due to its carefully chosen directory structure, which was a main frustration of mine when using other frameworks. Everything outside of core functionality has been contained inside of a module to make navigating the framework easy.
+Infuse is a node.js inspired framework to make developing web applications quick and fun. In addition to MVC goodness, the framework also gives you a free REST API and administrator dashboard for models. This makes Infuse Framework an incredibly powerful tool for building a modern web application today. Infuse does not take long to learn due to its carefully chosen directory structure, which was a main frustration of mine when using other frameworks. Everything outside of core functionality has been contained inside of a module to make navigating the framework easy.
 
 ## Why another MVC framework?
 
-Nfuse is the culmination of best practices that I learned through developing PHP web applications. After using node.js and switching back to PHP, I immediately missed what node and it's awesome frameworks had to offer. I decided to port over some of the patterns learned from node over to PHP with nfuse, despite an already crowded PHP framework space. I have gotten a lot out of the nfuse framework so am open sourcing it in hopes that someone else may benefit. This project has been built to my own taste. If something is off base, I would love to hear about it in the issues.
+Infuse is the culmination of best practices that I learned through developing PHP web applications. After using node.js and switching back to PHP, I immediately missed what node and it's awesome frameworks had to offer. I decided to port over some of the patterns learned from node over to PHP with Infuse, despite an already crowded PHP framework space. I have gotten a lot out of the Infuse Framework so am open sourcing it in hopes that someone else may benefit. This project has been built to my own taste. If something is off base, I would love to hear about it in the issues.
 
 ## Demo
 
