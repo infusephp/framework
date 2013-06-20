@@ -35,11 +35,4 @@ class Cron extends \infuse\Controller
 		
 		\infuse\libs\Cron::scheduleCheck(true);
 	}
-	
-	function install()
-	{
-		Database::sql("CREATE TABLE IF NOT EXISTS `Cron` (`id` INT NOT NULL AUTO_INCREMENT ,`name` VARCHAR( 255 ) NOT NULL ,`module` VARCHAR( 100 ) NOT NULL ,
-					`command` VARCHAR( 100 ) NOT NULL ,`minute` VARCHAR( 10 ) NOT NULL ,`hour` VARCHAR( 10 ) NOT NULL ,`day` VARCHAR( 10 ) NOT NULL ,`week` VARCHAR( 10 ) NOT NULL ,
-					`month` VARCHAR( 10 ) NOT NULL ,`last_ran` INT( 10 ) NULL,`next_run` INT ( 10 ) NULL ,PRIMARY KEY ( `id` ))");
-	}
 }

@@ -374,60 +374,6 @@ class Modules
 
 		return true;
 	}
-
-	/**
-	* Installs a module
-	*
-	* @param string $module module
-	*
-	* @return boolean true if successful
-	*/
-	static function installModule( $module )
-	{
-		$module = strtolower( $module );
-	
-		if ( self::exists( $module ) )
-		{
-			// check if required
-			if (in_array( $module, self::requiredModules() ) )
-				return false;
-
-			// load module code
-			if( !include_once self::$moduleDirectory . $module . '/' . 'controller.php' )
-				return false;
-				
-			self::load( $module );
-			
-			self::$controllers[ $module ]->install();
-
-			return true;
-
-		} else {
-			return false;
-		}
-	}
-
-	/**
-	* Uninstalls a module
-	*
-	* @param string $module module
-	*
-	* @return boolean true if successful
-	*/	
-	function uninstallModule( $module )
-	{
-		if ( self::exists( $module ) )
-		{
-			// check if required
-			if (in_array( $module, self::requiredModules() ) )
-				return false;
-				
-			// load module if it hasn't been alraedy
-			self::load( $module );
-			
-			self::$controllers[ $module ]->uninstall();
-		}
-	}
 }
 
 // hack
