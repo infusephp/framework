@@ -955,77 +955,78 @@ class User extends \infuse\Model
 	 */
 	function sendEmail( $message, $details = array() )
 	{
-		$email = $this->get( 'user_email' );
+		$email = $this->getProperty( 'user_email' );
 	
-		$template = '';
+		$subject = 'Message from ' . Config::value( 'site', 'title' );
 		
 		$details[ 'message' ] = $message;
+		$details[ 'user' ] = $this;
 		$details[ 'baseUrl' ] = ((Config::value( 'site', 'ssl-enabled' )) ? 'https://' : 'http://') . Config::value( 'site', 'host-name' ) . '/';
 		$details[ 'siteEmail' ] = Config::value( 'site', 'email' );
 		$details[ 'email' ] = $email;
-		$details[ 'username' ] = $this->name( true );
 
 		switch ($message)
 		{
 		case 'registration-welcome':
-			$template = 'invoiced-welcome-e-mail';
+			$subject = 'Welcome to ' . Config::value( 'site', 'title' );
 		break;
 		case 'email-verification':
-			$template = 'invoiced-verification-e-mail';
+			$subject = 'Please validate your e-mail address';
 			$details[ 'verifyLink' ] = "{$details['baseUrl']}users/verifyEmail/{$details['verify']}";
 		break;
 		case 'forgot-password':
-			$template = 'invoiced-forgot-password-e-mail';
+			$subject = 'Password change request on ' . Config::value( 'site', 'title' );
 			$details[ 'forgotLink' ] = "{$details['baseUrl']}users/forgot/{$details['forgot']}";
-		break;
-		case 'invite-confirmation':
-			$template = 'invoiced-invite-confirmation-e-mail';
-		break;
-		case 'invite-ready':
-			$template = 'invoiced-invitation-ready-e-mail';
-			$details[ 'inviteLink' ] = "{$details['baseUrl']}users/signupFromInvite?user_email=$email";
 		break;
 		default:
 			return false;
 		break;
 		}
-		
+				
 		try
 		{
-			Modules::load( 'mandrill' );
+			ob_start();
 			
-			$mandrill = new \Mandrill( Config::value( 'mandrill', 'key' ) );
+			// load the Mail module
+			Modules::load( 'mail' );
+			$mail = new \infuse\libs\Mail;
 			
-			$template_content = array();
-
-			$mergeVars = array();
-			foreach( $details as $key => $detail )
-				$mergeVars[] = array(
-					'name' => $key,
-					'content' => $detail );
-
-			$message = array(
-				'to' => array(
-					array(
-						'email' => $email,
-						'name' => $this->name( true )
-					)
-				),
-				'global_merge_vars' => $mergeVars
-			);
-						
-			$result = $mandrill->messages->sendTemplate( $template, $template_content, $message, false, '' );
+			// basic e-mail info
+			$mail->From = SMTP_FROM_ADDRESS;
+			$mail->FromName = Config::value( 'site', 'title' );
+			$mail->Subject = $subject;
 			
-			if( in_array( $result[ 0 ][ 'status' ], array( 'sent', 'queued' ) ) )
-				return true;
-			else {
-				ErrorStack::add( $result[ 0 ][ 'reject_reason' ], __CLASS__, __FUNCTION__ );
+			// generate the body
+			$engine = \infuse\ViewEngine::engine();
+			$engine->assignData( $details );
+			$body = $engine->fetch( Modules::$moduleDirectory . 'users/views/emails.tpl' );
+		
+			// text body
+			$mail->AltBody = $body;
+			
+			// html body
+			$mail->MsgHTML( nl2br($body) );
+			
+			// send it to the user
+			$mail->AddAddress( $email );
+			
+			// send the e-mail
+			$success = $mail->Send();
+			
+			$errors = ob_get_contents();
+			ob_end_clean();
+			
+			if( $errors )
+			{
+				\infuse\ErrorStack::add( $errors, __CLASS__, __FUNCTION__ );
 				return false;
 			}
+			else
+				return $success;
 		}
-		catch( \Mandrill_Error $e )
+		catch( Exception $ex )
 		{
-			ErrorStack::add( $e->getMessage(), __CLASS__, __FUNCTION__ );
+			ErrorStack::add( $ex->getMessage(), __CLASS__, __FUNCTION__ );
 			return false;
 		}
 	}
