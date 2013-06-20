@@ -39,7 +39,7 @@ spl_autoload_register( function( $class ) {
 date_default_timezone_set( Config::value( 'site', 'time-zone' ) );
 
 // check if site disabled, still allow access to admin panel
-if( Config::value( 'site', 'disabled' ) && urlParam( 0 ) != '4dm1n' )
+if( Config::value( 'site', 'disabled' ) && !strpos( '4dm1n', $_SERVER[ 'REQUEST_URI' ] ) )
 	message_die( Config::value( 'site', 'disabled-message' ) );
 
 // load site constants

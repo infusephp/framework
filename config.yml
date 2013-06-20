@@ -10,6 +10,7 @@ site:
 	time-zone: America/Chicago
 	disabled: false
 	disabled-message: The site is currently unavailable.
+	installed: false
 
 database:
 	type: mysql
@@ -22,6 +23,7 @@ memcache:
 	enabled: false
 	host: 127.0.0.1
 	port: 11211
+	prefix: example
 
 smtp:
 	from: no-reply@example.com

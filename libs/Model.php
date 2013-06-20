@@ -149,10 +149,16 @@ abstract class Model extends Acl
 	// Private class variables
 	/////////////////////////////
 
-	private static $memcache;
-	private $memcachePrefix;
-	private static $memcacheConnectionAttempted;
 	private $cacheInitialized = false;
+
+	private static $excludePropertyTypes = array( 'custom', 'html' );
+
+	// memcache
+	private static $memcache;
+	private static $memcacheConnectionAttempted;
+	public $memcachePrefix;
+
+	// local cache
 	private static $globalCache = array(); // used 
 	private $localCache = array();
 	
@@ -166,38 +172,45 @@ abstract class Model extends Acl
 	{
 		if( $this->cacheInitialized )
 			return;
-	
-		$class = get_class($this);
-		$cacheKey = $this->id . implode('-',array_keys(static::$supplementaryIds)) . implode('-',static::$supplementaryIds);
-
-		// use a local object cache as the first line of defense
-		if( !isset( self::$globalCache[ $class ] ) )
-			self::$globalCache[ $class ] = array();
 		
-		if( !isset( self::$globalCache[ $class ][ $cacheKey ] ) )
-			self::$globalCache[ $class ][ $cacheKey ] = array();
-
-		$this->localCache =& self::$globalCache[ $class ][ $cacheKey ];
-
+		// generate keys for caching this model
+		$class = str_replace( '\\', '', get_class($this) );
+		
+		$cacheKey = $this->id . implode('-',array_keys(static::$supplementaryIds)) . implode('-',static::$supplementaryIds);			
+	
 		// initialize memcache if enabled
-		if( class_exists('Memcache') && Config::value( 'memcache', 'enabled' ) && !self::$memcacheConnectionAttempted )
+		if( class_exists('Memcache') && Config::value( 'memcache', 'enabled' ) )
 		{
-			self::$memcacheConnectionAttempted = true;
+			$this->memcachePrefix = Config::value( 'memcache', 'prefix' ) . '-' . $class . '-' . $cacheKey . '-';
 
 			// attempt to connect to memcache
 			try
 			{
-				self::$memcache = new Memcache;
-				self::$memcache->connect( Config::value( 'memcache', 'host' ), Config::value( 'memcache', 'port' ) ) or (self::$memcache = false);
-				
-				$this->memcachePrefix = $cacheKey . '-'; // TODO: append the site name or something to this
-				
-				$this->cacheInitialized = true;
+				if( !self::$memcache && !self::$memcacheConnectionAttempted )
+				{
+					self::$memcache = new \Memcache;
+					
+					self::$memcache->connect( Config::value( 'memcache', 'host' ), Config::value( 'memcache', 'port' ) ) or (self::$memcache = false);
+					
+					self::$memcacheConnectionAttempted = true;
+				}				
 			}
-			catch(Exception $e)
+			catch(\Exception $e)
 			{
 				self::$memcache = false;
-			}			
+			}
+		}
+
+		// fallback to local cache if no memcache
+		if( !self::$memcache )
+		{
+			if( !isset( self::$globalCache[ $class ] ) )
+				self::$globalCache[ $class ] = array();
+			
+			if( !isset( self::$globalCache[ $class ][ $cacheKey ] ) )
+				self::$globalCache[ $class ][ $cacheKey ] = array();
+			
+			$this->localCache =& self::$globalCache[ $class ][ $cacheKey ];
 		}
 
 		$this->cacheInitialized = true;
@@ -245,26 +258,45 @@ abstract class Model extends Acl
 	 */
 	function get( $whichProperties )
 	{
+		$this->setupCache();
+	
 		$properties = (is_string( $whichProperties )) ? explode(',', $whichProperties) : (array)$whichProperties;
 
 		$return = array();
-		foreach( $properties as $key => $property )
+
+		// look to memcache first
+		if( self::$memcache )
 		{
-			// look locally first
-			if( isset( $this->localCache[ $property ] ) )
+			$mKeys = array_map( function ($str) { return $this->memcachePrefix . $str; }, $properties );
+			
+			$cache = self::$memcache->get( $mKeys );
+
+			foreach( $cache as $property => $value )
 			{
-				$return[ $property ] = $this->localCache[ $property ];
-				unset( $properties[ $key ] );
-			}
-			// look in memcache next
-			else if( self::$memcache )
-			{
-				$cachedProperty =  self::$memcache->get( $this->memcachePrefix . $key );
+				// strip memcache prefix
+				$property = str_replace( $this->memcachePrefix, '', $property );
+			
+				// remove from property search
+				$k = array_search( $property, $properties );
+				if( $k )
+					unset( $properties[ $k ] );
 				
-				if( $cachedProperty !== false )
+				// add to return
+				$return[ $property ] = $value;
+			}
+		}
+		// fallback to local cache
+		else
+		{
+			foreach( $properties as $key => $property )
+			{
+				if( isset( $this->localCache[ $property ] ) )
 				{
-					$return[ $property ] = $cachedProperty;
-					unset( $fields[ $key ] );
+					// remove from property search
+					unset( $properties[ $key ] );
+
+					// add to return
+					$return[ $property ] = $this->localCache[ $property ];
 				}
 			}
 		}
@@ -325,6 +357,8 @@ abstract class Model extends Acl
 	 */	
 	static function getCacheStats()
 	{
+		$this->setupCache();
+	
 		return (self::$memcache) ? self::$memcache->getStats() : false;
 	}
 	
@@ -342,7 +376,7 @@ abstract class Model extends Acl
 		// get the names of all the properties
 		foreach( static::$properties as $name => $property )
 		{
-			if( !empty( $name ) && !in_array( $name, $exclude ) )
+			if( !empty( $name ) && !in_array( $name, $exclude ) && !in_array( $property[ 'type' ], self::$excludePropertyTypes ) )
 				$properties[] = $name;
 		}
 				
@@ -367,16 +401,28 @@ abstract class Model extends Acl
 	/**
 	 * Fetches models with pagination support
 	 *
+	 * @param array key-value parameters
+	 *
 	 * @param int $start record number to start at
 	 * @param int $limit max results to return
 	 * @param string $sort sort (i.e. name asc, year asc)
 	 * @param string $search search query
 	 * @param array $where criteria
 	 *
-	 * @return array model ids
-	 */
+	 * @return array array( 'models' => models, 'count' => 'total found' )
+	 */ 
 	static function find( $start = 0, $limit = 100, $sort = '', $search = '', $where = array() )
 	{
+		// unpack parameters
+		if( is_array( $start ) )
+		{
+			$where = (array)val( $start, 'where' );
+			$search = val( $start, 'search' );
+			$sort = val( $start, 'sort' );
+			$limit = val( $start, 'limit' );
+			$start = val( $start, 'start' ); // must be last
+		}
+	
 		if( empty( $start ) || !is_numeric( $start ) || $start < 0 )
 			$start = 0;
 		if( empty( $limit ) || !is_numeric( $limit ) || $limit > 1000 )
@@ -393,7 +439,7 @@ abstract class Model extends Acl
 			$w = array();
 			foreach( static::$properties as $name => $property )
 			{
-				if( val( $property, 'type' ) != 'custom' )
+				if( !in_array( val( $property, 'type' ), self::$excludePropertyTypes ) )
 					$w[] = "$name LIKE '%$search%'";
 			}
 			
@@ -502,17 +548,15 @@ abstract class Model extends Acl
 	 *
 	 * The output of this follows the same format as Database::listColumns( 'tablename' )
 	 *
-	 * @param array $currentSchema current schema
-	 *
 	 * @return array
 	 */
-	static function suggestSchema( $currentSchema )
+	static function suggestSchema()
 	{
 		$schmea = array();
 		
 		foreach( static::$properties as $name => $property )
 		{
-			if( in_array( $property[ 'type' ], array( 'custom' ) ) )
+			if( in_array( $property[ 'type' ], self::$excludePropertyTypes ) )
 				continue;
 		
 			$column = array(
@@ -560,6 +604,7 @@ abstract class Model extends Acl
 			break;
 			}
 			
+			// TODO support multiple primary keys
 			if( $name == static::$idFieldName || in_array( $name, static::$supplementaryIds ) )
 			{
 				$column[ 'Key' ] = 'PRI';
@@ -567,80 +612,11 @@ abstract class Model extends Acl
 				if( $property[ 'type' ] == 'id' )
 					$column[ 'Extra' ] = 'auto_increment';
 			}
-
-			// does the column exist in the current schema?
-			foreach( $currentSchema as $c )
-			{
-				if( $column[ 'Field' ] == $c[ 'Field' ] )
-				{
-					$column[ 'Exists' ] = true;
-					break;
-				}
-			}
 			
 			$schema[] = $column;
 		}
 		
 		return $schema;
-	}
-
-	/**
-	 * Converts a schema into SQL statements
-	 *
-	 * @param array $schema
-	 * @param boolean $newTable true if a new table should be created
-	 *
-	 * @return string sql
-	 */
-	static function schemaToSql( $schema, $newTable = true )
-	{
-		if( count( $schema ) == 0 )
-			return false;
-
-		$sql = '';
-
-		$tablename = static::tablename();
-
-		if( $newTable )
-			$sql .= "CREATE TABLE IF NOT EXISTS `$tablename` (\n";
-		else
-			$sql .= "ALTER TABLE `$tablename`\n";
-
-		$cols = array();
-		foreach( $schema as $column )
-		{
-			$col = "\t";
-
-			if( !$newTable )
-				$col .= ( val( $column, 'Exists' ) ) ? 'MODIFY ' : 'ADD ';
-
-			$col .= "`{$column['Field']}` {$column['Type']} ";
-
-			$col .= ( $column['Null'] == 'Yes' ) ? 'NULL' : 'NOT NULL';
-			
-			if( $column['Default'] )
-				$col .= " DEFAULT '{$column['Default']}'";
-
-			if( $column['Extra'] )
-				$col .= " {$column['Extra']}";
-
-			if( $column['Key'] && $newTable )
-				$col .= ($column['Key'] == 'PRI') ? ' PRIMARY KEY' : ' ' . $column['Key'];
-
-			$cols[] = $col;
-		}
-
-		// TODO support multiple primary keys
-		// TODO support changing primary key when altering table
-
-		$sql .= implode( ",\n", $cols);
-
-		if( $newTable )
-			$sql .= "\n) ;";
-		else
-			$sql .= "\n ;";
-
-		return $sql;
 	}
 	
 	/////////////////////////////
@@ -687,12 +663,11 @@ abstract class Model extends Acl
 	
 		// cache in memcache
 		if( self::$memcache )
-		{
 			self::$memcache->set( $this->memcachePrefix . $property, $value );
-		}
 		
 		// cache locally
-		$this->localCache[ $property ] = $value;
+		else
+			$this->localCache[ $property ] = $value;
 	}
 	
 	/**
@@ -719,10 +694,13 @@ abstract class Model extends Acl
 	{
 		$this->setupCache();
 		
+		// use memcache
 		if( self::$memcache )
 			self::$memcache->delete( $this->memcachePrefix . $property );
-
-		unset( $this->localCache[ $property ] );
+		
+		// fallback to local cache
+		else
+			unset( $this->localCache[ $property ] );
 	}
 	
 	/**

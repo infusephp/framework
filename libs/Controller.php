@@ -179,12 +179,12 @@ abstract class Controller extends Acl
 		// filter
 		$filter = (array)$req->query( 'filter' );
 		
-		$models = $modelClassName::find(
-			$start,
-			$limit,
-			$sort,
-			$search,
-			$filter );
+		$models = $modelClassName::find( array(
+			'start' => $start,
+			'limit' => $limit,
+			'sort' => $sort,
+			'search' => $search,
+			'where' => $filter ) );
 		
 		foreach( $models[ 'models' ] as $m )
 			array_push( $return->$module, $m->toArray() );
@@ -439,42 +439,19 @@ abstract class Controller extends Acl
 		$paths = $req->paths();
 		
 		if( count( $paths ) >= 3 && $paths[ 2 ] == 'schema' )
-		{			
+		{
+			$params[ 'schema' ] = true;
+			
 			// get tablename for model
 			$tablename = $modelObj::tablename();
+			$params[ 'tablename' ] = $tablename;
 			
 			// look up current schema
 			$currentSchema = Database::listColumns( $tablename );			
-
-			// are we creating a new table or altering?
-			$newTable = count( $currentSchema ) == 0;			
+			$params[ 'currentSchema' ] = $currentSchema;
 			
 			// suggest a schema based on properties
-			$suggestedSchema = $modelObj::suggestSchema( $currentSchema );
-			$suggestedSchemaSql = $modelObj::schemaToSql( $suggestedSchema, $newTable );
-
-			// update the schema?
-			if( val( $paths, 3 ) == 'update' )
-			{
-				try
-				{
-					$params[ 'success' ] = Database::sql( $suggestedSchemaSql );
-
-					if( $params[ 'success' ] )
-					{
-						// refresh current schema
-						$currentSchema = Database::listColumns( $tablename );			
-					}
-				}
-				catch( \Exception $e )
-				{
-					$params[ 'error' ] = $e->getMessage();
-				}
-			}
-
-			$params[ 'schema' ] = true;
-			$params[ 'currentSchema' ] = $modelObj::schemaToSql( $currentSchema, true );
-			$params[ 'suggestedSchema' ] = $suggestedSchemaSql;			
+			$params[ 'suggestedSchema' ] = $modelObj::suggestSchema();
 		}
 		else
 		{
