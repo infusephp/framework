@@ -444,10 +444,17 @@ abstract class Controller extends Acl
 			$tablename = $modelObj::tablename();
 			
 			// look up current schema
-			$currentSchema = Database::listColumns( $tablename );			
+			try
+			{
+				$currentSchema = Database::listColumns( $tablename );
+			}
+			catch( \Exception $e )
+			{
+				$currentSchema = false;
+			}
 
 			// are we creating a new table or altering?
-			$newTable = count( $currentSchema ) == 0;			
+			$newTable = !$currentSchema;			
 			
 			// suggest a schema based on properties
 			$suggestedSchema = $modelObj::suggestSchema( $currentSchema );
@@ -461,10 +468,7 @@ abstract class Controller extends Acl
 					$params[ 'success' ] = Database::sql( $suggestedSchemaSql );
 
 					if( $params[ 'success' ] )
-					{
-						// refresh current schema
-						$currentSchema = Database::listColumns( $tablename );			
-					}
+						return $res->redirect( '/4dm1n/' . $module . '/schema?success=t' );
 				}
 				catch( \Exception $e )
 				{
@@ -473,8 +477,10 @@ abstract class Controller extends Acl
 			}
 
 			$params[ 'schema' ] = true;
-			$params[ 'currentSchema' ] = $modelObj::schemaToSql( $currentSchema, true );
-			$params[ 'suggestedSchema' ] = $suggestedSchemaSql;			
+			$params[ 'tablename' ] = $tablename;
+			$params[ 'currentSchema' ] = ($currentSchema) ? $modelObj::schemaToSql( $currentSchema, true ) : false;
+			$params[ 'suggestedSchema' ] = $suggestedSchemaSql;	
+			$params[ 'success' ] = $req->query( 'success' );
 		}
 		else
 		{

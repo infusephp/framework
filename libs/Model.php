@@ -615,12 +615,15 @@ abstract class Model extends Acl
 			}
 
 			// does the column exist in the current schema?
-			foreach( $currentSchema as $c )
+			if( $currentSchema )
 			{
-				if( $column[ 'Field' ] == $c[ 'Field' ] )
+				foreach( $currentSchema as $c )
 				{
-					$column[ 'Exists' ] = true;
-					break;
+					if( $column[ 'Field' ] == $c[ 'Field' ] )
+					{
+						$column[ 'Exists' ] = true;
+						break;
+					}
 				}
 			}
 			
