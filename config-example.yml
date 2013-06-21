@@ -44,6 +44,8 @@ redis:
 routes:
 	"/":
 		controller: home
+    "get /install/finish":
+    	controller: home
 	"get /login":
 		controller: users
 		action: loginForm

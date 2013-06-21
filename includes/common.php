@@ -36,7 +36,8 @@ spl_autoload_register( function( $class ) {
 });
 
 // set the time zone
-date_default_timezone_set( Config::value( 'site', 'time-zone' ) );
+if( Config::value( 'site', 'time-zone' ) )
+	date_default_timezone_set( Config::value( 'site', 'time-zone' ) );
 
 // check if site disabled, still allow access to admin panel
 if( Config::value( 'site', 'disabled' ) && !strpos( '4dm1n', $_SERVER[ 'REQUEST_URI' ] ) )
@@ -64,6 +65,10 @@ if( $req->isCli() )
 	\infuse\Router::route( $req, $res );
 		
 	echo $res->getBody();
+}
+else if( !Config::value( 'site', 'installed' ) )
+{
+	include 'install.php';
 }
 else
 {

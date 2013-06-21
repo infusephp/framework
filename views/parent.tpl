@@ -56,7 +56,7 @@
 	<footer>
 		<div class="container">
 			<hr />
-			<p>Powered by <a href="https://github.com/jaredtking/nfuse" target="_blank">nfuse framework</a></p>
+			<p>Powered by <a href="https://github.com/jaredtking/nfuse" target="_blank">Infuse Framework</a></p>
 		</div>
 	</footer>
 </body>

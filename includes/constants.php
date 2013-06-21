@@ -38,6 +38,7 @@ if( !defined( 'INFUSE_BASE_DIR' ) )
 define( 'INFUSE_APP_DIR', INFUSE_BASE_DIR . '/app' );
 define( 'INFUSE_MODULES_DIR', INFUSE_BASE_DIR . '/modules' );
 define( 'INFUSE_TEMP_DIR', INFUSE_BASE_DIR . '/temp' );
+define( 'INFUSE_VIEWS_DIR', INFUSE_BASE_DIR . '/views' );
 
 // user levels
 define( 'SUPER_USER', -2 );

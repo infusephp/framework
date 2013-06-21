@@ -199,9 +199,9 @@ function json_decode_array($d)
 }
 
 // lifted from php comments
-function get_tz_options($selectedzone)
+function get_tz_options($selectedzone, $name = 'time_zone')
 {
-  $return = '<select name="time_zone">';
+  $return = '<select name="' . $name . '">';
   function timezonechoice($selectedzone) {
     $all = timezone_identifiers_list();
 

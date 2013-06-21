@@ -42,7 +42,7 @@ class ViewEngine Extends \Smarty
 		parent::__construct();
 		
 		$this->error_reporting = 1;
-		$this->base_template_dir = INFUSE_BASE_DIR . '/views';
+		$this->base_template_dir = INFUSE_VIEWS_DIR;
 		$this->template_dir = $this->base_template_dir . '/';
 		$this->compile_dir = INFUSE_TEMP_DIR . '/smarty/';
 		$this->cache_dir = INFUSE_TEMP_DIR . '/smarty/cache/';

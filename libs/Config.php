@@ -37,13 +37,13 @@ class Config
 	/////////////////////////////
 	
 	/**
-	* Gets a global configuration value
-	*
-	* @param string $section section
-	* @param string $name configuration name
-	*
-	* @return string|null value
-	*/
+	 * Gets a global configuration value
+	 *
+	 * @param string $section section
+	 * @param string $name configuration name
+	 *
+	 * @return string|null value
+	 */
 	static function value( $section, $property )
 	{
 		if( isset( self::$values[ $section ] ) &&
@@ -54,13 +54,13 @@ class Config
 	}
 	
 	/**
-	* Gets a global configuration value, section, or all values
-	*
-	* @param string $section section
-	* @param string $name configuration name
-	*
-	* @return string|null value
-	*/
+	 * Gets a global configuration value, section, or all values
+	 *
+	 * @param string $section section
+	 * @param string $name configuration name
+	 *
+	 * @return string|null value
+	 */
 	static function get( $section = false, $property = false )
 	{
 		if( !$section )
@@ -77,6 +77,23 @@ class Config
 		if( isset( self::$values[ $section ] ) &&
 			isset( self::$values[ $section ][ $property ] ) )
 			return self::$values[ $section ][ $property ];
+	}
+	
+	/** 
+	 * Sets a configuration value (only persists for the duration of the script)
+	 *
+	 * @param string $section
+	 * @param string $property
+	 * @param string $value
+	 *
+	 * @param return void
+	 */
+	static function set( $section, $property, $value )
+	{
+		if( !isset( self::$values[ $section ] ) )
+			self::$values[ $section ] = array();
+			
+		self::$values[ $section ][ $property ] = $value;
 	}
 	
 	/**
