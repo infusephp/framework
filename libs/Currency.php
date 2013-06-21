@@ -32,44 +32,53 @@ class Currency
 			'symbol' => 'د.إ'
 		),
 		'AFN' => array(
-			'name' => 'Afghanistan Afghani'
+			'name' => 'Afghanistan Afghani',
+			'symbol' => '؋'
 		),
 		'ALL' => array(
-			'name' => 'Albania Lek'
+			'name' => 'Albania Lek',
+			'symbol' => 'Lek'
 		),
 		'AMD' => array(
 			'name' => 'Armenia Dram'
 		),
 		'ANG' => array(
-			'name' => 'Netherlands Antilles Guilder'
+			'name' => 'Netherlands Antilles Guilder',
+			'symbol' => 'ƒ'
 		),
 		'AOA' => array(
 			'name' => 'Angola Kwanza'
 		),
 		'ARS' => array(
-			'name' => 'Argentina Peso'
+			'name' => 'Argentina Peso',
+			'symbol' => '$'
 		),
 		'AUD' => array(
 			'name' => 'Australia Dollar',
 			'symbol' => '$'
 		),
 		'AWG' => array(
-			'name' => 'Aruba Guilder'
+			'name' => 'Aruba Guilder',
+			'symbol' => 'ƒ'
 		),
 		'AZN' => array(
-			'name' => 'Azerbaijan New Manat'
+			'name' => 'Azerbaijan New Manat',
+			'symbol' => 'ман'
 		),
 		'BAM' => array(
-			'name' => 'Bosnia and Herzegovina Convertible Marka'
+			'name' => 'Bosnia and Herzegovina Convertible Marka',
+			'symbol' => 'KM'
 		),
 		'BBD' => array(
-			'name' => 'Barbados Dollar'
+			'name' => 'Barbados Dollar',
+			'symbol' => '$'
 		),
 		'BDT' => array(
 			'name' => 'Bangladesh Taka'
 		),
 		'BGN' => array(
-			'name' => 'Bulgaria Lev'
+			'name' => 'Bulgaria Lev',
+			'symbol' => 'лв'
 		),
 		'BHD' => array(
 			'name' => 'Bahrain Dinar'
@@ -78,31 +87,39 @@ class Currency
 			'name' => 'Burundi Franc'
 		),
 		'BMD' => array(
-			'name' => 'Bermuda Dollar'
+			'name' => 'Bermuda Dollar',
+			'symbol' => '$'
 		),
 		'BND' => array(
-			'name' => 'Brunei Darussalam Dollar'
+			'name' => 'Brunei Darussalam Dollar',
+			'symbol' => '$'
 		),
 		'BOB' => array(
-			'name' => 'Bolivia Boliviano'
+			'name' => 'Bolivia Boliviano',
+			'symbol' => '	$b'
 		),
 		'BRL' => array(
-			'name' => 'Brazil Real'
+			'name' => 'Brazil Real',
+			'symbol' => 'R$'
 		),
 		'BSD' => array(
-			'name' => 'Bahamas Dollar'
+			'name' => 'Bahamas Dollar',
+			'symbol' => '$'
 		),
 		'BTN' => array(
 			'name' => 'Bhutan Ngultrum'
 		),
 		'BWP' => array(
-			'name' => 'Botswana Pula'
+			'name' => 'Botswana Pula',
+			'symbol' => 'P'
 		),
 		'BYR' => array(
-			'name' => 'Belarus Ruble'
+			'name' => 'Belarus Ruble',
+			'symbol' => 'p.'
 		),
 		'BZD' => array(
-			'name' => 'Belize Dollar'
+			'name' => 'Belize Dollar',
+			'symbol' => 'BZ$'
 		),
 		'CAD' => array(
 			'name' => 'Canada Dollar',
@@ -116,44 +133,53 @@ class Currency
 			'symbol' => 'CHF'
 		),
 		'CLP' => array(
-			'name' => 'Chile Peso'
+			'name' => 'Chile Peso',
+			'symbol' => '$'
 		),
 		'CNY' => array(
 			'name' => 'China Yuan Renminbi',
 			'symbol' => '¥'
 		),
 		'COP' => array(
-			'name' => 'Colombia Peso'
+			'name' => 'Colombia Peso',
+			'symbol' => 'p.'
 		),
 		'CRC' => array(
-			'name' => 'Costa Rica Colon'
+			'name' => 'Costa Rica Colon',
+			'symbol' => '₡'
 		),
 		'CUC' => array(
 			'name' => 'Cuba Convertible Peso'
 		),
 		'CUP' => array(
-			'name' => 'Cuba Peso'
+			'name' => 'Cuba Peso',
+			'symbol' => '₱'
 		),
 		'CVE' => array(
 			'name' => 'Cape Verde Escudo'
 		),
 		'CZK' => array(
-			'name' => 'Czech Republic Koruna'
+			'name' => 'Czech Republic Koruna',
+			'symbol' => 'Kč'
 		),
 		'DJF' => array(
-			'name' => 'Djibouti Franc'
+			'name' => 'Djibouti Franc',
+			'symbol' => 'CHF'
 		),
 		'DKK' => array(
-			'name' => 'Denmark Krone'
+			'name' => 'Denmark Krone',
+			'symbol' => 'kr'
 		),
 		'DOP' => array(
-			'name' => 'Dominican Republic Peso'
+			'name' => 'Dominican Republic Peso',
+			'symbol' => 'RD$'
 		),
 		'DZD' => array(
 			'name' => 'Algeria Dinar'
 		),
 		'EGP' => array(
-			'name' => 'Egypt Pound'
+			'name' => 'Egypt Pound',
+			'symbol' => '£'
 		),
 		'ERN' => array(
 			'name' => 'Eritrea Nakfa'
@@ -166,10 +192,12 @@ class Currency
 			'symbol' => '€'
 		),
 		'FJD' => array(
-			'name' => 'Fiji Dollar'
+			'name' => 'Fiji Dollar',
+			'symbol' => '$'
 		),
 		'FKP' => array(
-			'name' => 'Falkland Islands (Malvinas) Pound'
+			'name' => 'Falkland Islands (Malvinas) Pound',
+			'symbol' => '£'
 		),
 		'GBP' => array(
 			'name' => 'United Kingdom Pound',
@@ -179,13 +207,15 @@ class Currency
 			'name' => 'Georgia Lari'
 		),
 		'GGP' => array(
-			'name' => 'Guernsey Pound'
+			'name' => 'Guernsey Pound',
+			'symbol' => '£'
 		),
 		'GHS' => array(
 			'name' => 'Ghana Cedi'
 		),
 		'GIP' => array(
-			'name' => 'Gibraltar Pound'
+			'name' => 'Gibraltar Pound',
+			'symbol' => '£'
 		),
 		'GMD' => array(
 			'name' => 'Gambia Dalasi'
@@ -194,17 +224,20 @@ class Currency
 			'name' => 'Guinea Franc'
 		),
 		'GTQ' => array(
-			'name' => 'Guatemala Quetzal'
+			'name' => 'Guatemala Quetzal',
+			'symbol' => 'Q'
 		),
 		'GYD' => array(
-			'name' => 'Guyana Dollar'
+			'name' => 'Guyana Dollar',
+			'symbol' => '$'
 		),
 		'HKD' => array(
 			'name' => 'Hong Kong Dollar',
 			'symbol' => 'HK$'
 		),
 		'HNL' => array(
-			'name' => 'Honduras Lempira'
+			'name' => 'Honduras Lempira',
+			'symbol' => 'L'
 		),
 		'HRK' => array(
 			'name' => 'Croatia Kuna',
@@ -214,16 +247,20 @@ class Currency
 			'name' => 'Haiti Gourde'
 		),
 		'HUF' => array(
-			'name' => 'Hungary Forint'
+			'name' => 'Hungary Forint',
+			'symbol' => 'Ft'
 		),
 		'IDR' => array(
-			'name' => 'Indonesia Rupiah'
+			'name' => 'Indonesia Rupiah',
+			'symbol' => 'Rp'
 		),
 		'ILS' => array(
-			'name' => 'Israel Shekel'
+			'name' => 'Israel Shekel',
+			'symbol' => '₪'
 		),
 		'IMP' => array(
-			'name' => 'Isle of Man Pound'
+			'name' => 'Isle of Man Pound',
+			'symbol' => '£'
 		),
 		'INR' => array(
 			'name' => 'India Rupee',
@@ -233,16 +270,20 @@ class Currency
 			'name' => 'Iraq Dinar'
 		),
 		'IRR' => array(
-			'name' => 'Iran Rial'
+			'name' => 'Iran Rial',
+			'symbol' => '﷼'
 		),
 		'ISK' => array(
-			'name' => 'Iceland Krona'
+			'name' => 'Iceland Krona',
+			'symbol' => 'kr'
 		),
 		'JEP' => array(
-			'name' => 'Jersey Pound'
+			'name' => 'Jersey Pound',
+			'symbol' => '£'
 		),
 		'JMD' => array(
-			'name' => 'Jamaica Dollar'
+			'name' => 'Jamaica Dollar',
+			'symbol' => 'J$'
 		),
 		'JOD' => array(
 			'name' => 'Jordan Dinar'
@@ -255,49 +296,61 @@ class Currency
 			'name' => 'Kenya Shilling'
 		),
 		'KGS' => array(
-			'name' => 'Kyrgyzstan Som'
+			'name' => 'Kyrgyzstan Som',
+			'symbol' => 'лв'
 		),
 		'KHR' => array(
-			'name' => 'Cambodia Riel'
+			'name' => 'Cambodia Riel',
+			'symbol' => '៛'
 		),
 		'KMF' => array(
 			'name' => 'Comoros Franc'
 		),
 		'KPW' => array(
-			'name' => 'Korea (North) Won'
+			'name' => 'Korea (North) Won',
+			'symbol' => '₩'
 		),
 		'KRW' => array(
-			'name' => 'Korea (South) Won'
+			'name' => 'Korea (South) Won',
+			'symbol' => '₩'
 		),
 		'KWD' => array(
 			'name' => 'Kuwait Dinar'
 		),
 		'KYD' => array(
-			'name' => 'Cayman Islands Dollar'
+			'name' => 'Cayman Islands Dollar',
+			'symbol' => '$'
 		),
 		'KZT' => array(
-			'name' => 'Kazakhstan Tenge'
+			'name' => 'Kazakhstan Tenge',
+			'symbol' => 'лв'
 		),
 		'LAK' => array(
-			'name' => 'Laos Kip'
+			'name' => 'Laos Kip',
+			'symbol' => '₭'
 		),
 		'LBP' => array(
-			'name' => 'Lebanon Pound'
+			'name' => 'Lebanon Pound',
+			'symbol' => '£'
 		),
 		'LKR' => array(
-			'name' => 'Sri Lanka Rupee'
+			'name' => 'Sri Lanka Rupee',
+			'symbol' => '₨'
 		),
 		'LRD' => array(
-			'name' => 'Liberia Dollar'
+			'name' => 'Liberia Dollar',
+			'symbol' => '$'
 		),
 		'LSL' => array(
 			'name' => 'Lesotho Loti'
 		),
 		'LTL' => array(
-			'name' => 'Lithuania Litas'
+			'name' => 'Lithuania Litas',
+			'symbol' => 'Lt'
 		),
 		'LVL' => array(
-			'name' => 'Latvia Lat'
+			'name' => 'Latvia Lat',
+			'symbol' => 'Ls'
 		),
 		'LYD' => array(
 			'name' => 'Libya Dinar'
@@ -312,13 +365,15 @@ class Currency
 			'name' => 'Madagascar Ariary'
 		),
 		'MKD' => array(
-			'name' => 'Macedonia Denar'
+			'name' => 'Macedonia Denar',
+			'symbol' => 'ден'
 		),
 		'MMK' => array(
 			'name' => 'Myanmar (Burma) Kyat'
 		),
 		'MNT' => array(
-			'name' => 'Mongolia Tughrik'
+			'name' => 'Mongolia Tughrik',
+			'symbol' => '₮'
 		),
 		'MOP' => array(
 			'name' => 'Macau Pataca'
@@ -327,7 +382,8 @@ class Currency
 			'name' => 'Mauritania Ouguiya'
 		),
 		'MUR' => array(
-			'name' => 'Mauritius Rupee'
+			'name' => 'Mauritius Rupee',
+			'symbol' => '₨'
 		),
 		'MVR' => array(
 			'name' => 'Maldives (Maldive Islands) Rufiyaa'
@@ -336,42 +392,52 @@ class Currency
 			'name' => 'Malawi Kwacha'
 		),
 		'MXN' => array(
-			'name' => 'Mexico Peso'
+			'name' => 'Mexico Peso',
+			'symbol' => '$'
 		),
 		'MYR' => array(
 			'name' => 'Malaysia Ringgit',
 			'symbol' => 'RM'
 		),
 		'MZN' => array(
-			'name' => 'Mozambique Metical'
+			'name' => 'Mozambique Metical',
+			'symbol' => 'MT'
 		),
 		'NAD' => array(
-			'name' => 'Namibia Dollar'
+			'name' => 'Namibia Dollar',
+			'symbol' => '$'
 		),
 		'NGN' => array(
-			'name' => 'Nigeria Naira'
+			'name' => 'Nigeria Naira',
+			'symbol' => '₦'
 		),
 		'NIO' => array(
-			'name' => 'Nicaragua Cordoba'
+			'name' => 'Nicaragua Cordoba',
+			'symbol' => 'C$'
 		),
 		'NOK' => array(
-			'name' => 'Norway Krone'
+			'name' => 'Norway Krone',
+			'symbol' => 'kr'
 		),
 		'NPR' => array(
-			'name' => 'Nepal Rupee'
+			'name' => 'Nepal Rupee',
+			'symbol' => '₨'
 		),
 		'NZD' => array(
 			'name' => 'New Zealand Dollar',
 			'symbol' => '$'
 		),
 		'OMR' => array(
-			'name' => 'Oman Rial'
+			'name' => 'Oman Rial',
+			'symbol' => '﷼'
 		),
 		'PAB' => array(
-			'name' => 'Panama Balboa'
+			'name' => 'Panama Balboa',
+			'symbol' => 'B/.'
 		),
 		'PEN' => array(
-			'name' => 'Peru Nuevo Sol'
+			'name' => 'Peru Nuevo Sol',
+			'symbol' => 'S/.'
 		),
 		'PGK' => array(
 			'name' => 'Papua New Guinea Kina'
@@ -381,25 +447,32 @@ class Currency
 			'symbol' => '₱'
 		),
 		'PKR' => array(
-			'name' => 'Pakistan Rupee'
+			'name' => 'Pakistan Rupee',
+			'symbol' => '₨'
 		),
 		'PLN' => array(
-			'name' => 'Poland Zloty'
+			'name' => 'Poland Zloty',
+			'symbol' => 'zł'
 		),
 		'PYG' => array(
-			'name' => 'Paraguay Guarani'
+			'name' => 'Paraguay Guarani',
+			'symbol' => 'Gs'
 		),
 		'QAR' => array(
-			'name' => 'Qatar Riyal'
+			'name' => 'Qatar Riyal',
+			'symbol' => '﷼'
 		),
 		'RON' => array(
-			'name' => 'Romania New Leu'
+			'name' => 'Romania New Leu',
+			'symbol' => 'lei'
 		),
 		'RSD' => array(
-			'name' => 'Serbia Dinar'
+			'name' => 'Serbia Dinar',
+			'symbol' => 'Дин.'
 		),
 		'RUB' => array(
-			'name' => 'Russia Ruble'
+			'name' => 'Russia Ruble',
+			'symbol' => 'руб'
 		),
 		'RWF' => array(
 			'name' => 'Rwanda Franc'
@@ -409,44 +482,52 @@ class Currency
 			'symbol' => '﷼'
 		),
 		'SBD' => array(
-			'name' => 'Solomon Islands Dollar'
+			'name' => 'Solomon Islands Dollar',
+			'symbol' => '$'
 		),
 		'SCR' => array(
-			'name' => 'Seychelles Rupee'
+			'name' => 'Seychelles Rupee',
+			'symbol' => '₨'
 		),
 		'SDG' => array(
 			'name' => 'Sudan Pound'
 		),
 		'SEK' => array(
-			'name' => 'Sweden Krona'
+			'name' => 'Sweden Krona',
+			'symbol' => 'kr'
 		),
 		'SGD' => array(
 			'name' => 'Singapore Dollar',
 			'symbol' => '$'
 		),
 		'SHP' => array(
-			'name' => 'Saint Helena Pound'
+			'name' => 'Saint Helena Pound',
+			'symbol' => '£'
 		),
 		'SLL' => array(
 			'name' => 'Sierra Leone Leone'
 		),
 		'SOS' => array(
-			'name' => 'Somalia Shilling'
+			'name' => 'Somalia Shilling',
+			'symbol' => 'S'
 		),
 		'SPL*' => array(
 			'name' => 'Seborga Luigino'
 		),
 		'SRD' => array(
-			'name' => 'Suriname Dollar'
+			'name' => 'Suriname Dollar',
+			'symbol' => '$'
 		),
 		'STD' => array(
 			'name' => '	São Tomé and Príncipe Dobra'
 		),
 		'SVC' => array(
-			'name' => 'El Salvador Colon'
+			'name' => 'El Salvador Colon',
+			'symbol' => '$'
 		),
 		'SYP' => array(
-			'name' => 'Syria Pound'
+			'name' => 'Syria Pound',
+			'symbol' => '£'
 		),
 		'SZL' => array(
 			'name' => 'Swaziland Lilangeni'
@@ -465,26 +546,30 @@ class Currency
 			'name' => 'Tunisia Dinar'
 		),
 		'TOP' => array(
-			'name' => 'Tonga Pa\'anga'
+			'name' => "Tonga Paanga"
 		),
 		'TRY' => array(
 			'name' => 'Turkey Lira',
 			'symbol' => 'TRY'
 		),
 		'TTD' => array(
-			'name' => 'Trinidad and Tobago Dollar'
+			'name' => 'Trinidad and Tobago Dollar',
+			'symbol' => 'TT$'
 		),
 		'TVD' => array(
-			'name' => 'Tuvalu Dollar'
+			'name' => 'Tuvalu Dollar',
+			'symbol' => '$'
 		),
 		'TWD' => array(
-			'name' => 'Taiwan New Dollar'
+			'name' => 'Taiwan New Dollar',
+			'symbol' => 'NT$'
 		),
 		'TZS' => array(
 			'name' => 'Tanzania Shilling'
 		),
 		'UAH' => array(
-			'name' => 'Ukraine Hryvna'
+			'name' => 'Ukraine Hryvna',
+			'symbol' => '₴'
 		),
 		'UGX' => array(
 			'name' => 'Uganda Shilling'
@@ -494,16 +579,20 @@ class Currency
 			'symbol' => '$'
 		),
 		'UYU' => array(
-			'name' => 'Uruguay Peso'
+			'name' => 'Uruguay Peso',
+			'symbol' => '$U'
 		),
 		'UZS' => array(
-			'name' => 'Uzbekistan Som'
+			'name' => 'Uzbekistan Som',
+			'symbol' => 'лв'
 		),
 		'VEF' => array(
-			'name' => 'Venezuela Bolivar'
+			'name' => 'Venezuela Bolivar',
+			'symbol' => 'Bs'
 		),
 		'VND' => array(
-			'name' => 'Viet Nam Dong'
+			'name' => 'Viet Nam Dong',
+			'symbol' => '₫'
 		),
 		'VUV' => array(
 			'name' => 'Vanuatu Vatu'
@@ -511,11 +600,9 @@ class Currency
 		'WST' => array(
 			'name' => 'Samoa Tala'
 		),
-		'XAF' => array(
-			'name' => 'CommunautÃ© FinanciÃ¨re Africaine (BEAC) CFA Franc BEAC'
-		),
 		'XCD' => array(
-			'name' => 'East Caribbean Dollar'
+			'name' => 'East Caribbean Dollar',
+			'symbol' => '$'
 		),
 		'XDR' => array(
 			'name' => 'International Monetary Fund (IMF) Special Drawing Rights'
@@ -527,16 +614,15 @@ class Currency
 			'name' => 'Comptoirs Français du Pacifique (CFP) Franc'
 		),
 		'YER' => array(
-			'name' => 'Yemen Rial'
+			'name' => 'Yemen Rial',
+			'symbol' => '﷼'
 		),
 		'ZAR' => array(
 			'name' => 'South Africa Rand',
 			'symbol' => 'R'
 		),
-		'ZMW' => array(
-			'name' => 'Zambia Kwacha'
-		),
 		'ZWD' => array(
-			'name' => 'Zimbabwe Dollar'
+			'name' => 'Zimbabwe Dollar',
+			'symbol' => 'Z$'
 		) );
 }
