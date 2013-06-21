@@ -81,7 +81,7 @@ server {
 
 ### apache
 
-An .htaccess file is already included in the `/app` directory for url rewrites. You must also make sure that you `DocumentRoot` points to `{FRAMEWORK_PATH}/app`.
+A .htaccess file is already included in the `/app` directory for url rewrites. You must also make sure that you `DocumentRoot` points to `{FRAMEWORK_PATH}/app`.
 
 ### Installer
 
