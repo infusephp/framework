@@ -29,21 +29,63 @@ A demo has been setup at [nfuse.jaredtking.com](http://nfuse.jaredtking.com).
 - CSS asset minification with LESS
 - Javascript minification
 
+## Requirements
+
+- PHP >= 5.3
+- PDO supported data store
+- mod_rewrite (if using apache)
+
+### Optional
+
+- memcached (for built-in model caching)
+- redis (for sessions)
+
 ## Getting Started
 
-An installer is on the way. Until then, there are a couple of steps to take before getting started.
+Infuse Framework is served through the `/app` directory to prevent the framework files from being publicly accessible. This requires a small amount of configuration for the web server to work properly.
 
-### Database setup
+### nginx
 
-The database can be setup by running the included `insall.sql` script.
+Here is a sample configuration:
 
-### Configuration
- 
-The framework configuration can be found in `config.yml`. At the least you must setup a database.
+```
+server {
+	listen 80;
+ 	server_name example.com;
+	root /var/www/example.com/app;
+	access_log /var/www/log/example.com-access.log;
+	error_log /var/www/log/example.com-error.log;
+	
+	location ~ \.php$ {
+		fastcgi_pass   127.0.0.1:9000;
+		fastcgi_index  index.php;
+		fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+		include        fastcgi_params;
+	}
 
-### Web Server
+	location / {
+	   	index  index.html index.htm index.php;
+		try_files $uri $uri/ /index.php?q=$uri&$args;
+	}
 
-The app is actually served through the `/app` directory to prevent the framework files from being publicly accessible. Whether using apache or nginx, make sure to set the site directory to `{FRAMEWORK_PATH}/app` or else the URL routing will not work properly.
+	location ~ ^/index.php
+	{
+	  	fastcgi_pass   127.0.0.1:9000;
+	 	fastcgi_index  index.php;
+	 	fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+		fastcgi_param  PATH_INFO $fastcgi_script_name;	
+		include        fastcgi_params;
+	}
+}
+```
+
+### apache
+
+An .htaccess file is already included in the `/app` directory for url rewrites. You must also make sure that you `DocumentRoot` points to `{FRAMEWORK_PATH}/app`.
+
+### Installer
+
+Once the web server is setup, fire up the url where the framework is installed and you will be redirected to an installer.
 
 ## Documentation
 
