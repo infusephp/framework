@@ -665,7 +665,7 @@ abstract class Model extends Acl
 
 			$col .= "`{$column['Field']}` {$column['Type']} ";
 
-			$col .= ( $column['Null'] == 'Yes' ) ? 'NULL' : 'NOT NULL';
+			$col .= ( strtolower( $column['Null'] ) == 'yes' ) ? 'NULL' : 'NOT NULL';
 			
 			if( $column['Default'] )
 				$col .= " DEFAULT '{$column['Default']}'";
