@@ -554,7 +554,7 @@ abstract class Model extends Acl
 	 */
 	static function suggestSchema( $currentSchema )
 	{
-		$schmea = array();
+		$schema = array();
 		
 		foreach( static::$properties as $name => $property )
 		{
