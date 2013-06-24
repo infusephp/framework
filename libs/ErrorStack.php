@@ -168,26 +168,55 @@ class ErrorStack
 	// SETTERS
 	/////////////////////////////////////
 	
-	public static function push( $code, $variables = array() )
+	public static function push( $code, $params = array() )
 	{
-		self::add( $code, null, null, (array)$variables );
+		self::add( array(
+			'error' => $code,
+			'params' => (array)$params ) );
 	}
 	
 	/**
 	* Adds an error message to the stack
 	*
-	* @param string $message message
-	* @param string $class class
-	* @param string $function function
-	* @param string $context context
-	* @param string $code error code
+	* @param array $message message
+	* - error: error code
+	* - params: array of parameters to be passed to message
+	* - message: (optional) the error message, this is typically generated automatically from the \infuse\Messages class
+	* - context: (optional) the context which the error message occured in
+	* - class: (optional) the class invoking the error
+	* - function: (optional) the function invoking the error
+	*
+	* N.B.: the other arguments are here for compatibility, for now, aim to remove them eventually
 	*
 	* @return boolean true if successful
 	*/
-	public static function add( $message, $class = null, $function = null, $variables = array(), $context = null, $code = 0 )
+	public static function add( $error, $class = null, $function = null, $params = array(), $context = null, $code = 0 )
 	{
-		$code = $message;
-		if( $class == null && $function == null )
+		// all of the arguments will be deprecated soon...
+		if( !is_array( $error ) )
+		{
+			$error = array(
+				'error' => $error,
+				'params' => $params,
+				'context' => ($context) ? $context : self::$context,
+				'class' => $class,
+				'function' => $function,
+				'message' => Messages::get( $error, $params )
+			);
+		}
+		else
+		{
+			if( !isset( $error[ 'context' ] ) )
+				$error[ 'context' ] = self::$context;
+			
+			if( !isset( $error[ 'message' ] ) )
+				$error[ 'message' ] = Messages::get( $error[ 'error' ], val( $error, 'params' ) );
+		}
+		
+		if( !val( $error, 'error' ) )
+			return false;
+	
+		if( !val( $error, 'function' ) )
 		{
 			// try to look up the call history using debug_backtrace()
 			$trace = debug_backtrace();
@@ -196,19 +225,12 @@ class ErrorStack
 				// $trace[0] is ourself
 				// $trace[1] is our caller
 				// and so on...
-				$class = $trace[1]['class'];
-				$function = $trace[1]['function'];
-			} // if
-		} // if
+				$error[ 'class' ] = $trace[1]['class'];
+				$error[ 'function' ] = $trace[1]['function'];
+			}
+		}
 		
-		self::$stack[] = array(
-			'class' => $class,
-			'function' => $function,
-			'message' => self::generateMessage( $message, $variables ),
-			'variables' => $variables,
-			'code' => $code,
-			'context' => ($context) ? $context : self::$context
-		);
+		self::$stack[] = $error;
 		
 		return true;
 	}
@@ -243,18 +265,6 @@ class ErrorStack
 	 */
 	public static function dump()
 	{
-		print_r(ErrorStack::stack());
-	}
-	
-	static function generateMessage( $message, $variables = array() )
-	{
-		$i = 1;
-		foreach( (array)$variables as $variable )
-		{
-			$message = str_replace( '{{' . $i . '}}', $variable, $message );
-			$i++;
-		}
-
-		return $message;
+		echo '<pre>' . print_r(ErrorStack::stack()) . '</pre>';
 	}	
 }

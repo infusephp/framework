@@ -3,7 +3,7 @@
 	<h1>Welcome to Infuse Framework!</h1>
 	
 	<ul>
-		<li><a href="https://github.com/jaredtking/nfuse">Documentation</a></li>
+		<li><a href="https://github.com/jaredtking/infuse/wiki" target="_blank">Documentation</a></li>
 		{if $currentUser->isLoggedIn()}
 			<li>
 				Logged in as:<br />

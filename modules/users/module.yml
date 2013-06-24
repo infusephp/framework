@@ -19,14 +19,8 @@ routes:
 	"post /users/forgot": forgotStep1
 	"get /users/forgot/:id": forgotForm
 	"post /users/forgot/:id": forgotStep2
-	"get /users/signupFromInvite": signupForm
+	"get /users/signup": signupForm
 	"post /users/signup": signup
 	"get /users/account": accountSettings
 	"post /users/account": editAccountSettings
 	"get /users/verifyEmail/:id": verifiyEmail
-	"post /users/requestInvite": requestInvite
-	"get /users/requestInvite": redirectToHome
-	"get /users/import": importUsers
-	"put /users/account": updateAccount
-	"get /users/invite/:uid": sendInvite
-	"get /users/paidList": getPaidUsers

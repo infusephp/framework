@@ -52,33 +52,14 @@ class Validate
 		$email = trim(strtolower($email));
 
 		if( filter_var($email, FILTER_VALIDATE_EMAIL) === false )
-		{
-			ErrorStack::add( Messages::VALIDATE_INVALID_EMAIL_ADDRESS, __CLASS__, __FUNCTION__ );
 			return false;
-		}
 
 		if( !val( $parameters, 'skipBanCheck' ) )
 		{
 			Modules::load('bans');
 			if( \infuse\models\Ban::isBanned( $email, BAN_TYPE_EMAIL ) )
 			{
-				ErrorStack::add( Messages::VALIDATE_EMAIL_ADDRESS_BANNED, __CLASS__, __FUNCTION__ );
-				return false;
-			}
-		}
-
-		if( !val( $parameters, 'skipRegisteredCheck' ) )
-		{
-			$emailTaken = false;
-			if( isset( $parameters[ 'model' ] ) )
-				$emailTaken = $parameters[ 'model' ]::emailTaken( $email, $parameters[ 'model' ]->get( 'user_email' ) );
-			else
-				$emailTaken = User::emailTaken( $email );
-			
-			// check if e-mail has already been claimed
-			if( $emailTaken )
-			{
-				ErrorStack::add( Messages::VALIDATE_EMAIL_ADDRESS_REGISTERED, __CLASS__, __FUNCTION__ );
+				ErrorStack::add( 'email_address_banned' );
 				return false;
 			}
 		}
@@ -97,35 +78,16 @@ class Validate
 	static function username( &$username, $parameters = array() )
 	{
 		if (!(strlen($username) >= 1) || !preg_match( '/^[A-Za-z0-9]+(?:[_-][A-Za-z0-9]+)*$/', $username ) )
-		{ // Check if user name is at least 2 characters long.
-			ErrorStack::add( Messages::VALIDATE_INVALID_USER_NAME, __CLASS__, __FUNCTION__ );
 			return false;
-		}
-		
+
 		if( !val( $parameters, 'skipBanCheck' ) )
 		{
 			Modules::load('bans');
 			if( \infuse\models\Ban::isBanned( $username, BAN_TYPE_USERNAME ) )
 			{
-				ErrorStack::add( Messages::VALIDATE_USER_NAME_BANNED, __CLASS__, __FUNCTION__ );
+				ErrorStack::add( 'user_name_banned' );
 				return false;
 			}
-		}
-			
-		if( val( $parameters, 'checkRegistered' ) || !isset( $parameters[ 'model' ] ) )
-		{
-			$usernameTaken = false;
-			if( isset( $parameters[ 'model' ] ) )
-				$usernameTaken = $parameters[ 'model' ]::usernameTaken( $username );
-			else
-				$usernameTaken = User::usernameTaken( $username );
-			
-			// Check if user name is already registered.
-			if( $usernameTaken ) {
-				ErrorStack::add( Messages::VALIDATE_USER_NAME_REGISTERED, __CLASS__, __FUNCTION__ );
-				return false;
-			}
-	
 		}
 
 		return true;
@@ -161,15 +123,12 @@ class Validate
 			 // Check if passwords match.
 			if( $password1 != $password2 )
 			{
-				ErrorStack::add( Messages::VALIDATE_PASSWORD_NOT_MATCHING, __CLASS__, __FUNCTION__ );
+				ErrorStack::add( 'passwords_not_matching' );
 				return false;
 			}
 		}
 		else
-		{
-			ErrorStack::add( Messages::VALIDATE_INVALID_PASSWORD, __CLASS__, __FUNCTION__, $min_pass_length );
 			return false;
-		}
 		
 		// encrypt password
 		$password = encryptPassword( $password1 );
@@ -239,10 +198,7 @@ class Validate
 	static function firstName( &$fname, $parameters = array() )
 	{
 		if( !isset( $fname ) || strlen($fname) < 2 )
-		{
-			ErrorStack::add( Messages::VALIDATE_INVALID_NAME );
 			return false;
-		}
 	
 		return true;
 	}

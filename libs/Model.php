@@ -679,8 +679,11 @@ abstract class Model extends Acl
 			$cols[] = $col;
 		}
 
-		// TODO support multiple primary keys
-		// TODO support changing primary key when altering table
+		// TODO
+		// multiple keys
+		// changing primary key when altering table
+		// index
+		// unique index
 
 		$sql .= implode( ",\n", $cols);
 
@@ -817,12 +820,12 @@ abstract class Model extends Acl
 		{
 			$propertyNames[] = $name;
 			if( val( $property, 'required' ) )
-				$requiredProperties[] = $property;
+				$requiredProperties[] = $name;
 		}
 		
 		// loop through each supplied field and validate, if setup
 		$insertArray = array();
-		foreach ($data as $field => $field_info)
+		foreach( $data as $field => $field_info )
 		{
 			if( in_array( $field, $propertyNames ) )
 				$value = $data[ $field ];
@@ -837,12 +840,14 @@ abstract class Model extends Acl
 
 			if( is_array( $property ) )
 			{
+				// null value
 				if( val( $property, 'null' ) && empty( $value ) )
 				{
 					$updateArray[ $field ] = null;
 					continue;
 				}
 				
+				// validate
 				if( is_callable( val( $property, 'validation' ) ) )
 				{
 					$parameters = array();
@@ -851,19 +856,41 @@ abstract class Model extends Acl
 					
 					$args = array( &$value, $parameters );
 					
-					if( call_user_func_array( $property[ 'validation' ], $args ) )
-						$insertArray[ $field ] = $value;
-					else
+					if( !call_user_func_array( $property[ 'validation' ], $args ) )
 					{
-						//echo "$field\n";
+						ErrorStack::add( array(
+							'error' => VALIDATION_FAILED,
+							'params' => array(
+								'field' => $field,
+								'field_name' => (isset($property['title'])) ? $property[ 'title' ] : Inflector::humanize( $field ) ) ) );
+						
 						$validated = false;
 					}
 				}
-				else
-					$insertArray[ $field ] = $value;
-			}
-			else
+				
+				// check for uniqueness
+				if( val( $property, 'unique' ) )
+				{
+					if( Database::select(
+						static::tablename(),
+						'count(*)',
+						array(
+							'where' => array(
+								$field => $value ),
+							'single' => true ) ) > 0 )
+					{
+						ErrorStack::add( array(
+							'error' => VALIDATION_NOT_UNIQUE,
+							'params' => array(
+								'field' => $field,
+								'field_name' => (isset($property['title'])) ? $property[ 'title' ] : Inflector::humanize( $field ) ) ) );					
+					
+						$validated = false;
+					}
+				}
+				
 				$insertArray[ $field ] = $value;
+			}			
 		}
 		
 		// add in default values
@@ -875,7 +902,19 @@ abstract class Model extends Acl
 		}
 		
 		// check for required fields
-		// TODO
+		foreach( $requiredProperties as $name )
+		{
+			if( !isset( $insertArray[ $name ] ) )
+			{
+				ErrorStack::add( array(
+					'error' => VALIDATION_REQUIRED_FIELD_MISSING,
+					'params' => array(
+						'field' => $name,
+						'field_name' => (isset(static::$properties[$name]['title'])) ? static::$properties[$name][ 'title' ] : Inflector::humanize( $name ) ) ) );
+
+				$validated = false;
+			}
+		}
 		
 		if( !$validated )
 			return false;
@@ -972,15 +1011,38 @@ abstract class Model extends Acl
 						$updateArray[ $field ] = $value;
 					else
 					{
-						//echo "$field\n";
+						ErrorStack::add( array(
+							'error' => VALIDATION_FAILED,
+							'params' => array(
+								'field' => $field,
+								'field_name' => (isset($property['title'])) ? $property[ 'title' ] : Inflector::humanize( $field ) ) ) );
+
 						$validated = false;
 					}
 				}
-				else
-					$updateArray[ $field ] = $value;
-			}
-			else
+				
+				if( val( $property, 'unique' ) && $value != $this->get( $field ) )
+				{
+					if( Database::select(
+						static::tablename(),
+						'count(*)',
+						array(
+							'where' => array(
+								$field => $value ),
+							'single' => true ) ) > 0 )
+					{
+						ErrorStack::add( array(
+							'error' => VALIDATION_NOT_UNIQUE,
+							'params' => array(
+								'field' => $field,
+								'field_name' => (isset($property['title'])) ? $property[ 'title' ] : Inflector::humanize( $field ) ) ) );					
+					
+						$validated = false;
+					}
+				}
+				
 				$updateArray[ $field ] = $value;
+			}
 		}
 
 		if( !$validated )

@@ -51,7 +51,9 @@ class User extends \infuse\Model
 			'type' => 'text',
 			'filter' => '<a href="mailto:{user_email}">{user_email}</a>',
 			'validation' => array('\infuse\libs\Validate','email'),
-			'required' => true
+			'required' => true,
+			'unique' => true,
+			'title' => 'E-mail address'
 		),
 		'first_name' => array(
 			'type' => 'text',
@@ -67,7 +69,8 @@ class User extends \infuse\Model
 			'type' => 'password',
 			'length' => 128,
 			'validation' => array('\infuse\libs\Validate','password'),
-			'required' => true
+			'required' => true,
+			'title' => 'Password'
 		),
 		'registered_timestamp' => array(
 			'type' => 'date',
@@ -323,17 +326,6 @@ class User extends \infuse\Model
 	}
 	
 	/**
-	 * Checks if the user has connected with Facebook
-	 *
-	 * @param boolean connected?
-	 */
-	function fbConnected()
-	{
-		// WARNING: this does not mean we still have permission, check with FB for that
-		return $this->get('fbid') != '';
-	}
-	
-	/**
 	* Gets the URL of the profile for the user
 	* @return string URL
 	*/
@@ -382,35 +374,7 @@ class User extends \infuse\Model
 		else
 			return false;
 	}
-	
-	static function emailTaken( $email, $exclude = null )
-	{
-		$excludeStr = ($exclude) ? 'user_email <> "' . $exclude . '"' : null;
-	
-		return Database::select(
-			'Users',
-			'count(uid)',
-			array(
-				'where' => array(
-					'user_email' => $email,
-					$excludeStr ),
-				'single' => true ) ) > 0;
-	}
-	
-	static function usernameTaken( $username )
-	{
-		$uid = (isset($this) && get_class($this) == __CLASS__) ? 'uid <> ' . $this->id : '';
-
-		return Database::select(
-			'Users',
-			'count(*)',
-			array(
-				'where' => array(
-					'user_name' => $username,
-					$uid ),
-				'single' => true ) ) > 0;
-	}
-	
+		
 	///////////////////////////////
 	// SETTERS
 	///////////////////////////////
@@ -698,7 +662,7 @@ class User extends \infuse\Model
 			}
 			else
 			// Could not make a match.
-				ErrorStack::add( Messages::USER_FORGOT_EMAIL_NO_MATCH, '\infuse\libs\Validate', 'email' );
+				ErrorStack::add( 'user_forgot_email_no_match' );
 		}
 
 		ErrorStack::clearContext();		
@@ -728,7 +692,7 @@ class User extends \infuse\Model
 					'link_type' => 0, // 0 = forgot, 1 = verify, 2 = temporary
 					'link_timestamp > ' . strtotime( '-30 minutes' ) ),
 				'single' => true ) ) ) {
-			ErrorStack::add( Messages::USER_FORGOT_EXPIRED_INVALID );
+			ErrorStack::add( 'user_forgot_expired_invalid' );
 			return false;
 		}
 		
@@ -773,28 +737,26 @@ class User extends \infuse\Model
 	 * @param string $email e-mail address
 	 * @param string $password password
 	 * @param boolean $remember remember me
-	 * @param int $fbid facebook id
 	 * @param bool $setSessionVars when true sets the $_SESSION with user info
 	 *
 	 * @return boolean true if successful
 	*/
-	function login( $email, $password, $remember = false, $fbid = 0, $setSessionVars = true )
+	function login( $email, $password, $remember = false, $setSessionVars = true )
 	{
 		if( $this->logged_in )
 			return true;
 			
 		ErrorStack::setContext('login');
 			
-		if( empty( $email ) ) // Validate the email.
+		if( empty( $email ) )
 		{
-			// TODO: update this message
-			ErrorStack::add( Messages::USER_BAD_EMAIL, __CLASS__, __FUNCTION__ );
+			ErrorStack::add( 'user_bad_email' );
 			return false;
 		}
 
-		if( empty( $password ) && $fbid == 0 ) // Validate the password.
+		if( empty( $password ) )
 		{
-			ErrorStack::add( Messages::USER_BAD_PASSWORD, __CLASS__, __FUNCTION__ );
+			ErrorStack::add( 'user_bad_password' );
 			return false;
 		}
 		
@@ -802,37 +764,24 @@ class User extends \infuse\Model
 		$verifyTimeWindow = time() - 3600*24;
 		
 		// Query the Database.
-		if( $fbid > 0 )
-			$userInfo = Database::select(
-				'Users AS u',
-				'uid, user_email, enabled',
-				array(
-					'where' => array(
-						'user_email' => $email,
-						'fbid' => $fbid,
-						'NOT EXISTS ( SELECT uid FROM User_Links AS l WHERE link_type = 1 AND u.uid = l.uid AND l.link_timestamp < ' . $verifyTimeWindow . ' )', // 0 = forgot, 1 = verify, 2 = temporary
-						'NOT EXISTS ( SELECT uid FROM User_Links AS l WHERE link_type = 2 AND u.uid = l.uid )' // 0 = forgot, 1 = verify, 2 = temporary
-					),
-					'singleRow' => true ),0,true );
-		else
-			$userInfo = Database::select(
-				'Users AS u',
-				'uid,user_email,enabled',
-				array(
-					'where' => array(
-						'user_email' => $email,
-						'user_password' => encryptPassword( $password ),
-						'NOT EXISTS ( SELECT uid FROM User_Links AS l WHERE link_type = 1 AND u.uid = l.uid AND l.link_timestamp < ' . $verifyTimeWindow . ' )', // 0 = forgot, 1 = verify, 2 = temporary
-						'NOT EXISTS ( SELECT uid FROM User_Links AS l WHERE link_type = 2 AND u.uid = l.uid )' // 0 = forgot, 1 = verify, 2 = temporary
-					),
-					'singleRow' => true ) );
+		$userInfo = Database::select(
+			'Users AS u',
+			'uid,user_email,enabled',
+			array(
+				'where' => array(
+					'user_email' => $email,
+					'user_password' => encryptPassword( $password ),
+					'NOT EXISTS ( SELECT uid FROM User_Links AS l WHERE link_type = 1 AND u.uid = l.uid AND l.link_timestamp < ' . $verifyTimeWindow . ' )', // 0 = forgot, 1 = verify, 2 = temporary
+					'NOT EXISTS ( SELECT uid FROM User_Links AS l WHERE link_type = 2 AND u.uid = l.uid )' // 0 = forgot, 1 = verify, 2 = temporary
+				),
+				'singleRow' => true ) );
 
 		if( Database::numrows() == 1 )
 		{ // A match was made.
 			$banned = false; // TODO: user bans
 			if( $userInfo[ 'enabled' ] != 1 || $banned ) // check if disabled or banned
 			{
-				ErrorStack::add( Messages::USER_LOGIN_BANNED, __CLASS__, __FUNCTION__ );
+				ErrorStack::add( 'user_login_banned' );
 				return false;
 			}
 			// success
@@ -872,7 +821,7 @@ class User extends \infuse\Model
 					array(
 						'uid' => $userInfo[ 'uid' ],
 						'timestamp' => time(),
-						'type' => ($fbid > 0) ? '1' : '0', // regular (0) or FB (1)
+						'type' => '0', // regular = 0
 						'ip' => $_SERVER['REMOTE_ADDR']
 					)
 				);
@@ -884,7 +833,7 @@ class User extends \infuse\Model
 		}
 		else // No match was made.
 		{
-			ErrorStack::add( Messages::USER_LOGIN_NO_MATCH, __CLASS__, __FUNCTION__ );
+			ErrorStack::add( 'user_login_no_match' );
 			return false;
 		}
 	}
@@ -1085,7 +1034,7 @@ class User extends \infuse\Model
 							array(
 								'uid' => $this->id,
 								'timestamp' => time(),
-								'type' => 0, // regular (0) or FB (1)
+								'type' => 0, // regular = 0
 								'ip' => $_SERVER['REMOTE_ADDR'] ) );						
 						
 						return true;

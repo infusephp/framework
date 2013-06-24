@@ -22,7 +22,7 @@
 	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-// site configuration
+/* site configuration */
 if( !defined('SITE_TITLE') )
 	define ('SITE_TITLE', \infuse\Config::value( 'site', 'title' ) );
 if( !defined( 'SMTP_HOST' ) )
@@ -40,16 +40,18 @@ define( 'INFUSE_MODULES_DIR', INFUSE_BASE_DIR . '/modules' );
 define( 'INFUSE_TEMP_DIR', INFUSE_BASE_DIR . '/temp' );
 define( 'INFUSE_VIEWS_DIR', INFUSE_BASE_DIR . '/views' );
 
-// user levels
+/* user levels */
 define( 'SUPER_USER', -2 );
 define( 'ANONYMOUS', -1 );
 define( 'ADMIN', 1 );
 define( 'CLI', 4 );
 
-// error codes
+/* error codes */
 define( 'ERROR_NO_PERMISSION', 'no_permission' );
-define( 'ERROR_VALIDATION', 'validation_error' );
+define( 'VALIDATION_FAILED', 'validation_failed' );
+define( 'VALIDATION_REQUIRED_FIELD_MISSING', 'required_field_missing' );
+define( 'VALIDATION_NOT_UNIQUE', 'not_unique' );
 
-// acl
+/* acl */
 define( 'ACL_RESULT_NOT_CACHED', -1 );
 define( 'ACL_NO_ID', -1 );
