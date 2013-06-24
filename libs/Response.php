@@ -256,12 +256,13 @@ class Response
 					$message = self::$codes[$this->code];
 				break;
 			}
-				
+			
 			if( $contentType == 'text/html' )
 			{
 				$this->render( 'error.tpl', array(
 					'message' => $message,
 					'errorCode' => $this->code,
+					'title' => $this->code,
 					'errorMessage' => $message ) );
 				
 				echo $this->body;
