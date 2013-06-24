@@ -192,6 +192,18 @@ class Request
 	{
 		return val( $this->server, 'SERVER_PORT' );
 	}
+
+	/**
+	 * Gets values from the request headers
+	 *
+	 * @param string $index optional
+	 *
+	 * @return mixed
+	 */
+	public function header( $index = false )
+	{
+		return ($index) ? val( $this->headers, strtoupper( $index ) ) : $this->headers;
+	}
 	
 	/**
 	 * Gets the username from the auth headers associated with the request
