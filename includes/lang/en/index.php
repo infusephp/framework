@@ -30,6 +30,7 @@ class Messages
 	
 	/* Generic */
 	'success' => 'Success!',
+	'no_permission' => 'You do not have permission to do that',
 
 	/* Users */
 	'user_bad_email' => 'Please enter a valid e-mail address.',

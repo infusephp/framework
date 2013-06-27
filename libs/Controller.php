@@ -422,9 +422,12 @@ abstract class Controller extends Acl
 			'create' => $modelObj->can('create'),
 			'edit' => $modelObj->can('edit'),
 			'delete' => $modelObj->can('delete') );
-		$modelInfo->idFieldName = $modelClassName::$idFieldName;
-				
-		$modelInfo->fields = array();
+		$modelInfo->idFieldName = $modelClassName::$idFieldName;		
+		$modelInfo->properties = array();
+		$modelInfo->properName = Inflector::humanize( Inflector::underscore( $model ) );
+		$modelInfo->properNamePlural = Inflector::humanize( Inflector::underscore( Inflector::pluralize( $model ) ) );
+		$modelInfo->className = $model;
+		
 		$default = array(
 			'truncate' => true,
 			'nowrap' => true
@@ -432,14 +435,13 @@ abstract class Controller extends Acl
 		
 		$params = array(
 			'moduleName' => $module,
-			'modelName' => $model,
-			'modelNamePlural' => Inflector::humanize( Inflector::underscore( Inflector::pluralize( $model ) ) )
+			'modelNamePlural' => $modelInfo->properNamePlural
 		);
 		
 		$paths = $req->paths();
 		
 		if( count( $paths ) >= 3 && $paths[ 2 ] == 'schema' )
-		{			
+		{
 			// get tablename for model
 			$tablename = $modelObj::tablename();
 			
@@ -479,14 +481,14 @@ abstract class Controller extends Acl
 			$params[ 'schema' ] = true;
 			$params[ 'tablename' ] = $tablename;
 			$params[ 'currentSchema' ] = ($currentSchema) ? $modelObj::schemaToSql( $currentSchema, true ) : false;
-			$params[ 'suggestedSchema' ] = $suggestedSchemaSql;	
+			$params[ 'suggestedSchema' ] = $suggestedSchemaSql;
 			$params[ 'success' ] = $req->query( 'success' );
 		}
 		else
 		{
 			foreach( $modelClassName::$properties as $name => $property )
 			{
-				$modelInfo->fields[] = array_merge(
+				$modelInfo->properties[] = array_merge(
 					$default,
 					array(
 						'name' => $name,
@@ -495,6 +497,7 @@ abstract class Controller extends Acl
 			}
 			
 			$params[ 'modelJSON' ] = json_encode( $modelInfo );
+			$params[ 'ngApp' ] = 'models';
 		}
 		
 		$res->render( 'admin/model.tpl', $params );

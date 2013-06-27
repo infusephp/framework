@@ -34,10 +34,11 @@ class Module extends \infuse\Model
 			'type' => 'text'
 		),
 		'description' => array(
-			'type' => 'text'
+			'type' => 'text',
+			'truncate' => false
 		),
 		'author' => array(
-			'type' => 'text',
+			'type' => 'html',
 			'truncate' => false
 		),
 		'api' => array(
@@ -47,6 +48,18 @@ class Module extends \infuse\Model
 			'type' => 'boolean'
 		)
 	);
+	
+	function can( $permission, $requester = null )
+	{
+		if( !$requester )
+			$requester = \infuse\models\User::currentUser();
+		
+		// can only view
+		if( $requester->isAdmin() && in_array( $permission, array( 'view' ) ) )
+			return true;
+		
+		return false;
+	}
 
 	static function find( $start = 0, $limit = 100, $sort = '', $search = '', $where = array() )
 	{
@@ -77,14 +90,5 @@ class Module extends \infuse\Model
 		$info[ 'author' ] = "<a href='{$author['website']}' target='_blank'>{$author['name']}</a> (<a href='mailto:{$author['email']}'>{$author['email']}</a>)";
 		
 		return $info;
-	}
-	
-	function can( $permission, $requester = null )
-	{
-		// no CRUD besides view
-		if( $permission == 'view' )
-			return parent::can( $permission, $requester );
-
-		return false;
 	}
 }

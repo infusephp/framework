@@ -265,6 +265,6 @@ class ErrorStack
 	 */
 	public static function dump()
 	{
-		echo '<pre>' . print_r(ErrorStack::stack()) . '</pre>';
+		echo '<pre>' . print_r(ErrorStack::stack(), true) . '</pre>';
 	}	
 }

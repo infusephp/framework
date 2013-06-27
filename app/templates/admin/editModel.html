@@ -1,0 +1,66 @@
+<h2 ng-show="newModel">New {{modelInfo.properName}}</h2>
+<div ng-hide="newModel">
+	<h2>Edit {{modelInfo.properName}} #{{model[modelInfo.idFieldName]}}</h2>
+	<p>
+		<a href="#/{{model[modelInfo.idFieldName]}}" class="btn btn-large">&larr; Cancel</a>
+	</p>
+</div>
+
+<form ng-submit="saveModel()">
+	<div class="errors">
+		<p class="alert alert-error" ng-repeat="error in errors">{{error}}</p>
+	</div>
+	
+	<div class="models">
+		<div ng-repeat="property in modelInfo.properties" class="model">
+			<h4>{{property.title}}</h4>
+			
+			<div class="value input">
+				<div ng-switch on="property.type">
+					<div ng-switch-when="id">
+						<input class="input-medium" type="text" name="{{property.name}}" ng-model="model[property.name]" />
+					</div>
+					<div ng-switch-when="date">
+						<input type="text" name="{{property.name}}" class="date" ui-date ng-model="model[property.name]" />
+					</div>
+					<div ng-switch-when="boolean">
+						<input type="checkbox" class="checkbox" value="1" name="{{property.name}}" ng-model="model[property.name]" />
+					</div>
+					<div ng-switch-when="longtext">
+						<textarea name="{{property.name}}" expanding-textarea ng-model="model[property.name]"></textarea>
+					</div>
+					<div ng-switch-when="hidden">
+						<input type="hidden" name="{{property.name}}" ng-model="model[property.name]" />
+					</div>
+					<div ng-switch-when="file">
+						not implemented
+					</div>
+					<div ng-switch-when="enum">
+						<select class="input-xlarge" name="{{property.name}}" ng-options="value for (key,value) in property.enum" ng-model="model[property.name]"></select>
+					</div>
+					<div ng-switch-when="password">
+						<input class="input-large" type="password" name="{{property.name}}" autocomplete="off" />
+					</div>
+					<div ng-switch-when="number">
+						<input class="input-large" type="text" name="{{property.name}}" ng-model="model[property.name]" />
+					</div>
+					<div ng-switch-when="custom">
+						
+					</div>
+					<div ng-switch-when="html">
+					
+					</div>
+					<div ng-switch-default>
+						<input class="input-xxlarge" type="text" name="{{property.name}}" ng-model="model[property.name]" />
+					</div>
+				</div>
+			</div>
+		</div>
+		<div ng-show="newModel">
+			<input type="submit" class="btn btn-success btn-large" value="Create" ng-disabled="saving" />
+		</div>
+		<div ng-hide="newModel">
+			<input type="submit" class="btn btn-success btn-large" value="Save" ng-disabled="saving" />
+		</div>
+	</div>
+</form>
