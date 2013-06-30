@@ -1,4 +1,4 @@
-infuse v0.1.0
+infuse v0.1.1
 =====
 
 PHP MVC framework for rapid development of web applications
