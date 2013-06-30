@@ -25,4 +25,21 @@
 namespace infuse\controllers;
 
 class Bans extends \infuse\Controller
-{ }
+{
+	function middleware( $req, $res )
+	{
+		// check if ip is banned
+		if( \infuse\Database::select(
+			'Bans',
+			'count(*)',
+			array(
+				'where' => array(
+					'type' => 1,
+					'value' => $req->ip() ),
+				'single' => true ) ) > 0 )
+		{
+			$res->setCode(403);
+			$res->send();
+		}		
+	}
+}

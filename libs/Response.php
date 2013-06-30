@@ -200,6 +200,12 @@ class Response
 	{
 		if( !$req )
 			$req = new Request();
+
+		if( $req->isCli() )
+		{
+			echo $this->body;
+			exit;
+		}
 	
 		$contentType = $this->contentType;
 		

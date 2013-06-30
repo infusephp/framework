@@ -29,11 +29,33 @@ use \infuse\models\User as User;
 
 class DatabaseSession
 {
+	static function start($redis_conf = array(), $unpackItems = array())
+	{
+		$obj = new self($redis_conf, $unpackItems);
+
+		session_set_save_handler(
+			array($obj, "open"),
+			array($obj, "close"),
+			array($obj, "read"),
+			array($obj, "write"),
+			array($obj, "destroy"),
+			array($obj, "gc"));
+
+		session_start();
+
+		return $obj;
+	}
+
+	function __construct()
+	{
+
+	}
+
 	/**
 	* Opens a session
 	* @return boolean success
 	*/
-	function _open( )
+	function open( )
 	{
 		return true;
 	}
@@ -42,7 +64,7 @@ class DatabaseSession
 	* Closes a session
 	* @return boolean success
 	*/
-	function _close( )
+	function close( )
 	{
 		return true;
 	}
@@ -52,7 +74,7 @@ class DatabaseSession
 	* @param int $id session ID
 	* @return boolean success
 	*/
-	function _read( $id )
+	function read( $id )
 	{
 		return Database::select(
 			'Sessions',
@@ -73,7 +95,7 @@ class DatabaseSession
 	* @param string $data session data
 	* @return boolean success
 	*/
-	function _write( $id, $data )
+	function write( $id, $data )
 	{
 		Database::delete( 'Sessions', array( 'id' => $id ) );
 		$uid = ( isset(User::$currentUser) && User::$currentUser->logged_in() ) ? User::$currentUser->id() : null;
@@ -91,7 +113,7 @@ class DatabaseSession
 	* @param int $id session ID
 	* @return boolean success
 	*/
-	function _destroy( $id )
+	function destroy( $id )
 	{
 		return Database::delete( 'Sessions', array( 'id' => $id ) );
 	}
@@ -101,7 +123,7 @@ class DatabaseSession
 	* @param int $max maximum number of seconds a session can live
 	* @return boolean success
 	*/
-	function _gc( $max )
+	function gc( $max )
 	{
 		// delete persistent sessions older than 3 months
 		Database::delete( 'Persistent_Sessions', array( 'created < ' . (time() - 3600*24*30*3) ) );
@@ -112,3 +134,6 @@ class DatabaseSession
 		return true;
 	}
 }
+
+// the following prevents unexpected effects when using objects as save handlers
+register_shutdown_function('session_write_close');

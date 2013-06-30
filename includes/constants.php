@@ -22,16 +22,21 @@
 	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+use \infuse\Config as Config;
+
+/* infuse */
+define( 'INFUSE_VERSION', '0.1.0' ); // please don't change this
+
 /* site configuration */
 if( !defined('SITE_TITLE') )
-	define ('SITE_TITLE', \infuse\Config::value( 'site', 'title' ) );
+	define ('SITE_TITLE', Config::value( 'site', 'title' ) );
 if( !defined( 'SMTP_HOST' ) )
 {
-	define( 'SMTP_HOST', \infuse\Config::value( 'smtp', 'host' ) );
-	define( 'SMTP_USERNAME', \infuse\Config::value( 'smtp', 'username' ) );
-	define( 'SMTP_PASSWORD', \infuse\Config::value( 'smtp', 'password' ) );
-	define( 'SMTP_PORT', \infuse\Config::value( 'smtp', 'port' ) );
-	define( 'SMTP_FROM_ADDRESS', \infuse\Config::value( 'smtp', 'from' ) );
+	define( 'SMTP_HOST', Config::value( 'smtp', 'host' ) );
+	define( 'SMTP_USERNAME', Config::value( 'smtp', 'username' ) );
+	define( 'SMTP_PASSWORD', Config::value( 'smtp', 'password' ) );
+	define( 'SMTP_PORT', Config::value( 'smtp', 'port' ) );
+	define( 'SMTP_FROM_ADDRESS', Config::value( 'smtp', 'from' ) );
 }
 if( !defined( 'INFUSE_BASE_DIR' ) )
 	define( 'INFUSE_BASE_DIR', dirname( __DIR__ ) );

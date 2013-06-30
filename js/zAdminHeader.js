@@ -189,6 +189,24 @@ if (typeof angular != 'undefined') {
 				return pages;
 			};
 			
+			$scope.prevPage = function() {
+				$scope.goToPage($scope.page-1);
+			};
+			
+			$scope.nextPage = function() {
+				$scope.goToPage($scope.page+1);
+			};
+			
+			$scope.goToPage = function(p) {
+				if (p < 1 || p > $scope.page_count)
+					return;
+				
+				if ($scope.page != p) {
+					$scope.page = p;
+					$scope.loadModels();
+				}
+			};
+			
 			$scope.findModel = function(id) {
 				$scope.loading = false;
 				

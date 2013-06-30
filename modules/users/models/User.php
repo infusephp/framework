@@ -745,9 +745,9 @@ class User extends \infuse\Model
 	{
 		if( $this->logged_in )
 			return true;
-			
+		
 		ErrorStack::setContext('login');
-			
+		
 		if( empty( $email ) )
 		{
 			ErrorStack::add( 'user_bad_email' );
@@ -763,10 +763,13 @@ class User extends \infuse\Model
 		// give users 1 day to verify their e-mail address
 		$verifyTimeWindow = time() - 3600*24;
 		
-		// Query the Database.
+		$email = str_replace( array( '"', "'" ), array( '', '' ), $email );
+		
+		// look the user up
+		// fun . . .
 		$userInfo = Database::select(
 			'Users AS u',
-			'uid,user_email,enabled',
+			'uid,enabled',
 			array(
 				'where' => array(
 					'user_email' => $email,
@@ -777,65 +780,87 @@ class User extends \infuse\Model
 				'singleRow' => true ) );
 
 		if( Database::numrows() == 1 )
-		{ // A match was made.
-			$banned = false; // TODO: user bans
+		{
+			 // TODO: user bans
+			$banned = false;
+			
 			if( $userInfo[ 'enabled' ] != 1 || $banned ) // check if disabled or banned
 			{
 				ErrorStack::add( 'user_login_banned' );
 				return false;
 			}
-			// success
 			else
-			{
-				$this->id = $userInfo[ 'uid' ];
-			
-				if( $setSessionVars )
-				{
-					// update the session with the user's id
-					$this->changeSessionUserID( $userInfo[ 'uid' ] );
-				
-					// store the user agent
-					$_SESSION[ 'user_agent' ] = $_SERVER[ 'HTTP_USER_AGENT' ];
-				}
-
-				if( $remember )
-				{
-					$series = $this->generateToken();
-					$token = $this->generateToken();
-					setcookie( 'persistent', $userInfo[ 'user_email' ] . '!-!' . $series . '!-!' . $token . '!-!' . $_SERVER[ 'HTTP_USER_AGENT' ], time() + 3600*24*30*3, '/', $_SERVER[ 'HTTP_HOST' ], false, true );
-					
-					Database::insert(
-						'Persistent_Sessions',
-						array(
-							'user_email' => $userInfo[ 'user_email' ],
-							'series' => encryptPassword( $series ),
-							'token' => encryptPassword( $token ),
-							'created' => time()
-						)
-					);
-				}
-
-				// create an entry in the login history table
-				Database::insert(
-					'User_Login_History',
-					array(
-						'uid' => $userInfo[ 'uid' ],
-						'timestamp' => time(),
-						'type' => '0', // regular = 0
-						'ip' => $_SERVER['REMOTE_ADDR']
-					)
-				);
-
-				$this->logged_in = true;
-				
-				return true;
-			}
+				return $this->loginForUid( $userInfo[ 'uid' ], 0, $remember, $setSessionVars );
 		}
-		else // No match was made.
+		else
 		{
+			// TODO
+			// it would be nice to know more detail here
+			// i.e. if the user has an unverified or temporary account
+			
 			ErrorStack::add( 'user_login_no_match' );
+			
 			return false;
 		}
+	}
+	
+	/**
+	 * Logs in the user for a given uid.
+	 * 
+	 * This function is useful when logging in through multiple providers (oauth, fb, twitter).
+	 * Please do not abuse this function.
+	 *
+	 * @param int $uid
+	 * @param int $type an integer flag to denote the login type (regular = 0)
+	 * @param boolean $persistent true if the user should be logged in for a very long time
+	 * @param boolean $setSessionVars true if the login should be saved to sessions
+	 *
+	 * @return boolean
+	 */
+	function loginForUid( $uid, $type = 0, $persistent = false, $setSessionVars = true )
+	{
+		$this->id = $uid;
+	
+		if( $setSessionVars )
+		{
+			// update the session with the user's id
+			$this->changeSessionUserID( $uid );
+		
+			// store the user agent
+			$_SESSION[ 'user_agent' ] = $_SERVER[ 'HTTP_USER_AGENT' ];
+		}
+
+		if( $persistent )
+		{
+			$series = $this->generateToken();
+			$token = $this->generateToken();
+			setcookie( 'persistent', $this->get( 'user_email' ) . '!-!' . $series . '!-!' . $token . '!-!' . $_SERVER[ 'HTTP_USER_AGENT' ], time() + 3600*24*30*3, '/', $_SERVER[ 'HTTP_HOST' ], false, true );
+			
+			Database::insert(
+				'Persistent_Sessions',
+				array(
+					'user_email' => $this->get( 'user_email' ),
+					'series' => encryptPassword( $series ),
+					'token' => encryptPassword( $token ),
+					'created' => time()
+				)
+			);
+		}
+
+		// create an entry in the login history table
+		Database::insert(
+			'User_Login_History',
+			array(
+				'uid' => $uid,
+				'timestamp' => time(),
+				'type' => $type,
+				'ip' => $_SERVER['REMOTE_ADDR']
+			)
+		);
+
+		$this->logged_in = true;
+		
+		return true;		
 	}
 	
 	/**
@@ -861,6 +886,7 @@ class User extends \infuse\Model
 			
 			return true;
 		}
+		
 		return false;
 	}
 	

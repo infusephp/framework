@@ -96,18 +96,6 @@ function set_cookie_fix_domain($Name, $Value = '', $Expires = 0, $Path = '', $Do
 		. (!$HTTPOnly ? '' : '; HttpOnly'), false);
 }
 
-function message_die( $message )
-{
-	die ("<html><head><title>Error</title></head><body><p>$message</p></body></html>");
-	session_write_close();
-	exit();
-}
-
-function successMessage( $message = 'Success!' )
-{
-	return '<div class="alert alert-success">' . $message .	'</div>';
-}
-
 function guid()
 {
 	if( function_exists( 'com_create_guid' ) )
@@ -153,39 +141,6 @@ function seoUrl( $string, $id = null )
 	$return = substr( join("-", $seo_slug_array), 0, 150 ) . ( ($id) ? '-' . $id : '' );
 	// allow only single runs of dashes
 	return strtolower(preg_replace('/--+/u', '-', $return));
-}
-
-function oauthCredentialsSupplied()
-{
-	if( isset( $_GET[ 'access_token' ] ) )
-		return true;
-	
-	if( isset( $_POST[ 'access_token' ] ) )
-		return true;
-
-    $auth_header = false;
-    
-	if (array_key_exists("HTTP_AUTHORIZATION", $_SERVER))
-		$auth_header = $_SERVER["HTTP_AUTHORIZATION"];
-	
-	if (function_exists("apache_request_headers"))
-	{
-		$headers = apache_request_headers();
-	
-		if (array_key_exists("Authorization", $headers))
-			$auth_header = $headers["Authorization"];
-	}
-
-	if ($auth_header !== false)
-	{
-		// Make sure it's Token authorization
-		if (strcmp(substr(trim($auth_header), 0, 7), "Bearer ") !== 0)
-			return false;
-
-		return true;
-	}
-
-	return false;
 }
 
 function encryptPassword( $password, $nonce = '' )

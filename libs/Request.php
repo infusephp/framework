@@ -390,14 +390,13 @@ class Request
 	}
 	
 	/**
-	 * Checks if the request is an API call. Note, this is specific to infuse framework.
+	 * Checks if the request is for the API. This is used to decide if a request is stateless or not.
 	 *
 	 * @return boolean
 	 */
 	public function isApi()
 	{
-		// TODO clean this up
-		return oauthCredentialsSupplied();
+		return isset( $this->headers[ 'AUTHORIZATION' ] );
 	}
 	
 	/**

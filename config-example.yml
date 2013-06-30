@@ -4,7 +4,7 @@ site:
 	production-level: false
 	host-name: example.com
 	ssl-enabled: false
-	required-modules: users
+	required-modules: users, bans
 	default-admin-module: statistics
 	salt: replacewithrandomstring
 	time-zone: America/Chicago
