@@ -35,15 +35,6 @@ class Users extends \infuse\Controller
 {
 	function middleware( $req, $res )
 	{
-		$isApiCall = $req->isApi();
-
-		// initialize current user
-		if( $isApiCall && Modules::exists('oauth') )
-		{
-			Modules::load('oauth');
-			OAuthClient::authenticateUser();
-		}
-		
 		$currentUser = User::currentUser();
 		
 		if( $currentUser->isLoggedIn() )
@@ -51,20 +42,8 @@ class Users extends \infuse\Controller
 			$currentUser->loadProperties();
 			
 			// Try to get user's preferred time zone.
-			if( $time_zone = $currentUser->get( 'time_zone' ) )
+			if( $currentUser->hasProperty( 'time_zone' ) && $time_zone = $currentUser->get( 'time_zone' ) )
 				putenv("TZ=" . $time_zone);
-		}
-		
-		if( !$isApiCall )
-		{
-			// this is useful to know for redirects
-			$what = $req->paths( 1 );
-			if( !$currentUser->isLoggedIn() && !in_array( $what, array( 'login', 'register' ) ) && !in_array($req->paths(0),array('features','tour','home','billing','user','pusher')) )
-				$_SESSION[ 'redir' ] = $req->url();
-			
-			// check for a successful registration
-			if( val( $_SESSION, 'registration-success' ) )
-				ViewEngine::engine()->assign( 'userRegistrationSuccess', true );
 		}
 	}
 	

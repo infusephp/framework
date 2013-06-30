@@ -28,8 +28,8 @@ class SiteStats
 		$return['php'] = array();
 		
 		// php version
-		$return['php']['version'] = phpversion();		
-				
+		$return['php']['version'] = phpversion();
+		
 		/* Site Statistics */
 		$return['site'] = array();
 		
@@ -42,11 +42,14 @@ class SiteStats
 		// site mode
 		$return['site']['mode'] = Config::value( 'site', 'production-level' );
 		
-		// site email
-		$return['site']['email'] = Config::value( 'site', 'email' );
-		
 		// session adapter
 		$return['site']['session'] = Config::value( 'session', 'adapter' );		
+
+		/* Infuse Statistics */
+		$return[ 'infuse' ] = array();
+		
+		// infuse version
+		$return['infuse']['version'] = INFUSE_VERSION;
 		
 		/* Database Statistics */
 		$return['Database'] = array();

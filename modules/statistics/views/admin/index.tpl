@@ -41,7 +41,7 @@
 <div class="stat-header">Site</div>
 
 <div class="row-fluid stats">
-	<div class="span2 stat offset1">
+	<div class="span2 stat">
 		<strong>{$stats.site.title}</strong><br/>
 		Site Title
 	</div>
@@ -58,6 +58,10 @@
 	<div class="span2 stat">
 		<strong>{$stats.php.version}</strong><br/>
 		PHP Version
+	</div>
+	<div class="span2 stat">
+		<strong>{$stats.infuse.version}</strong><br/>
+		Infuse Version
 	</div>
 	<div class="span2 stat">
 		<strong>{if $stats.site.mode}<span style="color:#0a0">Production</span>{else}<span style="color:#777">Development</span>{/if}</strong><br/>
