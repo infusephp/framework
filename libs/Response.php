@@ -162,6 +162,27 @@ class Response
 	 */
 	public function render( $template, $parameters = array() )
 	{
+		// add extension if left off
+		if( substr( $template, -4, 4 ) != '.tpl' )
+			$template .= '.tpl';
+
+		// deal with relative paths
+		if( substr( $template, 0, 1 ) != '/' )
+		{
+			// check if called from a controller
+			$backtrace = debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS, 2 );
+			
+			if( isset( $backtrace[ 1 ] ) )
+			{
+				if( strpos( $backtrace[ 1 ][ 'class' ], 'infuse\\controllers\\' ) !== false )
+				{					
+					$module = strtolower( str_replace( 'infuse\\controllers\\', '', $backtrace[ 1 ][ 'class' ] ) );
+					
+					$template = INFUSE_MODULES_DIR . '/' . $module . '/views/' . $template;
+				}
+			}
+		}
+			
 		$parameters[ 'currentUser' ] = \infuse\models\User::currentUser();
 		$parameters[ 'baseUrl' ] = ((Config::value('site','ssl-enabled'))?'https':'http') . '://' . Config::value('site','host-name') . '/';
 	

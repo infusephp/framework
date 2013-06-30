@@ -57,7 +57,7 @@ class Statistics extends \infuse\Controller
 		$dbsize = file_size( $stats['database']['size'] );
 		$stats['database']['size'] =  $dbsize['size'] . " " . $dbsize['type'];
 		
-		$res->render( $this->adminTemplateDir() . 'index.tpl', array(
+		$res->render( 'admin/index', array(
 			'stats' => $stats
 		) );
 	}
@@ -102,7 +102,7 @@ class Statistics extends \infuse\Controller
 		
 		$history = SiteStats::history( $metric, $start, $end );
 
-		$res->render( $this->adminTemplateDir() . 'history.tpl', array(
+		$res->render( 'admin/history', array(
 			'metrics' => SiteStats::$historyMetrics,
 			'history' => $history,
 			'metric' => $metric,

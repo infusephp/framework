@@ -52,7 +52,7 @@ class Users extends \infuse\Controller
 		if( User::currentUser()->isLoggedIn() )
 			$res->redirect( '/' );
 	
-		$res->render( $this->templateDir() . 'login.tpl', array(
+		$res->render( 'login', array(
 			'loginErrors' => ErrorStack::errorsWithContext( 'login' ),
 			'redir' => val( $_SESSION, 'redir' ),
 			'title' => 'Login'
@@ -96,7 +96,7 @@ class Users extends \infuse\Controller
 		if( $currentUser->isLoggedIn() )
 			$currentUser->logout();
 
-		$res->render( $this->templateDir() . 'forgot.tpl', array(
+		$res->render( 'forgot', array(
 			'forgotErrors' => ErrorStack::errorsWithContext( 'forgot' ),
 			'success' => $req->params( 'success' ),
 			'title' => 'Forgot Password',
@@ -142,7 +142,7 @@ class Users extends \infuse\Controller
 		if( $currentUser->isLoggedIn() )
 			$currentUser->logout();
 
-		$res->render( $this->templateDir() . 'register.tpl', array(
+		$res->render( 'register', array(
 			'signupErrors' => ErrorStack::errorsWithContext( 'create' ),
 			'title' => 'Sign Up'
 		) );
@@ -201,7 +201,7 @@ class Users extends \infuse\Controller
 		
 		$success = User::verifyEmail( $req->params( 'id' ) );
 
-		$res->render( $this->templateDir() . 'verifyEmail.tpl', array(
+		$res->render( 'verifyEmail', array(
 			'title' => 'Verify E-mail',
 			'success' => $success ) );
 	}
@@ -216,7 +216,7 @@ class Users extends \infuse\Controller
 				return $res->setErrorCode( 401 );
 		}
 		
-		$res->render( $this->templateDir() . 'account.tpl', array(
+		$res->render( 'account', array(
 			'accountErrors' => ErrorStack::errorsWithContext( 'edit' ),
 			'success' => $req->params( 'success' ),
 			'deleteError' => $req->params( 'deleteError' ),

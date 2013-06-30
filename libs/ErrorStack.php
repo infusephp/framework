@@ -219,7 +219,7 @@ class ErrorStack
 		if( !val( $error, 'function' ) )
 		{
 			// try to look up the call history using debug_backtrace()
-			$trace = debug_backtrace();
+			$trace = debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS, 2 );
 			if( isset( $trace[ 1 ] ) )
 			{
 				// $trace[0] is ourself

@@ -36,7 +36,7 @@ class Groups extends \infuse\Controller
 		if( !$group->can( 'view' ) )
 			return $res->setCode( 401 );
 			
-		$res->render( $this->templateDir() . 'view.tpl', array(
+		$res->render( 'view', array(
 			'title' => $group->name(),
 			'group' => $group ) );
 	}
