@@ -26,6 +26,7 @@ namespace infuse\controllers;
 
 use \infuse\libs\SiteStats as SiteStats;
 use \infuse\Modules as Modules;
+use \infuse\Util as Util;
 
 class Statistics extends \infuse\Controller
 {
@@ -33,29 +34,12 @@ class Statistics extends \infuse\Controller
 	{
 		if( !$this->can( 'view-admin' ) )
 			return $res->setCode( 401 );
-	
-		function file_size ($filesize)
-		{
-			$bytes = array('KB', 'KB', 'MB', 'GB', 'TB');
-		
-			if ($filesize < 1024) $filesize = 1; // Values are always displayed.
-		
-			for ($i = 0; $filesize > 1024; $i++)  { // In KB at least.
-				$filesize /= 1024;
-			} // for
-		
-			$file_size_info['size'] = ceil($filesize);
-			$file_size_info['type'] = $bytes[$i];
-		
-			return $file_size_info;
-		}
-		
+
 		$stats = SiteStats::generateSnapshot();
 	
 		$stats['users']['newestUser'] = new \infuse\models\User( $stats['users']['newestUser'] );
 		
-		$dbsize = file_size( $stats['database']['size'] );
-		$stats['database']['size'] =  $dbsize['size'] . " " . $dbsize['type'];
+		$stats['database']['size'] =  Util::formatNumberAbbreviation( $stats['database']['size'], 1 );
 		
 		$res->render( 'admin/index', array(
 			'stats' => $stats

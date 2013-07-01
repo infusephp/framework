@@ -11,6 +11,7 @@ site:
 	disabled: false
 	disabled-message: The site is currently unavailable.
 	installed: false
+	language: en
 
 database:
 	type: mysql

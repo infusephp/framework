@@ -28,9 +28,10 @@ namespace infuse\models;
 use \infuse\Database as Database;
 use \infuse\Modules as Modules;
 use \infuse\ErrorStack as ErrorStack;
-use \infuse\libs\Validate as Validate;
+use \infuse\Validate as Validate;
 use \infuse\Config as Config;
 use \infuse\Messages as Messages;
+use \infuse\Util as Util;
 
 class User extends \infuse\Model
 {
@@ -50,25 +51,25 @@ class User extends \infuse\Model
 		'user_email' => array(
 			'type' => 'text',
 			'filter' => '<a href="mailto:{user_email}">{user_email}</a>',
-			'validation' => array('\infuse\libs\Validate','email'),
+			'validation' => array('\infuse\Validate','email'),
 			'required' => true,
 			'unique' => true,
 			'title' => 'E-mail address'
 		),
 		'first_name' => array(
 			'type' => 'text',
-			'validation' => array('\infuse\libs\Validate','firstName'),
+			'validation' => array('\infuse\Validate','firstName'),
 			'required' => true
 		),
 		'last_name' => array(
 			'name' => 'last_name',
 			'type' => 'text',
-			'validation' => array('\infuse\libs\Validate','lastName')
+			'validation' => array('\infuse\Validate','lastName')
 		),
 		'user_password' => array(
 			'type' => 'password',
 			'length' => 128,
-			'validation' => array('\infuse\libs\Validate','password'),
+			'validation' => array('\infuse\Validate','password'),
 			'required' => true,
 			'title' => 'Password'
 		),
@@ -85,7 +86,7 @@ class User extends \infuse\Model
 		),
 		'enabled' => array(
 			'type' => 'boolean',
-			'validation' => array('\infuse\libs\Validate','boolean_'),
+			'validation' => array('\infuse\Validate','boolean_'),
 			'required' => true,
 			'default' => true
 		),
@@ -95,7 +96,7 @@ class User extends \infuse\Model
 			'required' => true,
 			'default' => 'America/Chicago',
 			'nowrap' => true,
-			'validation' => array('\infuse\libs\Validate','timeZone')
+			'validation' => array('\infuse\Validate','timeZone')
 		)
 	);
 					
@@ -105,6 +106,7 @@ class User extends \infuse\Model
 
 	private $logged_in;
 	private static $currentUser;
+	private static $verifyTimeWindow = 86400; // one day
 	
 	/**
 	* Constructor
@@ -174,6 +176,29 @@ class User extends \infuse\Model
 					'link_type' => 2 // 0 = forgot, 1 = verify, 2 = temporary
 				),
 				'single' => true ) );
+	}
+	
+	/**
+	* Checks if the account has been verified
+	*
+	* @param boolean $withinTimeWindow when true, allows a time window before the account is considered unverified
+	*
+	* @return boolean
+	*/
+	function isVerified( $withinTimeWindow = true )
+	{
+		$timeWindow = ( $withinTimeWindow ) ? time() - self::$verifyTimeWindow : time() + 100;
+		
+		return Database::select(
+			'User_Links',
+			'count(*)',
+			array(
+				'where' => array(
+					'uid' => $this->id,
+					'link_type' => 1, // 0 = forgot, 1 = verify, 2 = temporary
+					'link_timestamp < ' . $timeWindow
+				),
+				'single' => true ) ) == 0;
 	}
 	
 	/**
@@ -332,7 +357,7 @@ class User extends \infuse\Model
 	function profileURL()
 	{
 		if( $this->id > 0 )
-			return 'http://' . Config::value( 'site', 'host-name' ) . '/users/' . seoUrl( $this->name(true), $this->id );
+			return 'http://' . Config::value( 'site', 'host-name' ) . '/users/' . Util::seoUrl( $this->name(true), $this->id );
 		
 		return false;
 	}
@@ -489,7 +514,7 @@ class User extends \infuse\Model
 		$passwordRequired = false;
 		
 		if( isset( $data[ 'current_password' ] ) ) {
-			if( encryptPassword( $data[ 'current_password' ] ) == $this->get( 'user_password' ) || self::$currentUser->isAdmin() )
+			if( Util::encryptPassword( $data[ 'current_password' ] ) == $this->get( 'user_password' ) || self::$currentUser->isAdmin() )
 				$passwordValidated = true;
 		}
 
@@ -760,46 +785,46 @@ class User extends \infuse\Model
 			return false;
 		}
 		
-		// give users 1 day to verify their e-mail address
-		$verifyTimeWindow = time() - 3600*24;
-		
 		$email = str_replace( array( '"', "'" ), array( '', '' ), $email );
 		
 		// look the user up
-		// fun . . .
-		$userInfo = Database::select(
-			'Users AS u',
-			'uid,enabled',
-			array(
-				'where' => array(
-					'user_email' => $email,
-					'user_password' => encryptPassword( $password ),
-					'NOT EXISTS ( SELECT uid FROM User_Links AS l WHERE link_type = 1 AND u.uid = l.uid AND l.link_timestamp < ' . $verifyTimeWindow . ' )', // 0 = forgot, 1 = verify, 2 = temporary
-					'NOT EXISTS ( SELECT uid FROM User_Links AS l WHERE link_type = 2 AND u.uid = l.uid )' // 0 = forgot, 1 = verify, 2 = temporary
-				),
-				'singleRow' => true ) );
-
-		if( Database::numrows() == 1 )
+		$users = self::find( array(
+			'where' => array(
+				'user_email' => $email,
+				'user_password' => Util::encryptPassword( $password ) ) ) );
+		
+		if( $users[ 'count' ] == 1 )
 		{
-			 // TODO: user bans
-			$banned = false;
+			$user = $users[ 'models' ][ 0 ];
+			$user->loadProperties();
 			
-			if( $userInfo[ 'enabled' ] != 1 || $banned ) // check if disabled or banned
+			// check if banned
+			// TODO
+			$banned = false;
+						
+			if( !$user->get( 'enabled' ) || $banned )
 			{
 				ErrorStack::add( 'user_login_banned' );
 				return false;
 			}
+			// check if temporary
+			else if( $user->isTemporary() )
+			{
+				ErrorStack::add( 'user_login_temporary' );
+				return false;
+			}
+			// check if verified
+			else if( !$user->isVerified() )
+			{
+				ErrorStack::add( 'user_login_unverified' );
+				return false;
+			}
 			else
-				return $this->loginForUid( $userInfo[ 'uid' ], 0, $remember, $setSessionVars );
+				return $this->loginForUid( $user->id(), 0, $remember, $setSessionVars );
 		}
 		else
-		{
-			// TODO
-			// it would be nice to know more detail here
-			// i.e. if the user has an unverified or temporary account
-			
+		{			
 			ErrorStack::add( 'user_login_no_match' );
-			
 			return false;
 		}
 	}
@@ -840,8 +865,8 @@ class User extends \infuse\Model
 				'Persistent_Sessions',
 				array(
 					'user_email' => $this->get( 'user_email' ),
-					'series' => encryptPassword( $series ),
-					'token' => encryptPassword( $token ),
+					'series' => Util::encryptPassword( $series ),
+					'token' => Util::encryptPassword( $token ),
 					'created' => time()
 				)
 			);
@@ -903,7 +928,7 @@ class User extends \infuse\Model
 	
 		// check for the confirm and password
 		// only the current user can delete their account
-		if( $this->id > 1 && self::currentUser()->id() == $this->id && encryptPassword( $password ) == $this->get( 'user_password' ) )
+		if( $this->id > 1 && self::currentUser()->id() == $this->id && Util::encryptPassword( $password ) == $this->get( 'user_password' ) )
 		{
 			// delete the user
 			Database::delete(
@@ -1034,9 +1059,9 @@ class User extends \infuse\Model
 			{ // check if the email has changed, if it has changed persistent sessions are no longer valid
 				$email = $cookieParams[ 0 ];
 				$series = $cookieParams[ 1 ];
-				$seriesEnc = encryptPassword( $cookieParams[ 1 ] );
+				$seriesEnc = Util::encryptPassword( $cookieParams[ 1 ] );
 				$token = $cookieParams[ 2 ];
-				$tokenEnc = encryptPassword( $cookieParams[ 2 ] );
+				$tokenEnc = Util::encryptPassword( $cookieParams[ 2 ] );
 				$tokenDB = Database::select( 'Persistent_Sessions', 'token', array( 'where' => array( 'user_email' => $email, 'created > ' . (time() - 3600*24*30*3), 'series' => $seriesEnc ), 'single' => true ) );
 				if( Database::numrows() == 1 && $cookieParams[3] == $_SERVER[ 'HTTP_USER_AGENT' ] )
 				{ // so good, so far
@@ -1046,7 +1071,7 @@ class User extends \infuse\Model
 						Database::delete( 'Persistent_Sessions', array( 'user_email' => $email, 'series' => $seriesEnc, 'token' => $tokenEnc ) );
 						
 						$newToken = $this->generateToken();
-						Database::insert( 'Persistent_Sessions', array( 'user_email' => $email, 'series' => $seriesEnc, 'token' => encryptPassword( $newToken ), 'created' => time() ) );
+						Database::insert( 'Persistent_Sessions', array( 'user_email' => $email, 'series' => $seriesEnc, 'token' => Util::encryptPassword( $newToken ), 'created' => time() ) );
 						setcookie( 'persistent', $email . '!-!' . $series . '!-!' . $newToken . '!-!' . $_SERVER[ 'HTTP_USER_AGENT' ], time() + 3600*24*30*3, '/', $_SERVER[ 'HTTP_HOST' ], false, true );
 						
 						$this->id = $uid;

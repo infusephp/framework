@@ -25,7 +25,7 @@
 use \infuse\Config as Config;
 
 /* infuse */
-define( 'INFUSE_VERSION', '0.1.1' ); // please don't change this
+define( 'INFUSE_VERSION', '0.1.3' ); // please don't change this
 
 /* site configuration */
 if( !defined('SITE_TITLE') )
@@ -60,3 +60,24 @@ define( 'VALIDATION_NOT_UNIQUE', 'not_unique' );
 /* acl */
 define( 'ACL_RESULT_NOT_CACHED', -1 );
 define( 'ACL_NO_ID', -1 );
+
+/* some useful functions */
+function val( $a = array(), $k = '' )
+{
+	return (array_key_exists($k, (array)$a)) ? $a[$k] : null;
+}
+
+function print_pre($item)
+{
+	echo '<pre>' . print_r( $item, true ) . '</pre>';
+}
+
+function unsetSessionVar( $param )
+{
+	unset( $_SESSION[ $param ] );
+}
+
+function json_decode_array($d)
+{
+	return json_decode($d, true);
+}

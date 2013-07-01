@@ -8,7 +8,6 @@ author:
 model: User
 api: true
 admin: true
-dependencies: validation
 minimum-password-length: 5
 forgot-password-allowed: true
 routes:
@@ -24,3 +23,4 @@ routes:
 	"get /users/account": accountSettings
 	"post /users/account": editAccountSettings
 	"get /users/verifyEmail/:id": verifiyEmail
+	"get /users/:slug": profile

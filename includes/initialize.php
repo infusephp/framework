@@ -62,12 +62,11 @@ else
 if( Config::value( 'site', 'time-zone' ) )
 	date_default_timezone_set( Config::value( 'site', 'time-zone' ) );
 
-// site language: different files can be loaded for different languages
-require_once "includes/lang/en/index.php";
+// load messages for site language
+require_once 'lang/' . Config::value( 'site', 'language' ) . '.php';
 
-// start initializing stuff
-require_once "includes/functions.php";
-require_once "includes/constants.php";
+// setup some useful constants and functions
+require_once 'includes/constants.php';
 
 // finally, we can begin parsing the request and generating a response
 $req = new Request();
@@ -126,7 +125,7 @@ if( !$req->isApi() )
 	}
 	
 	// set the cookie by sending it in a header.
-	set_cookie_fix_domain(
+	Util::set_cookie_fix_domain(
 		session_name(),
 		session_id(),
 		time() + Config::value( 'session', 'lifetime' ),

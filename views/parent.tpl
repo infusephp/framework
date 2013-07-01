@@ -51,6 +51,11 @@
 		</div>
 	</div>
    <div class="container">
+   		{if !$currentUser->isVerified(false)}
+   			<p class="alert alert-error">
+   				Your account has not been verified yet. Please check your e-mail for instructions on verifying your account.
+   			</p>
+   		{/if}
     	{block name=content}{/block}
     </div>
 	<footer>

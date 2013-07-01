@@ -52,7 +52,7 @@ class SiteStats
 		$return['infuse']['version'] = INFUSE_VERSION;
 		
 		/* Database Statistics */
-		$return['Database'] = array();
+		$return['database'] = array();
 
 		// DB Type
 		$query = Database::sql( 'SELECT VERSION()' );

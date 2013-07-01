@@ -26,7 +26,7 @@ namespace infuse\controllers;
 
 use \infuse\models\User as User;
 use \infuse\Modules as Modules;
-use \infuse\libs\Validate as Validate;
+use \infuse\Validate as Validate;
 use \infuse\ErrorStack as ErrorStack;
 use \infuse\Config as Config;
 use \infuse\Database as Database;
@@ -257,5 +257,24 @@ class Users extends \infuse\Controller
 				}
 			}
 		}
+	}
+		
+	function profile( $req, $res )
+	{
+		if( !$req->isHtml() )
+			return parent::find( $req, $res );
+		
+		$slug = $req->params( 'slug' );
+		
+		$exp = explode( '-', $slug );
+		
+		$uid = end( $exp );
+		
+		$user = new User( $uid );
+		
+		if( !$user->exists() )
+			return $res->setCode( 404 );
+		
+		$res->render( 'profile', array( 'user' => $user ) );
 	}
 }
