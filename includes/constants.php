@@ -25,7 +25,7 @@
 use \infuse\Config as Config;
 
 /* infuse */
-define( 'INFUSE_VERSION', '0.1.3' ); // please don't change this
+define( 'INFUSE_VERSION', '0.1.4' ); // please don't change this
 
 /* site configuration */
 if( !defined('SITE_TITLE') )

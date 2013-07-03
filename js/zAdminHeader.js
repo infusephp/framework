@@ -35,7 +35,7 @@ if (typeof angular != 'undefined') {
 	
 	app.factory('Model', ['$resource', function ($resource) {
 		var Model = $resource(
-			'/' + module + '/:modelId',
+			'/' + module + '/' + modelInfo.plural_key + '/:modelId',
 			{ modelId : '@modelId' },
 			{
 				findAll: { method: 'GET', headers: { Accept: 'application/json'} },
@@ -156,12 +156,16 @@ if (typeof angular != 'undefined') {
 					$scope.per_page = result.per_page,
 					$scope.total_count = result.total_count
 					
-					$scope.models = result[$scope.module];
+					$scope.models = result[$scope.modelInfo.plural_key];
 					
 					// massage data for client side use
 					for (var i in $scope.models)
 						massageModelForClient ($scope.models[i], $scope.modelInfo.properties);
 					
+					$scope.loading = false;
+					
+				}, function(error) {
+				
 					$scope.loading = false;
 					
 				});		
@@ -214,7 +218,7 @@ if (typeof angular != 'undefined') {
 					modelId: id
 				}, function (result) {
 				
-					$scope.model = result[$scope.modelInfo.className.toLowerCase()];
+					$scope.model = result[$scope.modelInfo.singular_key];
 					
 					// the model needs to be massaged
 					massageModelForClient ($scope.model, $scope.modelInfo.properties);				
@@ -241,7 +245,10 @@ if (typeof angular != 'undefined') {
 					modelId: $scope.deleteModel[$scope.modelInfo.idFieldName]
 				}, function(result) {
 					if (result.success) {
-						$scope.loadModels();
+						if ($routeParams.id)
+							$location.path('/');
+						else
+							$scope.loadModels();
 					} else if (result.error && result.error instanceof Array) {
 		    			$scope.errors = result.error;
 		    		}

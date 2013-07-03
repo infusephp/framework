@@ -31,13 +31,21 @@ class Router
 	 *
 	 * Default routes for modules with automatic api generation enabled
 	 */
-	private static $apiRoutes = array(
+	private static $defaultApiRoutes = array(
 		'get /:controller' => 'findAll',
 		'get /:controller/:id' => 'find',
 		'post /:controller' => 'create',
 		'put /:controller/:id' => 'edit',
 		'delete /:controller/:id' => 'delete'
 	);
+	
+	private static $apiRoutes = array(
+		'get /:controller/:model' => 'findAll',
+		'get /:controller/:model/:id' => 'find',
+		'post /:controller/:model' => 'create',
+		'put /:controller/:model/:id' => 'edit',
+		'delete /:controller/:model/:id' => 'delete'
+	);	
 	
 	/**
 	 * Routes a request and resopnse to the appropriate controller. Sends a 404 if nothing was found.
@@ -96,14 +104,14 @@ class Router
 		}
 		
 		/* controller routes */
-
+		
 		// check if the first part of the path is a controller
 		$controller = $req->paths(0);
 		
 		if( Modules::exists( $controller ) )
 		{
 			Modules::load( $controller );
-		
+			
 			$moduleRoutes = Modules::info($controller)['routes'];
 			
 			$staticRoutes = array();
@@ -122,8 +130,37 @@ class Router
 			$moduleInfo = Modules::info( $controller );
 			
 			if( $moduleInfo[ 'api' ] )
-				$dynamicRoutes = array_merge( $dynamicRoutes, self::$apiRoutes );
-
+			{
+				$models = Modules::models( $controller );
+				
+				$defaultModel = false;
+						
+				if( isset( $moduleInfo[ 'default-model' ] ) )
+					$defaultModel = $moduleInfo[ 'default-model' ];
+				
+				if( count( $models ) == 1 )
+					$defaultModel = reset( $models );
+					
+				// this comes from /:module/:model
+				$secondPath = val( $req->paths(), 1 );
+				$possibleModel = Inflector::singularize( Inflector::camelize( $secondPath ) );
+				
+				// default model?
+				if( $defaultModel && !isset( $models[ $possibleModel ] ) )
+				{
+					$req->setParams( array( 'model' => $defaultModel ) );
+					
+					$dynamicRoutes = array_merge( $dynamicRoutes, self::$defaultApiRoutes );
+				}
+				// no default model
+				else
+				{
+					$req->setParams( array( 'model' => $secondPath ) );
+					
+					$dynamicRoutes = array_merge( $dynamicRoutes, self::$apiRoutes );
+				}
+			}
+			
 			/* static routes */
 			
 			if( isset( $staticRoutes[ $routeMethodStr ] ) )
@@ -146,7 +183,7 @@ class Router
 						'action' => $route ), $req, $res );
 			}
 		}
-		
+				
 		/* admin panel routes */	
 			
 		if( $req->paths(0) == '4dm1n' )
@@ -199,8 +236,8 @@ class Router
 							'action' => $route ), $req, $res );
 				}
 				
-				/* automatic admin routes */				
-			
+				/* automatic admin routes */
+				
 				if( $req->method() == 'GET' )
 				{
 					$moduleInfo = Modules::info( $controller );
@@ -222,7 +259,7 @@ class Router
 			if( file_exists( $templateFile ) )
 				return $res->render( $templateFile );
 		}
-
+		
 		/* not found */
 		
 		if( !defined( 'DO_NOT_SHOW_404' ) )

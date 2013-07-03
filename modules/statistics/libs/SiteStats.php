@@ -33,9 +33,6 @@ class SiteStats
 		/* Site Statistics */
 		$return['site'] = array();
 		
-		// site title
-		$return['site']['title'] = Config::value( 'site', 'title' );
-
 		// site status
 		$return['site']['status'] = !Config::value( 'site', 'disabled' );
 

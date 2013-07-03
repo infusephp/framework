@@ -26,18 +26,6 @@ namespace infuse;
 
 abstract class Controller extends Acl
 {
-	//////////////////////////////
-	// Private Class Variables
-	//////////////////////////////
-	
-	public static $description = '';
-	public static $version = 0;
-	public static $author = array();
-	public static $dependencies = array();
-	public static $admin = array();
-	public static $model;
-	public static $hasAdmin = false;
-
 	/*
 	 * Constructor
 	*/
@@ -99,7 +87,7 @@ abstract class Controller extends Acl
 	 * Checks permissions on the controller
 	 *
 	 * @param string $permission permission
-	 * @param object $model requester
+	 * @param object $requester requester
 	 *
 	 * @param boolean
 	 */
@@ -138,19 +126,20 @@ abstract class Controller extends Acl
 	 */
 	function findAll( $req, $res )
 	{
-		$module = self::name();
-		$moduleInfo = Modules::info($module);
-		$model = val( $moduleInfo, 'model' );
-
+		// which model are we talking about?
+		$model = $this->fetchModelInfo( $req->params( 'model' ) );
+		
 		// check if automatic api generation enabled
-		if( !$moduleInfo[ 'api' ] || empty( $model ) )
+		if( !$model || !$model[ 'api' ] )
 			return $res->setCode( 404 );
 
 		// json only
 		if( !$req->isJson() )
 			return $res->setCode( 406 );
 
-		$modelClassName = "\\infuse\\models\\$model";
+		$modelClassName = $model[ 'class_name' ];
+		$modelRouteName = $model[ 'plural_key' ];
+		
 		$modelObj = new $modelClassName( ACL_NO_ID );
 		
 		// permission?
@@ -158,7 +147,7 @@ abstract class Controller extends Acl
 			return $res->setCode( 401 );
 		
 		$return = new \stdClass;
-		$return->$module = array();
+		$return->$modelRouteName = array();
 		
 		// limit
 		$limit = $req->query( 'limit' );
@@ -187,7 +176,7 @@ abstract class Controller extends Acl
 			'where' => $filter ) );
 		
 		foreach( $models[ 'models' ] as $m )
-			array_push( $return->$module, $m->toArray() );
+			array_push( $return->$modelRouteName, $m->toArray() );
 		
 		// pagination
 		$total = $modelClassName::totalRecords( $filter );
@@ -201,7 +190,7 @@ abstract class Controller extends Acl
 		$return->total_count = $total;
 		
 		// links
-		$base = '/' . $module . "?sort=$sort&limit=$limit";
+		$base = $model[ 'route_base' ] . "?sort=$sort&limit=$limit";
 		$last = ($page_count-1) * $limit;
 		$return->links = array(
 			'self' => "$base&start=$start",
@@ -229,15 +218,14 @@ abstract class Controller extends Acl
 	 */
 	function find( $req, $res )
 	{
-		$module = self::name();
-		$moduleInfo = Modules::info($module);
-		$model = val( $moduleInfo, 'model' );
+		// which model are we talking about?
+		$model = $this->fetchModelInfo( $req->params( 'model' ) );
 		
 		// check if automatic api generation enabled
-		if( !$moduleInfo[ 'api' ] || empty( $model ) )
-			return $res->setCode( 404 );
+		if( !$model || !$model[ 'api' ] )
+ 			return $res->setCode( 404 );
 
-		$modelClassName = "\\infuse\\models\\$model";
+		$modelClassName = $model[ 'class_name' ];
 		$modelObj = new $modelClassName( $req->params( 'id' ) );
 		
 		// exists?
@@ -253,7 +241,7 @@ abstract class Controller extends Acl
 			return $res->setCode( 401 );
 				
 		$res->setBodyJson( array(
-			strtolower( $model ) => $modelObj->toArray() ) );
+			$model[ 'singular_key' ] => $modelObj->toArray() ) );
 	}
 	
 	/**
@@ -265,19 +253,18 @@ abstract class Controller extends Acl
 	 */
 	function create( $req, $res )
 	{
-		$module = self::name();
-		$moduleInfo = Modules::info($module);
-		$model = val( $moduleInfo, 'model' );
+		// which model are we talking about?
+		$model = $this->fetchModelInfo( $req->params( 'model' ) );
 		
 		// check if automatic api generation enabled
-		if( !$moduleInfo[ 'api' ] || empty( $model ) )
+		if( !$model || !$model[ 'api' ] )
 			return $res->setCode( 404 );
 
 		// json only
 		if( !$req->isJson() )
 			return $res->setCode( 406 );
 
-		$modelClassName = "\\infuse\\models\\$model";
+		$modelClassName = $model[ 'class_name' ];
 		$modelObj = new $modelClassName( ACL_NO_ID );
 		
 		// permission?
@@ -289,7 +276,7 @@ abstract class Controller extends Acl
 		
 		if( $newModel )
 			$res->setBodyJson( array(
-				strtolower( $model ) => $newModel->toArray(),
+				$model[ 'singular_key' ] => $newModel->toArray(),
 				'success' => true ) );
 		else
 		{
@@ -312,19 +299,18 @@ abstract class Controller extends Acl
 	 */
 	function edit( $req, $res )
 	{
-		$module = self::name();
-		$moduleInfo = Modules::info($module);
-		$model = val( $moduleInfo, 'model' );
+		// which model are we talking about?
+		$model = $this->fetchModelInfo( $req->params( 'model' ) );
 		
 		// check if automatic api generation enabled
-		if( !$moduleInfo[ 'api' ] || empty( $model ) )
+		if( !$model || !$model[ 'api' ] )
 			return $res->setCode( 404 );
 
 		// json only
 		if( !$req->isJson() )
 			return $res->setCode( 406 );
 
-		$modelClassName = "\\infuse\\models\\$model";
+		$modelClassName = $model[ 'class_name' ];
 		$modelObj = new $modelClassName( $req->params( 'id' ) );
 		
 		// permission?
@@ -358,19 +344,18 @@ abstract class Controller extends Acl
 	 */	
 	function delete( $req, $res )
 	{
-		$module = self::name();
-		$moduleInfo = Modules::info($module);
-		$model = val( $moduleInfo, 'model' );
-		
+		// which model are we talking about?
+		$model = $this->fetchModelInfo( $req->params( 'model' ) );
+
 		// check if automatic api generation enabled
-		if( !$moduleInfo[ 'api' ] || empty( $model ) )
+		if( !$model || !$model[ 'api' ] )
 			return $res->setCode( 404 );
 
 		// json only
 		if( !$req->isJson() )
 			return $res->setCode( 406 );
 
-		$modelClassName = "\\infuse\\models\\$model";
+		$modelClassName = $model[ 'class_name' ];
 		$modelObj = new $modelClassName( $req->params( 'id' ) );
 		
 		// permission?
@@ -396,12 +381,11 @@ abstract class Controller extends Acl
 	function routeAdmin( $req, $res )
 	{
 		$module = self::name();
-		
-		$moduleInfo = Modules::info( $module );
-		$model = val( $moduleInfo, 'model' );
-		
+		$moduleInfo = Modules::info( $module );		
+		$models = Modules::models( $module );
+				
 		// check if automatic admin generation enabled
-		if( !$moduleInfo[ 'admin' ] || !$model )
+		if( !$moduleInfo[ 'admin' ] )
 			return $res->setCode( 404 );
 
 		// html only
@@ -412,62 +396,57 @@ abstract class Controller extends Acl
 		if( !$this->can( 'view-admin' ) )
 			return $res->setCode( 401 );
 		
-		$modelClassName = "\\infuse\\models\\$model";
-		$modelObj = new $modelClassName( ACL_NO_ID );
-		
-		$modelInfo = new \stdClass;
-		$modelInfo->url = '/' . $module;
-		$modelInfo->jsonKey = $module;
-		$modelInfo->permissions = array(
-			'create' => $modelObj->can('create'),
-			'edit' => $modelObj->can('edit'),
-			'delete' => $modelObj->can('delete') );
-		$modelInfo->idFieldName = $modelClassName::$idFieldName;		
-		$modelInfo->properties = array();
-		$modelInfo->properName = Inflector::humanize( Inflector::underscore( $model ) );
-		$modelInfo->properNamePlural = Inflector::humanize( Inflector::underscore( Inflector::pluralize( $model ) ) );
-		$modelInfo->className = $model;
-		
-		$default = array(
-			'truncate' => true,
-			'nowrap' => true
-		);
+		$selectedModel = val( $req->paths(), 2 );
 		
 		$params = array(
 			'moduleName' => $module,
-			'modelNamePlural' => $modelInfo->properNamePlural
+			'models' => $models
 		);
 		
 		$paths = $req->paths();
 		
 		if( count( $paths ) >= 3 && $paths[ 2 ] == 'schema' )
 		{
-			// get tablename for model
-			$tablename = $modelObj::tablename();
+			$tablename = array();
+			$currentSchemaSql = array();
+			$suggestedSchema = array();
+		
+			foreach( $models as $model => $info )
+			{
+				$modelClassName = $info[ 'class_name' ];
+				$modelObj = new $modelClassName( ACL_NO_ID );
 			
-			// look up current schema
-			try
-			{
-				$currentSchema = Database::listColumns( $tablename );
-			}
-			catch( \Exception $e )
-			{
-				$currentSchema = false;
-			}
+				// get tablename for model
+				$tablename[ $model ] = $modelObj::tablename();
+			
+				// look up current schema				
+				try
+				{
+					$currentSchema[ $model ] = Database::listColumns( $tablename[ $model ] );
+				}
+				catch( \Exception $e )
+				{
+					$currentSchema[ $model ] = false;
+				}
 
-			// are we creating a new table or altering?
-			$newTable = !$currentSchema;			
-			
-			// suggest a schema based on properties
-			$suggestedSchema = $modelObj::suggestSchema( $currentSchema );
-			$suggestedSchemaSql = $modelObj::schemaToSql( $suggestedSchema, $newTable );
+				// are we creating a new table or altering?
+				$newTable = !$currentSchema[ $model ];
+				
+				// suggest a schema based on properties
+				$suggestedSchema[ $model ] = $modelObj::schemaToSql( $modelObj::suggestSchema( $currentSchema[ $model ] ), $newTable );
+				
+				// convert to sql
+				$currentSchema[ $model ] = ($currentSchema[ $model ]) ? $modelObj::schemaToSql( $currentSchema[ $model ], true ) : false;				
+			}
 
 			// update the schema?
 			if( val( $paths, 3 ) == 'update' )
 			{
+				$model = val( $paths, 4 );
+				
 				try
 				{
-					$params[ 'success' ] = Database::sql( $suggestedSchemaSql );
+					$params[ 'success' ] = Database::sql( $suggestedSchema[ $model ] );
 
 					if( $params[ 'success' ] )
 						return $res->redirect( '/4dm1n/' . $module . '/schema?success=t' );
@@ -480,15 +459,50 @@ abstract class Controller extends Acl
 
 			$params[ 'schema' ] = true;
 			$params[ 'tablename' ] = $tablename;
-			$params[ 'currentSchema' ] = ($currentSchema) ? $modelObj::schemaToSql( $currentSchema, true ) : false;
-			$params[ 'suggestedSchema' ] = $suggestedSchemaSql;
+			$params[ 'currentSchema' ] = $currentSchema;
+			$params[ 'suggestedSchema' ] = $suggestedSchema;
 			$params[ 'success' ] = $req->query( 'success' );
 		}
 		else
 		{
+			if( !$selectedModel )
+			{
+				$defaultModel = false;
+				
+				if( isset( $moduleInfo[ 'default-model' ] ) )
+					$defaultModel = $moduleInfo[ 'default-model' ];
+				
+				if( count( $models ) > 0 )
+					$defaultModel = reset( $models );
+				
+				if( $defaultModel )
+					return $res->redirect( '/4dm1n/' . $module . '/' . $defaultModel[ 'model' ] );
+			}
+			
+			// which model are we talking about?
+			$model = $this->fetchModelInfo( $selectedModel );
+			
+			$modelClassName = $model[ 'class_name' ];
+			$modelObj = new $modelClassName( ACL_NO_ID );
+			
+			$modelInfo = array_replace( $model, array(
+				'permissions' => array(
+					'create' => $modelObj->can('create'),
+					'edit' => $modelObj->can('edit'),
+					'delete' => $modelObj->can('delete') ),
+				'idFieldName' => $modelClassName::$idFieldName,
+				'properties' => array()
+			) );
+			$params[ 'modelInfo' ] = $modelInfo;		
+		
+			$default = array(
+				'truncate' => true,
+				'nowrap' => true
+			);		
+		
 			foreach( $modelClassName::$properties as $name => $property )
 			{
-				$modelInfo->properties[] = array_merge(
+				$modelInfo[ 'properties' ][] = array_merge(
 					$default,
 					array(
 						'name' => $name,
@@ -501,26 +515,6 @@ abstract class Controller extends Acl
 		}
 		
 		$res->render( 'admin/model.tpl', $params );
-	}
-	
-	/**
-	* Called to install the module
-	*
-	* @return boolean success?
-	*/
-	function install()
-	{
-		return true;
-	}
-	
-	/**
-	* Called to uninstall the module
-	*
-	* @return boolean success?
-	*/
-	function uninstall()
-	{
-		return true;
 	}
 
 	/**
@@ -554,7 +548,7 @@ abstract class Controller extends Acl
 	*/
 	protected function templateDir()
 	{
-		return Modules::$moduleDirectory . static::name() . '/views/';
+		return static::modulePath() . 'views/';
 	}
 	
 	/**
@@ -565,5 +559,45 @@ abstract class Controller extends Acl
 	protected function adminTemplateDir()
 	{
 		return static::templateDir() . 'admin/';
+	}
+	
+	///////////////////////////////////
+	// PRIVATE FUNCTIONS
+	///////////////////////////////////
+	
+	/** 
+	 * Takes the pluralized model name from the route and gets info about the model
+	 *
+	 * @param string $modelRouteName the name that comes from the route (i.e. the route "/users" would supply "users")
+	 *
+	 * @return array|false model info
+	 */
+	private function fetchModelInfo( $modelRouteName )
+	{
+		// which module are we?
+		$module = self::name();
+		
+		// get info about module
+		$moduleInfo = Modules::info( $module );
+		
+		// fetch all model info for our module
+		$modelsInfo = Modules::models( $module );
+		
+		// convert the route name to the pluralized name
+		$modelName = Inflector::singularize( Inflector::camelize( $modelRouteName ) );
+		
+		// attempt to fetch the model info
+		$modelInfo = val( $modelsInfo, $modelName );
+
+		if( !$modelInfo )
+		{
+			// attempt to pick a default model
+			if( count( $modelsInfo ) == 1 )
+				$modelInfo = reset( $modelsInfo );
+			else if( isset( $moduleInfo[ 'default-model' ] ) )
+				$modelInfo = val( $modelsInfo, $moduleInfo[ 'default-model' ] );
+		}
+		
+		return $modelInfo;
 	}
 }

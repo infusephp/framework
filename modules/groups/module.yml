@@ -7,4 +7,6 @@ author:
 	website: http://jaredtking.com
 admin: true
 api: true
-model: Group
+models:
+	- Group
+	- GroupMember

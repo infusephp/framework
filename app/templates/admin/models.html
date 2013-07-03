@@ -4,7 +4,7 @@
 
 <div class="filter-bar">
 	<a href="#/new" ng-show="modelInfo.permissions.create" class="btn btn-success">
-		<i class="icon-plus icon-white"></i> {{modelInfo.properName}}
+		<i class="icon-plus icon-white"></i> {{modelInfo.proper_name}}
 	</a>
 	<div class="input-prepend">
 		<span class="add-on"><i class="icon-search"></i></span>
@@ -22,7 +22,7 @@
 	<div class="models-holder">
 		<table class="table table-striped" id="models-table">
 			<thead>
-				<tr>
+				<tr class="title-bar">
 					<th></th>
 					<th ng-repeat="property in modelInfo.properties">
 						{{property.title}}
@@ -73,13 +73,13 @@
 	
 	<p>
 		<br/>
-		<strong>{{total_count}} {{modelInfo.properNamePlural}}</strong><br/>
+		<strong>{{total_count}} {{modelInfo.proper_name_plural}}</strong><br/>
 		<span ng-show="models.length>0">Showing <em>{{(page-1)*limit+1}}-{{((page-1)*limit)+models.length}}</em> of <em>{{filtered_count}}</em> found</span>
 		<span ng-show="models.length==0"><em>None Found</em></span>
 	</p>
 </div>
 <div class="no-results" ng-show="models.length==0&&!loading">
-	Unable to find any {{modelInfo.properNamePlural}}<span ng-show="query.length>0"> matching <strong>{{query}}</strong></span>.
+	Unable to find any {{modelInfo.proper_name_plural}}<span ng-show="query.length>0"> matching <strong>{{query}}</strong></span>.
 </div>
 <div class="loading" ng-show="loading">
 	<img src="/img/ajax-loader.gif" />
@@ -90,7 +90,7 @@
 		<h3>Are you sure?</h3>
 	</div>
 	<div class="modal-body">
-		<p>Are you sure you want to delete this {{modelInfo.properName}}?</p>
+		<p>Are you sure you want to delete this {{modelInfo.proper_name}}?</p>
 	</div>
 	<div class="modal-footer">
 		<button class="btn cancel" ng-click="closeDeleteModal()">No</button>

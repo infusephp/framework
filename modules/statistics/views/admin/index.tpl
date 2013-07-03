@@ -5,17 +5,6 @@
 	margin: 18px 0 0;
 }
 
-.stat-header {
-	width: 100%;
-	background: #08c;
-	color: #fff;
-	border-radius: 8px;
-	font-weight: bold;
-	text-align: center;
-	padding: 9px 0;
-	font-weight: 1.1em;
-}
-
 .stats {
 	margin: 19px 0;
 	text-align: center;
@@ -35,17 +24,13 @@
 	</div>
 </div>
 
-<h1>Statistics</h1>
+<h1>Dashboard <small>{$smarty.const.SITE_TITLE}</small></h1>
 <hr/>
 
-<div class="stat-header">Site</div>
+<div class="stat-header title-bar">Site</div>
 
 <div class="row-fluid stats">
-	<div class="span2 stat">
-		<strong>{$stats.site.title}</strong><br/>
-		Site Title
-	</div>
-	<div class="span2 stat">
+	<div class="span2 stat offset1">
 		<strong>
 			{if $stats.site.status == 1}
 				<span style="color: #00aa00;">Enabled</span>
@@ -73,7 +58,7 @@
 	</div>
 </div>
 
-<div class="stat-header">Users</div>
+<div class="stat-header title-bar">Users</div>
 
 <div class="row-fluid stats">
 	<div class="span2 stat offset2">
@@ -96,7 +81,7 @@
 	</div>
 </div>
 
-<div class="stat-header">Database</div>
+<div class="stat-header title-bar">Database</div>
 
 <div class="row-fluid stats">
 	<div class="span2 stat offset3">

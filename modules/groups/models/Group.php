@@ -168,39 +168,4 @@ class Group extends \infuse\Model
 		
 		return parent::can( $permission, $requestor );
 	}
-	
-	//////////////////////////////////////
-	// SETTERS
-	//////////////////////////////////////
-	
-	/**
-	* Renames the group
-	* @param string $name name
-	* @return boolean success
-	*/
-	static function rename( $name )
-	{
-		if( Permissions::getPermission('edit_groups') != 1) {
-			//displayError('permission_error',"form",NULL);
-			return false;
-		}
-		
-		if ($this->id == 1) {
-			//displayError('cannot_rename_admin',"form",NULL, 'module' );
-			return false;
-		}
-
-		if ( !isset( $name ) || strlen( $name ) < 1 )
-		{
-			//displayError( 'invalid_group_name', 'err_name', null, 'module' );
-			return false;
-		}
-
-		return \infuse\Database::update(
-			'Groups',
-			array(
-				'id' => $this->id,
-				'group_name' => $name ),
-			array( 'id' ) );
-	}	
 }

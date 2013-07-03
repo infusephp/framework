@@ -118,45 +118,50 @@ class Modules
 	}
 	
 	/**
-	* Gets the version of a module
-	* @param string $module module
-	* @return string version
-	*/
-	static function moduleVersion( $module )
+	 * Gets the models associated with a module
+	 *
+	 * @param string $module module
+	 *
+	 * @return array models
+	 */
+	static function models( $module )
 	{
-		$class = self::controllerName( $module );
-		if( class_exists( $class ) )
-			return $class::version();
+		$moduleInfo = self::info( $module );
+		
+		$modelParams = array();
+		
+		if( isset( $moduleInfo[ 'models' ] ) && is_array( $moduleInfo[ 'models' ] ) )
+		{
+			foreach( (array)$moduleInfo[ 'models' ] as $model )
+				$modelNames[] = $model;
+		}
+		else if( isset( $moduleInfo[ 'model' ] ) )
+		{
+			$modelNames[] = $moduleInfo[ 'model' ];
+		}
+		
+		$models = array();
 
-		return false;
-	}
-	
-	/**
-	* Gets the description of a module
-	* @param string $module module
-	* @return string description
-	*/
-	static function moduleDescription( $module )
-	{
-		$class = self::controllerName( $module );
-		if( class_exists( $class ) )
-			return $class::description();
-
-		return false;
-	}
-	
-	/**
-	* Gets the author of a module
-	* @param string $module module
-	* @return string author
-	*/
-	static function moduleAuthor( $module )
-	{
-		$class = self::controllerName( $module );
-		if( class_exists( $class ) )
-			return $class::author();
-
-		return false;
+		foreach( $modelNames as $model )
+		{		
+			$singularKey = Inflector::underscore( $model );
+			$pluralKey = Inflector::pluralize( $singularKey );
+			$properName = Inflector::humanize( $singularKey );			
+			
+			$models[ $model ] = array(
+				'model' => $model,
+				'class_name' => '\\infuse\\models\\' . $model,
+				'api' => val( $moduleInfo, 'api' ),
+				'admin' => val( $moduleInfo, 'admin' ),
+				'singular_key' => $singularKey,
+				'plural_key' => $pluralKey,
+				'route_base' => '/' . $module . '/' . $pluralKey,
+				'proper_name' => $properName,
+				'proper_name_plural' => Inflector::pluralize( $properName )
+			);
+		}
+		
+		return $models;
 	}
 	
 	/**
@@ -234,7 +239,7 @@ class Modules
 		
 		$configFile = self::$moduleDirectory . '/' . $module . '/module.yml';
 		
-		// todo: defaults
+		// module defaults
 		$info = array(
 			'title' => $module,
 			'version' => 0,
@@ -243,6 +248,8 @@ class Modules
 				'name' => '',
 				'email' => '',
 				'website' => '' ),
+			'model' => false,
+			'models' => false,
 			'api' => false,
 			'admin' => false,
 			'routes' => array()

@@ -284,7 +284,7 @@ class User extends \infuse\Model
 		$return = array( new Group(-1) );
 		
 		$gids = Database::select(
-			'Group_Members',
+			'GroupMembers',
 			'gid',
 			array(
 				'where' => array(
@@ -341,7 +341,7 @@ class User extends \infuse\Model
 		/* database */
 		
 		return Database::select(
-			'Group_Members',
+			'GroupMembers',
 			'count(*)',
 			array(
 				'where' => array(
@@ -665,7 +665,7 @@ class User extends \infuse\Model
 				$user->loadProperties();
 							
 				// Generate a forgot password link guid
-				$guid = str_replace( '-', '', guid() );
+				$guid = str_replace( '-', '', Util::guid() );
 
 				if( Database::insert(
 					'User_Links',
@@ -757,22 +757,15 @@ class User extends \infuse\Model
 	}
 	
 	/**
-	 * Attempts to log the user in
+	 * Checks if the a given username and password are valid
 	 *
 	 * @param string $email e-mail address
 	 * @param string $password password
-	 * @param boolean $remember remember me
-	 * @param bool $setSessionVars when true sets the $_SESSION with user info
 	 *
-	 * @return boolean true if successful
-	*/
-	function login( $email, $password, $remember = false, $setSessionVars = true )
+	 * @return User|false user if successful
+	 */
+	static function checkLogin( $email, $password )
 	{
-		if( $this->logged_in )
-			return true;
-		
-		ErrorStack::setContext('login');
-		
 		if( empty( $email ) )
 		{
 			ErrorStack::add( 'user_bad_email' );
@@ -819,14 +812,37 @@ class User extends \infuse\Model
 				ErrorStack::add( 'user_login_unverified' );
 				return false;
 			}
-			else
-				return $this->loginForUid( $user->id(), 0, $remember, $setSessionVars );
+			
+			// success!
+			return $user;
 		}
 		else
 		{			
 			ErrorStack::add( 'user_login_no_match' );
 			return false;
 		}
+
+	}
+	
+	/**
+	 * Performs a traditional login.
+	 *
+	 * @param string $email e-mail address
+	 * @param string $password password
+	 * @param boolean $remember remember me
+	 * @param bool $setSessionVars when true sets the $_SESSION with user info
+	 *
+	 * @return boolean true if successful
+	*/
+	function login( $email, $password, $remember = false, $setSessionVars = true )
+	{
+		if( $this->logged_in )
+			return true;
+		
+		ErrorStack::setContext('login');
+		
+		if( $user = self::checkLogin( $email, $password ) )
+			return $this->loginForUid( $user->id(), 0, $remember, $setSessionVars );
 	}
 	
 	/**
@@ -879,7 +895,7 @@ class User extends \infuse\Model
 				'uid' => $uid,
 				'timestamp' => time(),
 				'type' => $type,
-				'ip' => $_SERVER['REMOTE_ADDR']
+				'ip' => $_SERVER[ 'REMOTE_ADDR' ]
 			)
 		);
 

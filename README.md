@@ -1,4 +1,4 @@
-infuse v0.1.3
+infuse v0.1.4
 =====
 
 PHP MVC framework for rapid development of web applications
@@ -20,6 +20,7 @@ A demo has been setup at [nfuse.jaredtking.com](http://nfuse.jaredtking.com).
 - MVC pattern
 - Modular
 - Built-in authentication
+- Optional modules for OAuth, Facebook, and Twitter authentication
 - Robust permissions system
 - Database agnostic with PDO
 - Flexible URL routing

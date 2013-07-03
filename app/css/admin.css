@@ -74,6 +74,26 @@ footer {
 	margin-top: 10px;
 }
 
+.title-bar {
+	width: 100%;
+	background: #0099ff; /* Old browsers */
+	background: -moz-linear-gradient(top,  #0099ff 0%, #0088cc 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#0099ff), color-stop(100%,#0088cc)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  #0099ff 0%,#0088cc 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  #0099ff 0%,#0088cc 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  #0099ff 0%,#0088cc 100%); /* IE10+ */
+	background: linear-gradient(to bottom,  #0099ff 0%,#0088cc 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0099ff', endColorstr='#0088cc',GradientType=0 ); /* IE6-9 */
+	border: 1px solid #08c;
+	color: #fff;
+	border-radius: 4px;
+	font-weight: bold;
+	text-align: center;
+	padding: 9px 0;
+	font-weight: 1.1em;
+	text-shadow: 1px 1px 1px #08c;
+}
+
 .no-results {
 	text-align: center;
 	font-size: 18px;
@@ -97,9 +117,8 @@ footer {
 	white-space: nowrap;
 }
 
-#models-table th {
-  background: #08c;
-  color: #fff;
+#models-table td {
+	border: none;
 }
 
 .models .value {

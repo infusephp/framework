@@ -573,7 +573,10 @@ abstract class Model extends Acl
 			switch( $property[ 'type' ] )
 			{
 			case 'id':
-				$column[ 'Type' ] = 'int(11)';
+				$type = (isset($property['id'])) ? $property['id'] : 'int';
+				$length = (isset($property['length'])) ? $property['length'] : 11;
+			
+				$column[ 'Type' ] = "$type($length)";
 			break;
 			case 'boolean':
 				$column[ 'Type' ] = 'tinyint(1)';
@@ -610,7 +613,7 @@ abstract class Model extends Acl
 			{
 				$column[ 'Key' ] = 'PRI';
 				
-				if( $property[ 'type' ] == 'id' )
+				if( $property[ 'type' ] == 'id' && strtolower( substr( $column[ 'Type' ], 0, 3 ) ) == 'int' )
 					$column[ 'Extra' ] = 'auto_increment';
 			}
 
@@ -835,9 +838,9 @@ abstract class Model extends Acl
 			$property = static::$properties[ $field ];
 
 			// cannot insert keys, unless explicitly allowed
-			if( $field == static::$idFieldName && ( !is_array( $property ) || !val( $property, 'canSetKey' ) ) )
+			if( $field == static::$idFieldName && !val( $property, 'canSetKey' ) )
 				continue;
-
+			
 			if( is_array( $property ) )
 			{
 				// null value

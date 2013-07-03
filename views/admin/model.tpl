@@ -2,20 +2,23 @@
 {block name=header}
 <script type="text/javascript">
 	var select_enabled = {if $smarty.request.find}1{else}0{/if};
-	var modelInfo = {$modelJSON};
+	{if $modelJSON}var modelInfo = {$modelJSON};{/if}
 	var module = '{$moduleName}';
 </script>
 {/block}
 {block name=main}
 
 	<ul class="nav nav-pills">
-		<li class="{if !$schema}active{/if}">
-			<a href="/4dm1n/{$moduleName}#/">{$modelNamePlural}</a>
-		</li>
+		{foreach from=$models item=model}
+			<li class="{if $model.model == $modelInfo.model && !$schema}active{/if}">
+				<a href="/4dm1n/{$moduleName}/{$model.model}#/">{$model.proper_name_plural}</a>
+			</li>
+		{/foreach}
 		<li class="{if $schema}active{/if}">
 			<a href="/4dm1n/{$moduleName}/schema">Database Schema</a>
 		</li>
 	</ul>
+	<hr/>
 
 	{block name=content}{/block}
 	
@@ -34,33 +37,39 @@
 		{elseif $error}
 			<p class="alert alert-error">{$error}</p>
 		{/if}
-
-		<div class="row-fluid">
-			<div class="span6">
-				<h3>Current Schema</h3>
-
-				{if !$currentSchema}
-					<pre>{$tablename} does not exist in the database</pre>
-				{else}
-					<pre>{$currentSchema}</pre>
-				{/if}
-
+		
+		{foreach from=$models key=model item=info}
+		
+			<div class="title-bar">{$info.proper_name}</div>
+	
+			<div class="row-fluid">
+				<div class="span6">
+					<h3>Current Schema</h3>
+	
+					{if !$currentSchema[$model]}
+						<pre>{$tablename[$model]} does not exist in the database</pre>
+					{else}
+						<pre>{$currentSchema[$model]}</pre>
+					{/if}
+	
+				</div>
+				<div class="span6">
+					<h3>Suggested Schema</h3>
+					
+					{if !$suggestedSchema[$model]}
+						<pre>No suggestions</pre>
+					{else}
+						<pre>{$suggestedSchema[$model]}</pre>
+					{/if}
+	
+					<p>
+						<a href="/4dm1n/{$moduleName}/schema/update/{$model}" class="btn btn-large btn-success">&larr; Update</a>
+					</p>
+				
+				</div>
 			</div>
-			<div class="span6">
-				<h3>Suggested Schema</h3>
-
-				{if !$suggestedSchema}
-					<pre>No suggestions</pre>
-				{else}
-					<pre>{$suggestedSchema}</pre>
-				{/if}
-
-				<p>
-					<a href="/4dm1n/{$moduleName}/schema/update" class="btn btn-large btn-success">&larr; Update</a>
-				</p>
-
-			</div>
-		</div>
+			<br/>
+		{/foreach}
 	{else}
 		<div ng-view></div>
 	{/if}

@@ -262,7 +262,20 @@ class Users extends \infuse\Controller
 	function profile( $req, $res )
 	{
 		if( !$req->isHtml() )
-			return parent::find( $req, $res );
+		{
+			if( $req->params( 'slug' ) == 'users' )
+			{
+				$req->setParams( array( 'model' => 'users' ) );
+
+				return parent::findAll( $req, $res );
+			}
+			else
+			{
+				$req->setParams( array( 'id' => $req->params( 'slug' ) ) );
+
+				return parent::find( $req, $res );
+			}
+		}
 		
 		$slug = $req->params( 'slug' );
 		
