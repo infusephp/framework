@@ -139,7 +139,10 @@ class Router
 					$defaultModel = $moduleInfo[ 'default-model' ];
 				
 				if( count( $models ) == 1 )
-					$defaultModel = reset( $models );
+				{
+					$modelKeys = array_keys( $models );
+					$defaultModel = $modelKeys[ 0 ];
+				}
 					
 				// this comes from /:module/:model
 				$secondPath = val( $req->paths(), 1 );
