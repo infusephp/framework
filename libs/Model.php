@@ -48,6 +48,11 @@
 	  		The default value to be used when creating new models.
 	  		String
 	  		Optional
+	  	id:
+	  		The type of property when the property type = id
+	  		String
+	  		Default: int
+	  		Optional
 	  	number:
 	  		The type of number when the property type = number
 	  		String
@@ -112,6 +117,11 @@
   			String
   			Default: Derived from property name
   			Optional
+  		autoincrement:
+  			Auto increments the property when creating new models within the schema
+  			Boolean
+  			Default: true if property type is id, otherwise false
+  			Optional
   	)
  *
  *
@@ -135,21 +145,18 @@ abstract class Model extends Acl
 	/////////////////////////////
 
 	public static $properties = array();
-	public static $idFieldName = 'id';
+	public static $idProperty = 'id';
 
 	/////////////////////////////
 	// Protected class variables
 	/////////////////////////////
 
-	protected static $supplementaryIds = array(); // additional key columns
-	protected static $escapeFields = array(); // specifies fields that should be escaped with htmlspecialchars()
+	protected static $escapedProperties = array(); // specifies fields that should be escaped with htmlspecialchars()
 	protected static $tablename = false;
 
 	/////////////////////////////
 	// Private class variables
 	/////////////////////////////
-
-	private $cacheInitialized = false;
 
 	private static $excludePropertyTypes = array( 'custom', 'html' );
 
@@ -161,11 +168,18 @@ abstract class Model extends Acl
 	// local cache
 	private static $globalCache = array(); // used 
 	private $localCache = array();
+
+	private $cacheInitialized = false;
 	
-	public function __construct( $id )
+	/**
+	 * Creates a new model object
+	 *
+	 * @param array|string $id ordered array of ids or comma-separated id string
+	 */
+	public function __construct( $id = false )
 	{
-		$f = self::$idFieldName;
-		$this->$f = $id;
+		if( $id )
+			$this->id = implode( ',', (array)$id );
 	}
 	
 	private function setupCache()
@@ -176,12 +190,10 @@ abstract class Model extends Acl
 		// generate keys for caching this model
 		$class = str_replace( '\\', '', get_class($this) );
 		
-		$cacheKey = $this->id . implode('-',array_keys(static::$supplementaryIds)) . implode('-',static::$supplementaryIds);			
-	
 		// initialize memcache if enabled
 		if( class_exists('Memcache') && Config::value( 'memcache', 'enabled' ) )
 		{
-			$this->memcachePrefix = Config::value( 'memcache', 'prefix' ) . '-' . $class . '-' . $cacheKey . '-';
+			$this->memcachePrefix = Config::value( 'memcache', 'prefix' ) . '-' . $class . '-' . $this->id . '-';
 
 			// attempt to connect to memcache
 			try
@@ -207,10 +219,10 @@ abstract class Model extends Acl
 			if( !isset( self::$globalCache[ $class ] ) )
 				self::$globalCache[ $class ] = array();
 			
-			if( !isset( self::$globalCache[ $class ][ $cacheKey ] ) )
-				self::$globalCache[ $class ][ $cacheKey ] = array();
+			if( !isset( self::$globalCache[ $class ][ $this->id ] ) )
+				self::$globalCache[ $class ][ $this->id ] = array();
 			
-			$this->localCache =& self::$globalCache[ $class ][ $cacheKey ];
+			$this->localCache =& self::$globalCache[ $class ][ $this->id ];
 		}
 
 		$this->cacheInitialized = true;
@@ -239,14 +251,51 @@ abstract class Model extends Acl
 	}
 
 	/**
-	 * Gets the model ID
+	 * Gets the model identifier(s)
 	 *
-	 * @return int ID
+	 * @param boolean $keyValue return key-value array of id
+	 *
+	 * @return array|string key-value if specified, otherwise comma-separated id string
 	 */
-	function id()
+	function id( $keyValue = false )
 	{
-		return $this->id;
-	}	
+		if( !$keyValue )
+			return $this->id;
+	
+		$idProperties = (array)static::$idProperty;
+		
+		// get id(s) into key-value format
+		$return = array();
+		
+		// match up id values from comma-separated id string with property names
+		$ids = explode( ',', $this->id );
+		$ids = array_reverse( $ids );
+		
+		foreach( $idProperties as $f )
+			$return[ $f ] = (count($ids)>0) ? array_pop( $ids ) : false;
+		
+		return $return;
+	}
+	
+	/**
+	 * Checks if the model has not been supplied with an id
+	 *
+	 * @return boolean
+	 */
+	function hasNoId()
+	{
+		return $this->id !== ACL_NO_ID;
+	}
+	
+	/**
+	 * Checks if a property name is an id property
+	 *
+	 * @return boolean
+	 */
+	static function isIdProperty( $propertyName )
+	{
+		return ( is_array( static::$idProperty ) && in_array( $propertyName, static::$idProperty ) ) || $propertyName == static::$idProperty;
+	}
 	
 	/**
 	 * Fetches properties from the model. If caching is enabled, then look there first. When
@@ -304,22 +353,17 @@ abstract class Model extends Acl
 		// find remaining values in database
 		if( count( $return ) < count( $properties ) )
 		{
-			$where = array_merge(
-				array(
-					static::$idFieldName => $this->id ),
-				static::$supplementaryIds );
-
  			$values = Database::select(
 				static::tablename(),
 				implode(',', $properties),
 				array(
-					'where' => $where,
+					'where' => $this->id( true ),
 					'singleRow' => true ) );
 
 			foreach( (array)$values as $property => $value )
 			{
 				// escape certain fields
-				if( in_array( $property, static::$escapeFields ) )
+				if( in_array( $property, static::$escapedProperties ) )
 					$values[ $property ] = htmlspecialchars( $value );
 				
 				$return[ $property ] = $value;
@@ -381,9 +425,7 @@ abstract class Model extends Acl
 		}
 				
 		// get the values of all the properties
-		return array_merge( array(
-			static::$idFieldName => $this->id ),
-			(array)$this->get( $properties ) );
+		return array_replace( (array)$this->get( $properties ), $this->id( true ) );
 	}
 	
 	/**
@@ -497,7 +539,21 @@ abstract class Model extends Acl
 		{
 			foreach( $models as $info )
 			{
-				$model = new $modelName( $info[ static::$idFieldName ] );
+				$id = false;
+				
+				if( is_array( static::$idProperty ) )
+				{
+					$id = array();
+					
+					foreach( static::$idProperty as $f )
+						$id[] = $info[ $f ];
+				}
+				else
+				{
+					$id = $info[ static::$idProperty ];
+				}
+				
+				$model = new $modelName( $id );
 				$model->cacheProperties( $info );
 				$return['models'][] = $model;
 			}
@@ -530,16 +586,11 @@ abstract class Model extends Acl
 	 */
 	function exists()
 	{
-		$where = array_merge(
-			array(
-				static::$idFieldName => $this->id ),
-			static::$supplementaryIds );
-
 		return Database::select(
 			static::tablename(),
 			'count(*)',
 			array(
-				'where' => $where,
+				'where' => $this->id( true ),
 				'single' => true ) ) == 1;
 	}
 	
@@ -609,11 +660,14 @@ abstract class Model extends Acl
 			break;
 			}
 			
-			if( $name == static::$idFieldName || in_array( $name, static::$supplementaryIds ) )
+			if( self::isIdProperty( $name ) )
 			{
 				$column[ 'Key' ] = 'PRI';
 				
-				if( $property[ 'type' ] == 'id' && strtolower( substr( $column[ 'Type' ], 0, 3 ) ) == 'int' )
+				if( !isset( $property[ 'autoincrement' ] ) )
+					$property[ 'autoincrement' ] = true;
+				
+				if( $property[ 'type' ] == 'id' && strtolower( substr( $column[ 'Type' ], 0, 3 ) ) == 'int' && $property[ 'autoincrement' ] )
 					$column[ 'Extra' ] = 'auto_increment';
 			}
 
@@ -632,7 +686,7 @@ abstract class Model extends Acl
 			
 			$schema[] = $column;
 		}
-		
+
 		return $schema;
 	}
 
@@ -658,6 +712,8 @@ abstract class Model extends Acl
 		else
 			$sql .= "ALTER TABLE `$tablename`\n";
 
+		$primaryKeys = array();
+
 		$cols = array();
 		foreach( $schema as $column )
 		{
@@ -676,17 +732,31 @@ abstract class Model extends Acl
 			if( $column['Extra'] )
 				$col .= " {$column['Extra']}";
 
-			if( $column['Key'] && $newTable )
-				$col .= ($column['Key'] == 'PRI') ? ' PRIMARY KEY' : ' ' . $column['Key'];
+			if( $column['Key'] )
+			{
+				if( $column['Key'] == 'PRI' )
+					$primaryKeys[] = $column[ 'Field' ];
+				else if( $newTable )
+					$col .= ' ' . $column['Key'];
+			}
 
 			$cols[] = $col;
 		}
 
 		// TODO
-		// multiple keys
-		// changing primary key when altering table
 		// index
 		// unique index
+		
+		// primary key
+		if( $newTable )
+		{
+			$cols[] = "\t" . 'PRIMARY KEY(' . implode( ',', $primaryKeys ) . ')';		
+		}
+		else
+		{
+			$cols[] = "\t" . 'DROP PRIMARY KEY';
+			$cols[] = "\t" . 'ADD PRIMARY KEY(' . implode( ',', $primaryKeys ) . ')';
+		}
 
 		$sql .= implode( ",\n", $cols);
 
@@ -709,19 +779,14 @@ abstract class Model extends Acl
 	 */
 	function loadProperties()
 	{
-		if( $this->id == -1 )
+		if( $this->hasNoId() )
 			return;
 				
-		$where = array_merge(
-			array(
-				static::$idFieldName => $this->id ),
-			static::$supplementaryIds );
-
 		$info = Database::select(
 			static::tablename(),
 			'*',
 			array(
-				'where' => $where,
+				'where' => $this->id( true ),
 				'singleRow' => true ) );
 		
 		foreach( (array)$info as $property => $item )
@@ -805,7 +870,7 @@ abstract class Model extends Acl
 		ErrorStack::setContext( 'create' );
 
 		$modelName = get_called_class();
-		$model = new $modelName(ACL_NO_ID);
+		$model = new $modelName();
 		
 		// permission?
 		if( !$model->can( 'create' ) )
@@ -838,7 +903,7 @@ abstract class Model extends Acl
 			$property = static::$properties[ $field ];
 
 			// cannot insert keys, unless explicitly allowed
-			if( $field == static::$idFieldName && !val( $property, 'canSetKey' ) )
+			if( self::isIdProperty( $field ) && !val( $property, 'canSetKey' ) )
 				continue;
 			
 			if( is_array( $property ) )
@@ -965,10 +1030,7 @@ abstract class Model extends Acl
 			return true;
 
 		$validated = true;
-		$updateArray = array_merge(
-			array(
-				static::$idFieldName => $this->id ),
-			static::$supplementaryIds );
+		$updateArray = $this->id( true );
 		$updateKeys = array_keys( $updateArray );
 		
 		// get the property names
@@ -1084,8 +1146,6 @@ abstract class Model extends Acl
 		// delete the model
 		return Database::delete(
 			static::tablename(),
-			array_merge( array(
-				static::$idFieldName => $this->id ),
-				static::$supplementaryIds ) );
+			$this->id( true ) );
 	}
 }

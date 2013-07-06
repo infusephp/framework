@@ -138,11 +138,6 @@ class Util
 		return hash_hmac('sha512', $password . $nonce, Config::value( 'site', 'salt' ));
 	}
 	
-	static function json_decode_array($d)
-	{
-		return json_decode($d, true);
-	}
-	
 	// lifted from php comments
 	static function get_tz_options($selectedzone, $name = 'time_zone')
 	{

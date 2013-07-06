@@ -12,28 +12,16 @@ namespace infuse\models;
 
 class Group extends \infuse\Model
 {
-	protected static $escapeFields = array( 'website', 'about' );
 	public static $properties = array(
 		'id' => array(
 			'type' => 'id'
 		),
 		'group_name' => array(
-			'type' => 'text'
+			'type' => 'text',
+			'required' => true
 		)
 	);
-	
-	/**
-	* Constructor
-	* @param int $id group ID
-	*/
-	function __construct( $id )
-	{
-		if( is_numeric( $id ) )
-			$this->id = $id;
-		else
-			$this->id = -1;
-	}
-	
+		
 	/////////////////////////////////////
 	// GETTERS
 	/////////////////////////////////////

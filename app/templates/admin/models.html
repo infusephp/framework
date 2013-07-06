@@ -32,14 +32,14 @@
 			<tbody>
 				<tr ng-repeat="model in models">
 					<td>
-						<div class="btn-group" ng-show="model[modelInfo.idFieldName]">
-							<a href="#/{{model[modelInfo.idFieldName]}}" class="btn">View</a>
+						<div class="btn-group" ng-show="model.id">
+							<a href="#/{{model.id}}" class="btn">View</a>
 							<button class="btn dropdown-toggle" data-toggle="dropdown">
 								<span class="caret"></span>
 							</button>
 							<ul class="dropdown-menu">
 								<li ng-show="modelInfo.permissions.edit">
-									<a href="#/{{model[modelInfo.idFieldName]}}/edit">
+									<a href="#/{{model.id}}/edit">
 										<i class="icon-pencil"></i> Edit
 									</a>
 								</li>

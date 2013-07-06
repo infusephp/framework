@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Model representation of a user
  * 
@@ -39,7 +40,7 @@ class User extends \infuse\Model
 	// Model Properties
 	/////////////////////////////////////
 	
-	public static $idFieldName = 'uid';
+	public static $idProperty = 'uid';
 	
 	protected static $escapedFields = array();
 	
@@ -54,7 +55,7 @@ class User extends \infuse\Model
 			'validation' => array('\infuse\Validate','email'),
 			'required' => true,
 			'unique' => true,
-			'title' => 'E-mail address'
+			'title' => 'E-mail'
 		),
 		'first_name' => array(
 			'type' => 'text',
@@ -89,14 +90,6 @@ class User extends \infuse\Model
 			'validation' => array('\infuse\Validate','boolean_'),
 			'required' => true,
 			'default' => true
-		),
-		'time_zone' => array(
-			'type' => 'text',
-			'length' => 20,
-			'required' => true,
-			'default' => 'America/Chicago',
-			'nowrap' => true,
-			'validation' => array('\infuse\Validate','timeZone')
 		)
 	);
 					
@@ -113,11 +106,11 @@ class User extends \infuse\Model
 	* @param int $id id
 	* @param boolean $check_logged_in check if the user is logged in
 	*/
-	function __construct( $id, $check_logged_in = false, $logged_in = false )
+	function __construct( $id = false, $check_logged_in = false, $logged_in = false )
 	{
 		if( is_numeric( $id ) )
 			$this->id = $id;
-		else
+		else if( $id )
 		{
 			$exp = explode( '-', $id );
 			$last = end($exp);
@@ -127,10 +120,10 @@ class User extends \infuse\Model
 				$this->id = -1;
 		}
 			
-		if( $logged_in && $id > 0 )
+		if( $logged_in && $this->id > 0 )
 			$this->logged_in = true;
 		else if( $check_logged_in )
-			$this->logged_in = $this->logged_in_();		
+			$this->logged_in = $this->logged_in_();
 	}
 	
 	static function currentUser()
@@ -153,12 +146,12 @@ class User extends \infuse\Model
 		// allow user registrations
 		if( $permission == 'create' && !$requester->isLoggedIn() ) {
 			return true;
-		} else if( $permission == 'edit' && $requester->id() == $this->id() ) {
+		} else if( $permission == 'edit' && $requester->id() == $this->id ) {
 			return true;
 		}
 
 		return parent::can( $permission, $requester );
-	}	
+	}
 		
 	/**
 	* Gets the temporary string if the user is temporary
@@ -211,31 +204,10 @@ class User extends \infuse\Model
 	}
 	
 	/**
-	* Checks if the user is actively registered
-	* @return boolean true if the user is actively registered
-	*/
-	function registered()
-	{
-		if( $this->id == -1 )
-			return false;
-			
-		return $this->get('uid') == $this->id;
-	}
-	
-	/**
-	* Checks if the user's information is public
-	* @todo not implemented
-	* @return true if public 
-	*/
-	function isPublic()
-	{
-		// TODO
-		return true;
-	}	
-	
-	/**
 	* Get's the user's name
+	*
 	* @param boolean $full get full name if true
+	*
 	* @return string name
 	*/
 	function name( $full = false )
@@ -244,8 +216,8 @@ class User extends \infuse\Model
 			return 'Guest';
 		else
 		{
-			if( !$this->registered() )
-				return '(no longer registered)';
+			if( !$this->exists() )
+				return '(not registered)';
 				
 			$names = $this->get( array( 'first_name', 'last_name', 'user_email' ) );
 			if( $names[ 'first_name' ] != '' )
@@ -593,7 +565,7 @@ class User extends \infuse\Model
 	/**
 	 * Processes a verify e-mail hash
 	 *
-	 * @param string $verify verification hashflo
+	 * @param string $verify verification hash
 	 *
 	 * @return boolean success
 	*/
@@ -731,13 +703,13 @@ class User extends \infuse\Model
 		return Database::update(
 			'Users',
 			array(
-				'uid' => $user->id,
+				'uid' => $user->id(),
 				'user_password' => $password ),
 			array( 'uid' ) ) &&
 			Database::delete(
 				'User_Links',
 				array(
-					'uid' => $user->id,
+					'uid' => $user->id(),
 					'link_type' => 0 ) );
 	}
 	
@@ -749,11 +721,26 @@ class User extends \infuse\Model
 	 * Elevates the current user to super user status. This grants all permissions
 	 * to everything. BE CAREFUL. Typically, this is reserved for cron jobs that need
 	 * to work with models belonging to other users.
+	 *
+	 * WARNING: do not forget to remove super user permissions when done with endSuperUser()
+	 * or else the user will have free reign to do anything
 	 */
 	static function elevateToSuperUser()
 	{
 		self::currentUser();
+		self::$currentUser->oldUid = self::$currentUser->id;
 		self::$currentUser->id = SUPER_USER;
+	}
+	
+	/**
+	 * Removes super user permission.
+	 *
+	 */
+	static function endSuperUser()
+	{
+		self::currentUser();
+		if( isset( self::$currentUser->oldUid ) )
+			self::$currentUser->id = self::$currentUser->oldUid;
 	}
 	
 	/**
@@ -960,7 +947,7 @@ class User extends \infuse\Model
 		
 		return false;
 	}
-	
+
 	/**
 	 * Sends the user an e-mail
 	 *
@@ -1058,7 +1045,7 @@ class User extends \infuse\Model
 		{
 			$this->id = $_SESSION[ 'user_id' ];
 
-			if( !$this->registered() ) {
+			if( !$this->exists() ) {
 				$this->id = -1;
 				$_SESSION[ 'user_id' ] = -1;
 				return false;

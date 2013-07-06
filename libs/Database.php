@@ -203,7 +203,7 @@ class Database
 				$selectQueries .= $query . "\n";
 				echo $query . "\n";
 			}
-
+			
         	// execute query
 			$STH = self::$DBH->prepare( $query );
 			$STH->execute( $parameters[ 'where' ] );

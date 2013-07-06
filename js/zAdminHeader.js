@@ -160,7 +160,7 @@ if (typeof angular != 'undefined') {
 					
 					// massage data for client side use
 					for (var i in $scope.models)
-						massageModelForClient ($scope.models[i], $scope.modelInfo.properties);
+						massageModelForClient ($scope.models[i], $scope.modelInfo);
 					
 					$scope.loading = false;
 					
@@ -168,7 +168,7 @@ if (typeof angular != 'undefined') {
 				
 					$scope.loading = false;
 					
-				});		
+				});
 			};
 				
 			$scope.currentPages = function(n) {
@@ -221,7 +221,7 @@ if (typeof angular != 'undefined') {
 					$scope.model = result[$scope.modelInfo.singular_key];
 					
 					// the model needs to be massaged
-					massageModelForClient ($scope.model, $scope.modelInfo.properties);				
+					massageModelForClient ($scope.model, $scope.modelInfo);
 					
 					$scope.loading = true;
 					
@@ -242,7 +242,7 @@ if (typeof angular != 'undefined') {
 			$scope.deleteModelConfirm = function() {
 				
 				Model.delete({
-					modelId: $scope.deleteModel[$scope.modelInfo.idFieldName]
+					modelId: $scope.deleteModel.id
 				}, function(result) {
 					if (result.success) {
 						if ($routeParams.id)
@@ -288,7 +288,7 @@ if (typeof angular != 'undefined') {
 					
 				} else {
 				
-					modelData.modelId = $scope.model[$scope.modelInfo.idFieldName];
+					modelData.modelId = $scope.model.id;
 				
 					Model.edit(modelData, function(result) {
 						$scope.saving = false;
@@ -296,7 +296,7 @@ if (typeof angular != 'undefined') {
 						//console.log(result);
 		
 			    		if (result.success) {
-			    			$location.path('/' + modelData[$scope.modelInfo.idFieldName]);
+			    			$location.path('/' + modelData.id);
 						} else if (result.error && result.error instanceof Array) {
 			    			$scope.errors = result.error;
 			    		}
@@ -332,7 +332,7 @@ if (typeof angular != 'undefined') {
 					}
 					
 					// the model needs to be massaged
-					massageModelForClient ($scope.model, $scope.modelInfo.properties);
+					massageModelForClient ($scope.model, $scope.modelInfo);
 				
 				// browsing all models
 				} else {
@@ -403,10 +403,10 @@ if (typeof angular != 'undefined') {
 		return nl2br(htmlentities(value));
 	}
 	
-	function massageModelForClient (model, properties) {
+	function massageModelForClient (model, modelInfo) {
 	
-		for (var i in properties) {
-			var property = properties[i];
+		for (var i in modelInfo.properties) {
+			var property = modelInfo.properties[i];
 			var value = model[property.name];
 			
 			switch (property.type)
@@ -421,12 +421,30 @@ if (typeof angular != 'undefined') {
 				model[property.name] = (value > 0) ? true : false;
 			break;
 			}
-			
-			if (property.null) {
-			
-			}
 		}
-	
+		
+		// multiple ids
+		if (angular.isArray(modelInfo.idProperty))
+		{
+			var ids = [];
+			
+			for (var i in modelInfo.idProperty)
+			{
+				if (model[modelInfo.idProperty[i]] === '')
+				{
+					ids = false;
+					break;
+				}
+				
+				ids.push(model[modelInfo.idProperty[i]]);
+			}
+						
+			if (ids)
+				model.id = ids.join(',');
+		}
+		// single id
+		else
+			model.id = model[modelInfo.idProperty];			
 	}
 	
 	function massageModelForServer (model, properties) {

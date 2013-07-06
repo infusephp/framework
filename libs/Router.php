@@ -201,7 +201,7 @@ class Router
 			if( Modules::exists( $controller ) )
 			{
 				Modules::load( $controller );
-			
+				
 				/* controller admin routes */
 							
 				$moduleRoutes = Modules::info($controller)['routes'];

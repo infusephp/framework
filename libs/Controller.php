@@ -140,7 +140,7 @@ abstract class Controller extends Acl
 		$modelClassName = $model[ 'class_name' ];
 		$modelRouteName = $model[ 'plural_key' ];
 		
-		$modelObj = new $modelClassName( ACL_NO_ID );
+		$modelObj = new $modelClassName();
 		
 		// permission?
 		if( !$modelObj->can( 'view' ) )
@@ -265,7 +265,7 @@ abstract class Controller extends Acl
 			return $res->setCode( 406 );
 
 		$modelClassName = $model[ 'class_name' ];
-		$modelObj = new $modelClassName( ACL_NO_ID );
+		$modelObj = new $modelClassName();
 		
 		// permission?
 		if( !$modelObj->can( 'create' ) )
@@ -414,7 +414,7 @@ abstract class Controller extends Acl
 			foreach( $models as $model => $info )
 			{
 				$modelClassName = $info[ 'class_name' ];
-				$modelObj = new $modelClassName( ACL_NO_ID );
+				$modelObj = new $modelClassName();
 			
 				// get tablename for model
 				$tablename[ $model ] = $modelObj::tablename();
@@ -434,7 +434,7 @@ abstract class Controller extends Acl
 				
 				// suggest a schema based on properties
 				$suggestedSchema[ $model ] = $modelObj::schemaToSql( $modelObj::suggestSchema( $currentSchema[ $model ] ), $newTable );
-				
+
 				// convert to sql
 				$currentSchema[ $model ] = ($currentSchema[ $model ]) ? $modelObj::schemaToSql( $currentSchema[ $model ], true ) : false;				
 			}
@@ -483,14 +483,14 @@ abstract class Controller extends Acl
 			$model = $this->fetchModelInfo( $selectedModel );
 			
 			$modelClassName = $model[ 'class_name' ];
-			$modelObj = new $modelClassName( ACL_NO_ID );
+			$modelObj = new $modelClassName();
 			
 			$modelInfo = array_replace( $model, array(
 				'permissions' => array(
 					'create' => $modelObj->can('create'),
 					'edit' => $modelObj->can('edit'),
 					'delete' => $modelObj->can('delete') ),
-				'idFieldName' => $modelClassName::$idFieldName,
+				'idProperty' => $modelClassName::$idProperty,
 				'properties' => array()
 			) );
 			$params[ 'modelInfo' ] = $modelInfo;		

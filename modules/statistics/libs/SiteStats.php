@@ -68,7 +68,7 @@ class SiteStats
 		$return['database']['size'] = $dbsize;
 		
 		// number of tables
-		$return['database']['numTables'] = count( $status );		
+		$return['database']['numTables'] = count( $status );
 		
 		/* User Statistics */
 		$return['users'] = array();
@@ -102,7 +102,7 @@ class SiteStats
 			array(
 				'where' => array(
 					'registered_timestamp > ' . strtotime('today') ),
-				'single' => true ) );		
+				'single' => true ) );
 
 		return $return;
 	}

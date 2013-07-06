@@ -27,7 +27,7 @@ namespace infuse\models;
 
 class GroupMember extends \infuse\Model
 {
-	public static $idFieldName = array(
+	public static $idProperty = array(
 		'gid',
 		'uid'
 	);
