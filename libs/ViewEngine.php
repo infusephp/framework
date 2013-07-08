@@ -68,10 +68,10 @@ class ViewEngine Extends \Smarty
         @mkdir( INFUSE_APP_DIR . '/js' );
 		
 		// minify CSS
-		$this->autoCompileLess( INFUSE_BASE_DIR . '/css/styles.less', 'styles.css');
+		$this->autoCompileLess( INFUSE_BASE_DIR . '/assets/css/styles.less', 'styles.css');
 		
 		// minify JS
-		$this->autoCompileJs( INFUSE_BASE_DIR . '/js', 'header.js' );
+		$this->autoCompileJs( INFUSE_BASE_DIR . '/assets/js', 'header.js' );
 	}
 	
 	/**

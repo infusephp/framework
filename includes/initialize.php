@@ -66,7 +66,7 @@ if( Config::value( 'site', 'time-zone' ) )
 	date_default_timezone_set( Config::value( 'site', 'time-zone' ) );
 
 // load messages for site language
-require_once 'lang/' . Config::value( 'site', 'language' ) . '.php';
+require_once 'assets/lang/' . Config::value( 'site', 'language' ) . '.php';
 
 // setup some useful constants and functions
 require_once 'includes/constants.php';

@@ -74,7 +74,7 @@ class User extends \infuse\Model
 			'required' => true,
 			'title' => 'Password'
 		),
-		'registered_timestamp' => array(
+		'registered_on' => array(
 			'type' => 'date',
 			'required' => true,
 			'nowrap' => true
@@ -287,7 +287,7 @@ class User extends \infuse\Model
 	 */
 	function registerDate( $format = 'F j, Y' )
 	{
-		return date( $format, $this->get( 'registered_timestamp' ) );
+		return date( $format, $this->get( 'registered_on' ) );
 	}
 	
 	/**
@@ -389,7 +389,7 @@ class User extends \infuse\Model
 		ErrorStack::setContext( 'create' );
 		
 		$data[ 'ip' ] = $_SERVER[ 'REMOTE_ADDR' ];
-		$data[ 'registered_timestamp' ] = time();
+		$data[ 'registered_on' ] = time();
 
 		$user = parent::create( $data );
 		
@@ -438,7 +438,7 @@ class User extends \infuse\Model
 		$insertArray = array(
 			'user_email' => $data[ 'user_email' ],
 			'ip' => $_SERVER[ 'REMOTE_ADDR' ],
-			'registered_timestamp' => time(),
+			'registered_on' => time(),
 			'enabled' => 0
 		);
 		
@@ -538,7 +538,7 @@ class User extends \infuse\Model
 			'first_name' => $data[ 'first_name' ],
 			'last_name' => $data[ 'last_name' ],
 			'user_password' => $data[ 'user_password' ],
-			'registered_timestamp' => time(),
+			'registered_on' => time(),
 			'ip' => $_SERVER[ 'REMOTE_ADDR' ],
 			'enabled' => 1 );
 
