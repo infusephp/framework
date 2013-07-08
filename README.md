@@ -35,7 +35,7 @@ A demo has been setup at [nfuse.jaredtking.com](http://nfuse.jaredtking.com).
 - PHP >= 5.3
 - PDO supported data store
 - mod_rewrite (if using apache)
-- Composer [getcomposer.com](http://getcomposer.org)
+- [Composer](http://getcomposer.org)
 
 ### Optional
 
