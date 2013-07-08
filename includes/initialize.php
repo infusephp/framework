@@ -41,6 +41,9 @@ spl_autoload_register( function( $class ) {
 	}
 });
 
+// composer
+require 'vendor/autoload.php';
+
 // load configuration
 Config::load( INFUSE_BASE_DIR . '/config.yml' );
 

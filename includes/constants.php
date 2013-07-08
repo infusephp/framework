@@ -24,9 +24,6 @@
 
 use \infuse\Config as Config;
 
-/* infuse */
-define( 'INFUSE_VERSION', '0.1.5' ); // please don't change this
-
 /* site configuration */
 if( !defined('SITE_TITLE') )
 	define ('SITE_TITLE', Config::value( 'site', 'title' ) );

@@ -105,8 +105,6 @@ class Config
 	 */
 	static function load( $filename )
 	{
-		require_once "libs/Spyc.php";
-	
 		self::$values = (array)spyc_load_file( $filename );
 	}
 }

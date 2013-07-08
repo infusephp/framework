@@ -1,4 +1,4 @@
-infuse v0.1.5
+infuse v0.1.6
 =====
 
 PHP MVC framework for rapid development of web applications
@@ -20,7 +20,7 @@ A demo has been setup at [nfuse.jaredtking.com](http://nfuse.jaredtking.com).
 - MVC pattern
 - Modular
 - Built-in authentication
-- Optional modules for OAuth, Facebook, and Twitter authentication
+- Optional modules for [OAuth](https://github.com/jaredtking/infuse-oauth), [Facebook](https://github.com/jaredtking/infuse-facebook), and [Twitter](https://github.com/jaredtking/infuse-twitter) authentication
 - Robust permissions system
 - Database agnostic with PDO
 - Flexible URL routing
@@ -35,6 +35,7 @@ A demo has been setup at [nfuse.jaredtking.com](http://nfuse.jaredtking.com).
 - PHP >= 5.3
 - PDO supported data store
 - mod_rewrite (if using apache)
+- Composer [getcomposer.com](http://getcomposer.org)
 
 ### Optional
 
@@ -42,6 +43,14 @@ A demo has been setup at [nfuse.jaredtking.com](http://nfuse.jaredtking.com).
 - redis (for sessions)
 
 ## Getting Started
+
+Get the latest framework files:
+
+`git clone https://github.com/jaredtking/infuse.git ./`
+
+Install Composer dependencies:
+
+`composer install`.
 
 Infuse Framework is served through the `/app` directory to prevent the framework files from being publicly accessible. This requires a small amount of configuration for the web server to work properly.
 
@@ -86,7 +95,7 @@ A .htaccess file is already included in the `/app` directory for url rewrites. Y
 
 ### Installer
 
-Once the web server is setup, fire up the url where the framework is installed and you will be redirected to an installer.
+Fire up the url where the framework is installed and you will be redirected to an installer to setup the database and `config.yml`.
 
 ## Documentation
 

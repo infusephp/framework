@@ -1,3 +1,13 @@
 Thumbs.db 
 Desktop.ini
 .DS_Store
+/.settings
+/.project
+/.buildpath
+/composer.phar
+/vendor
+/nbproject
+phpunit.xml
+.vagrant
+Vagrantfile
+.idea

@@ -24,8 +24,6 @@
 
 namespace infuse;
 
-require_once "libs/Smarty/Smarty.class.php";
-
 class ViewEngine Extends \Smarty
 {
 	var $base_template_dir;
@@ -96,7 +94,7 @@ class ViewEngine Extends \Smarty
 			$cache = $inputFile;
 		}
 		
-		$less = new \infuse\lessc;
+		$less = new \lessc;
 		try
 		{
 			$newCache = $less->cachedCompile($cache);
@@ -149,7 +147,7 @@ class ViewEngine Extends \Smarty
 			
 			// minify js in production mode
 			if( Config::value( 'site', 'production-level' ) ) {
-				$js = JSMin::minify( $js );
+				$js = \JSMin::minify( $js );
 			}
 			
 			// write the js and cache to the output file

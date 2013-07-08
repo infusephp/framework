@@ -990,9 +990,14 @@ class User extends \infuse\Model
 		{
 			ob_start();
 			
-			// load the Mail module
-			Modules::load( 'mail' );
-			$mail = new \infuse\libs\Mail;
+			// setup the mailer
+			$mail = new \PHPMailer;
+			$mail->SMTPAuth = true;
+			$mail->SMTPSecure = 'tls';
+			$mail->Host = Config::value( 'smtp', 'host' );
+			$mail->Username = Config::value( 'smtp', 'username' );
+			$mail->Password = Config::value( 'smtp', 'password' );
+			$mail->Port = Config::value( 'smtp', 'port' );
 			
 			// basic e-mail info
 			$mail->From = SMTP_FROM_ADDRESS;

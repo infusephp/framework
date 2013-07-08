@@ -45,8 +45,11 @@ class SiteStats
 		/* Infuse Statistics */
 		$return[ 'infuse' ] = array();
 		
+		// load composer.json
+		$infuseComposer = json_decode( file_get_contents( INFUSE_BASE_DIR . '/composer.json' ) );
+		
 		// infuse version
-		$return['infuse']['version'] = INFUSE_VERSION;
+		$return['infuse']['version'] = $infuseComposer->version;
 		
 		/* Database Statistics */
 		$return['database'] = array();
