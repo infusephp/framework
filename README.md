@@ -13,7 +13,7 @@ Infuse is the culmination of best practices that I learned through developing PH
 
 ## Demo
 
-A demo has been setup at [nfuse.jaredtking.com](http://nfuse.jaredtking.com).
+A demo has been setup at [infuse.jaredtking.com](http://infuse.jaredtking.com).
 
 ## Features
 
