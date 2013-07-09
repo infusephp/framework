@@ -157,7 +157,7 @@ class Modules
 				'plural_key' => $pluralKey,
 				'route_base' => '/' . $module . '/' . $pluralKey,
 				'proper_name' => $properName,
-				'proper_name_plural' => Inflector::pluralize( $properName )
+				'proper_name_plural' => Inflector::humanize( $pluralKey )
 			);
 		}
 		
