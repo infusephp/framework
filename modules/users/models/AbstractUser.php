@@ -64,6 +64,16 @@ abstract class AbstractUser extends \infuse\Model
 			'required' => true,
 			'title' => 'Password'
 		),
+		'first_name' => array(
+			'type' => 'text',
+			'validation' => array('\infuse\Validate','firstName'),
+			'required' => true
+		),
+		'last_name' => array(
+			'name' => 'last_name',
+			'type' => 'text',
+			'validation' => array('\infuse\Validate','lastName')
+		),
 		'ip' => array(
 			'type' => 'text',
 			'filter' => '<a href="http://www.infobyip.com/ip-{ip}.html" target="_blank">{ip}</a>',
@@ -366,6 +376,14 @@ abstract class AbstractUser extends \infuse\Model
 	// SETTERS
 	///////////////////////////////
 	
+	function preCreateHook( &$data )
+	{
+		$data[ 'ip' ] = $_SERVER[ 'REMOTE_ADDR' ];
+		$data[ 'registered_on' ] = time();
+
+		return true;
+	}
+	
 	/**
 	* Creates a user
 	*
@@ -376,11 +394,6 @@ abstract class AbstractUser extends \infuse\Model
 	*/
 	static function create( $data, $verifiedEmail = false )
 	{
-		ErrorStack::setContext( 'create' );
-		
-		$data[ 'ip' ] = $_SERVER[ 'REMOTE_ADDR' ];
-		$data[ 'registered_on' ] = time();
-
 		$user = parent::create( $data );
 		
 		if( $user )
@@ -453,52 +466,47 @@ abstract class AbstractUser extends \infuse\Model
 			return false;	
 	}	
 	
-	/**
-	 * Updates the model
-	 *
-	 * @param array|string $data key-value properties or name of property
-	 * @param string new $value value to set if name supplied
-	 *
-	 * @return boolean
-	 */
-	function set( $data, $value = false )
+	function preSetHook( &$data )
 	{
-		ErrorStack::setContext( 'edit' );
-		
 		if( !is_array( $data ) )
 			$data = array( $data => $value );
 		
 		$params = array();
-		$protectedFields = array( 'user_email', 'user_password' );
+		$protectedFields = array( 'user_email', 'user_password', 'username' );
 		
 		// check if the current password is accurate
 		$passwordValidated = false;
 		$passwordRequired = false;
 		
-		if( isset( $data[ 'current_password' ] ) ) {
+		if( isset( $data[ 'current_password' ] ) )
+		{
 			if( Util::encryptPassword( $data[ 'current_password' ] ) == $this->get( 'user_password' ) || static::$currentUser->isAdmin() )
 				$passwordValidated = true;
 		}
 
-		foreach( $data as $key => $value ) {			
-			if( static::hasProperty( $key ) ) {
-				if( in_array( $key, $protectedFields ) ) {
+		foreach( $data as $key => $value )
+		{
+			if( static::hasProperty( $key ) )
+			{
+				if( in_array( $key, $protectedFields ) )
+				{
 					if (strlen(implode((array)$value)) == 0)
 						continue;
 					
 					$passwordRequired = true;
 				}			
 			
-				$params[ $key ] = $value;
+				$data[ $key ] = $value;
 			}
 		}
 		
-		if( $passwordRequired && !$passwordValidated && !static::currentUser()->isAdmin() ) {
-			ErrorStack::add( 'Oops, looks like the password is incorrect.', __CLASS__, 'current-password' );
+		if( $passwordRequired && !$passwordValidated && !static::currentUser()->isAdmin() )
+		{
+			ErrorStack::add( 'Oops, looks like the password is incorrect.' );
 			return false;
 		}
 		
-		return parent::set( $params );
+		return true;
 	}
 	
 	/**

@@ -47,23 +47,28 @@ class CronJob extends \infuse\Model
 		),
 		'minute' => array(
 			'type' => 'text',
-			'length' => 2
+			'length' => 2,
+			'validation' => array( '\infuse\models\CronJob', 'validateMinute' )
 		),
 		'hour' => array(
 			'type' => 'text',
-			'length' => 2
+			'length' => 2,
+			'validation' => array( '\infuse\models\CronJob', 'validateHour' )
 		),
 		'day' => array(
 			'type' => 'text',
-			'length' => 2
+			'length' => 2,
+			'validation' => array( '\infuse\models\CronJob', 'validateDay' )
 		),
 		'month' => array(
 			'type' => 'text',
-			'length' => 2
+			'length' => 2,
+			'validation' => array( '\infuse\models\CronJob', 'validateMonth' )
 		),
 		'week' => array(
 			'type' => 'text',
-			'length' => 2
+			'length' => 2,
+			'validation' => array( '\infuse\models\CronJob', 'validateWeek' )
 		),
 		'next_run' => array(
 			'type' => 'date'
@@ -82,79 +87,44 @@ class CronJob extends \infuse\Model
 		)		
 	);
 	
-	/**
-	* Creates a task
-	*
-	* @param array $data
-	*
-	* @return boolean success
-	*/
-	static function create( $data )
+	static function validateMinute( &$minute )
 	{
-		$modelName = get_called_class();
-		$model = new $modelName(ACL_NO_ID);
-		
-		// permission?
-		if( !$model->can( 'create' ) )
-		{
-			ErrorStack::add( ERROR_NO_PERMISSION );
-			return false;
-		}
-		
-		if( !self::validateCronTimePiece( val( $data, 'minute' ), 0, 59 ) )
-			return false;
-		
-		if( !self::validateCronTimePiece( val( $data, 'hour' ), 0, 23 ) )
-			return false;
-		
-		if( !self::validateCronTimePiece( val( $data, 'day' ), 1, 31 ) )
-			return false;
-		
-		if( !self::validateCronTimePiece( val( $data, 'month' ), 1, 12 ) )
-			return false;
-		
-		if( !self::validateCronTimePiece( val( $data, 'week' ), 0, 6 ) )
-			return false;
-		
+		return self::validateCronTimePiece( $minute, 0, 59 );
+	}
+
+	static function validateHour( &$hour )
+	{
+		return self::validateCronTimePiece( $hour, 0, 23 );
+	}
+
+	static function validateDay( &$day )
+	{
+		return self::validateCronTimePiece( $day, 1, 31 );
+	}
+
+	static function validateMonth( &$month )
+	{
+		return self::validateCronTimePiece( $month, 1, 12 );
+	}
+
+	static function validateWeek( &$week )
+	{
+		return self::validateCronTimePiece( $week, 0, 6 );
+	}
+	
+	function preCreateHook( &$data )
+	{
 		$data[ 'next_run' ] = self::calcNextRun( $data[ 'minute' ], $data[ 'hour' ], $data[ 'day' ],$data[ 'month' ],$data[ 'week' ] );
 
-		return parent::create( $data );
+		return true;
 	}
-		
-	/**
-	 * Updates the model
-	 *
-	 * @param array|string $data key-value properties or name of property
-	 * @param string new $value value to set if name supplied
-	 *
-	 * @return boolean
-	 */
-	function set( $data, $value = false )
+	
+	function preSetHook( &$data )
 	{
-		ErrorStack::setContext( 'edit' );
-		
-		if( !is_array( $data ) )
-			$data = array( $data => $value );
-
-		if( isset( $data[ 'minute' ] ) && !self::validateCronTimePiece( $data[ 'minute' ], 0, 59 ) )
-			return false;
-		
-		if( isset( $data[ 'hour' ] ) && !self::validateCronTimePiece( $data[ 'hour' ], 0, 23 ) )
-			return false;
-		
-		if( isset( $data[ 'day' ] ) && !self::validateCronTimePiece( $data[ 'day' ], 1, 31 ) )
-			return false;
-		
-		if( isset( $data[ 'month' ] ) && !self::validateCronTimePiece( $data[ 'month' ], 1, 12 ) )
-			return false;
-		
-		if( isset( $data[ 'week' ] ) && !self::validateCronTimePiece( $data[ 'week' ], 0, 6 ) )
-			return false;
-
 		if( isset( $data[ 'minute' ] ) && isset( $data[ 'hour' ] ) && isset( $data[ 'day' ] ) && isset( $data[ 'month' ] ) && isset( $data[ 'week' ] ) )
 			$data[ 'next_run' ] = self::calcNextRun( $data[ 'minute' ], $data[ 'hour' ], $data[ 'day' ], $data[ 'month' ], $data[ 'week' ] );
 
-		return parent::set( $data );
+		return true;
 	}
 	
 	/**

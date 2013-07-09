@@ -879,6 +879,10 @@ abstract class Model extends Acl
 			return false;
 		}
 
+		// pre-hook
+		if( !$model->preCreateHook( $data ) )
+			return false;
+
 		$validated = true;
 		
 		// get the property names, and required properties
@@ -997,6 +1001,9 @@ abstract class Model extends Acl
 			// cache
 			$newModel->cacheProperties( $insertArray );
 			
+			// post-hook
+			$newModel->postCreateHook();
+			
 			return $newModel;
 		}
 		
@@ -1028,6 +1035,10 @@ abstract class Model extends Acl
 		// not updating anything?
 		if( count( $data ) == 0 )
 			return true;
+			
+		// pre-hook
+		if( !$this->preSetHook( $data ) )
+			return false;
 
 		$validated = true;
 		$updateArray = $this->id( true );
@@ -1121,6 +1132,9 @@ abstract class Model extends Acl
 			// update the local cache
 			$this->cacheProperties( $updateArray );
 				
+			// post-hook
+			$this->postSetHook();
+			
 			return true;
 		}
 		
@@ -1143,9 +1157,43 @@ abstract class Model extends Acl
 			return false;
 		}
 		
+		// pre-hook
+		if( !$this->preRemoveHook() )
+			return false;
+		
 		// delete the model
-		return Database::delete(
+		if( Database::delete(
 			static::tablename(),
-			$this->id( true ) );
+			$this->id( true ) ) )
+		{
+			// post-hook
+			$this->postRemoveHook();
+			
+			return true;
+		}
+		else
+			return false;
 	}
+	
+	/////////////////////////////
+	// HOOKS
+	/////////////////////////////
+	
+	protected function preCreateHook( &$data )
+	{ return true; }
+	
+	protected function postCreateHook()
+	{ }
+	
+	protected function preSetHook( &$data )
+	{ return true; }
+	
+	protected function postSetHook()
+	{ }
+	
+	protected function preRemoveHook()
+	{ return true; }
+	
+	protected function postRemoveHook()
+	{ }
 }
