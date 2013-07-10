@@ -46,7 +46,9 @@ A demo has been setup at [infuse.jaredtking.com](http://infuse.jaredtking.com).
 
 Install with composer:
 
-`composer create-project infuse/infuse ./path/to/dir`
+```
+composer create-project infuse/infuse ./path/to/dir
+```
 
 Infuse Framework is served through the `/app` directory to prevent the framework files from being publicly accessible. This requires a small amount of configuration for the web server to work properly.
 
