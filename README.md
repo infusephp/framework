@@ -1,4 +1,4 @@
-infuse v0.1.8
+infuse v0.1.9
 =====
 
 PHP MVC framework for rapid development of web applications
@@ -44,13 +44,9 @@ A demo has been setup at [infuse.jaredtking.com](http://infuse.jaredtking.com).
 
 ## Getting Started
 
-Get the latest framework files:
+Install with composer:
 
-`git clone https://github.com/jaredtking/infuse.git ./`
-
-Install Composer dependencies:
-
-`composer install`.
+`composer create-project infuse/infuse ./path/to/dir`
 
 Infuse Framework is served through the `/app` directory to prevent the framework files from being publicly accessible. This requires a small amount of configuration for the web server to work properly.
 

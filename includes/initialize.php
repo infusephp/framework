@@ -30,17 +30,6 @@ use \infuse\models\User as User;
 define( 'INFUSE_BASE_DIR', dirname(__DIR__));
 set_include_path( get_include_path() . PATH_SEPARATOR . INFUSE_BASE_DIR );
 
-// register autoloader
-spl_autoload_register( function( $class ) {
-	$classPaths = explode('\\', $class);
-	if( $classPaths[ 0 ] == 'infuse' && count( $classPaths ) == 2 )
-	{
-		$path = INFUSE_BASE_DIR . '/libs/' . $classPaths[1] . '.php';
-		if( file_exists($path) && is_readable($path) )
-			include_once $path;
-	}
-});
-
 // composer
 require 'vendor/autoload.php';
 

@@ -1,6 +1,6 @@
 {
 	"name": "infuse/infuse",
-	"version": "0.1.8",
+	"version": "0.1.9",
 	"description": "Rapid-development MVC framework",
 	"type": "library",
 	"keywords": ["mvc","framework","infuse"],
@@ -20,10 +20,7 @@
 	},
 	"require": {
 		"php": ">=5.3.0",
-		"smarty/smarty": "v3.1.14",
-		"phpmailer/phpmailer": "5.2.6",
-		"mustangostang/spyc": "0.5.1",
-		"leafo/lessphp": "v0.3.9",
-		"linkorb/jsmin-php": "1.0.0"
+		"infuse/libs": "0.1.9",
+		"phpmailer/phpmailer": "5.2.6"
 	}
 }

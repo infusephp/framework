@@ -961,6 +961,8 @@ abstract class AbstractUser extends \infuse\Model
 	{
 		$email = $this->getProperty( 'user_email' );
 	
+		$template = '';
+	
 		$subject = 'Message from ' . Config::value( 'site', 'title' );
 		
 		$details[ 'message' ] = $message;
@@ -973,14 +975,17 @@ abstract class AbstractUser extends \infuse\Model
 		{
 		case 'registration-welcome':
 			$subject = 'Welcome to ' . Config::value( 'site', 'title' );
+			$template = 'welcome';
 		break;
 		case 'email-verification':
 			$subject = 'Please validate your e-mail address';
 			$details[ 'verifyLink' ] = "{$details['baseUrl']}users/verifyEmail/{$details['verify']}";
+			$template = 'email-verification';
 		break;
 		case 'forgot-password':
 			$subject = 'Password change request on ' . Config::value( 'site', 'title' );
 			$details[ 'forgotLink' ] = "{$details['baseUrl']}users/forgot/{$details['forgot']}";
+			$template = 'forgot-password';
 		break;
 		default:
 			return false;
@@ -1008,7 +1013,7 @@ abstract class AbstractUser extends \infuse\Model
 			// generate the body
 			$engine = \infuse\ViewEngine::engine();
 			$engine->assignData( $details );
-			$body = $engine->fetch( Modules::$moduleDirectory . 'users/views/emails.tpl' );
+			$body = $engine->fetch( 'emails/' . $template . '.tpl' );
 		
 			// text body
 			$mail->AltBody = $body;
