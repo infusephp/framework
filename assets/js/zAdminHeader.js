@@ -381,7 +381,7 @@ if (typeof angular != 'undefined') {
 			{
 				if (property.enum[value])
 					value = property.enum[value];
-				else if (!property.default)
+				else if (property.default)
 					value = property.enum[property.default];
 			}		
 		break;
