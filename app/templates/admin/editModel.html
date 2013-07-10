@@ -36,7 +36,7 @@
 						not implemented
 					</div>
 					<div ng-switch-when="enum">
-						<select class="input-xlarge" name="{{property.name}}" ng-options="value for (key,value) in property.enum" ng-model="model[property.name]"></select>
+						<select class="input-xlarge" name="{{property.name}}" ng-options="key as value for (key,value) in property.enum" ng-model="model[property.name]"></select>
 					</div>
 					<div ng-switch-when="password">
 						<input class="input-large" type="password" name="{{property.name}}" autocomplete="off" />
