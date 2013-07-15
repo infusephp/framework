@@ -518,7 +518,7 @@ abstract class AbstractUser extends \infuse\Model
 	 */
 	function upgradeFromTemporary( $data )
 	{
-		ErrorStack::setContext( 'create' );
+		ErrorStack::setContext( 'user.create' );
 		
 		if( !$this->isTemporary() )
 			return true;
@@ -615,11 +615,9 @@ abstract class AbstractUser extends \infuse\Model
 	 */
 	static function forgotStep1( $email )
 	{
-		Modules::load( 'validation' );
+		ErrorStack::setContext( 'user.forgot' );
 		
-		ErrorStack::setContext( 'forgot' );
-		
-		if( Validate::email( $email, array( 'skipRegisteredCheck' => true ) ) )
+		if( Validate::email( $email ) )
 		{
 			$uid = Database::select(
 				'Users',
@@ -659,6 +657,14 @@ abstract class AbstractUser extends \infuse\Model
 			// Could not make a match.
 				ErrorStack::add( 'user_forgot_email_no_match' );
 		}
+		else
+		{
+			ErrorStack::add( array(
+				'error' => VALIDATION_FAILED,
+				'params' => array(
+					'field' => 'email',
+					'field_name' => 'Email' ) ) );
+		}
 
 		ErrorStack::clearContext();		
 		
@@ -676,7 +682,7 @@ abstract class AbstractUser extends \infuse\Model
 	static function forgotStep2( $token, $password )
 	{
 		// set the context
-		ErrorStack::setContext( 'forgot' );
+		ErrorStack::setContext( 'user.forgot' );
 			
 		if( !$uid = Database::select(
 			'User_Links',
@@ -827,7 +833,7 @@ abstract class AbstractUser extends \infuse\Model
 		if( $this->logged_in )
 			return true;
 		
-		ErrorStack::setContext('login');
+		ErrorStack::setContext( 'user.login' );
 		
 		if( $user = static::checkLogin( $username, $password ) )
 			return $this->loginForUid( $user->id(), 0, $remember, $setSessionVars );
@@ -928,7 +934,7 @@ abstract class AbstractUser extends \infuse\Model
 	 */
 	function deleteConfirm( $password )
 	{
-		ErrorStack::setContext( 'delete' );
+		ErrorStack::setContext( 'user.delete' );
 	
 		// check for the confirm and password
 		// only the current user can delete their account
@@ -1032,7 +1038,10 @@ abstract class AbstractUser extends \infuse\Model
 			
 			if( $errors )
 			{
-				\infuse\ErrorStack::add( $errors, __CLASS__, __FUNCTION__ );
+				ErrorStack::add( 'email_send_failure' );
+				
+				Logger::error( $errors );
+				
 				return false;
 			}
 			else
@@ -1040,7 +1049,10 @@ abstract class AbstractUser extends \infuse\Model
 		}
 		catch( Exception $ex )
 		{
-			ErrorStack::add( $ex->getMessage(), __CLASS__, __FUNCTION__ );
+			ErrorStack::add( 'email_send_failure' );
+			
+			Logger::error( Logger::formatException( $ex ) );
+			
 			return false;
 		}
 	}

@@ -36,19 +36,63 @@ require 'vendor/autoload.php';
 // load configuration
 Config::load( INFUSE_BASE_DIR . '/config.yml' );
 
-// error reporting
-if( Config::value( 'site', 'production-level' ) )
+// setup logging
+Logger::setConfig( Config::get( 'logging' ) );
+
+// error handling
+function handleError( $errno, $errstr, $errfile, $errline, $errcontext )
 {
-	ini_set("display_errors", 0);
-	ini_set("log_errors", 1);
-	ini_set("error_log", "syslog");
-	error_reporting  (E_ERROR | E_WARNING | E_PARSE);
+	$formattedErrorString = Logger::formatPhpError( $errno, $errstr, $errfile, $errline, $errcontext );
+	
+	switch( $errno )
+	{
+	case E_ERROR:
+	case E_CORE_ERROR:
+	case E_COMPILE_ERROR:
+	case E_PARSE:
+	case E_USER_ERROR:
+	case E_RECOVERABLE_ERROR:
+		Logger::error( $formattedErrorString );
+	break;
+	case E_WARNING:
+	case E_CORE_WARNING:
+	case E_COMPILE_WARNING:
+	case E_USER_WARNING:
+	case E_NOTICE:
+	case E_USER_NOTICE:
+	case E_DEPRECATED:
+	case E_USER_DEPRECATED:
+	case E_STRICT:
+		Logger::warning( $formattedErrorString );
+	break;
+	}
+	
+	if( !Config::value( 'site', 'production-level' ) )
+		echo "<pre>$formattedErrorString</pre>";
+	
+	return true;
 }
-else
+
+set_error_handler( '\infuse\handleError', E_ALL | E_STRICT );
+
+// exception handling
+set_exception_handler( function( $exception )
 {
-	ini_set( 'display_errors', 'On' );
-	error_reporting(E_ALL);
-}
+	Logger::error( Logger::formatException( $exception ) );
+} );
+
+// show errors on shutdown
+register_shutdown_function( function()
+{
+	if( $error = error_get_last() )
+	{
+		handleError( $error[ 'type' ], $error[ 'message' ], $error[ 'file' ], $error[ 'line' ], null );
+    }
+} );
+
+ini_set( 'display_errors', 0 );
+ini_set( 'log_errors', 0 );
+error_reporting( E_ALL | E_STRICT );
 
 // time zone
 if( Config::value( 'site', 'time-zone' ) )
@@ -82,10 +126,10 @@ if( !Config::value( 'site', 'installed' ) && !$req->isCli() )
 if( !$req->isApi() )
 {
 	// initialize sessions
-	ini_set('session.use_trans_sid', false);
-	ini_set('session.use_only_cookies', true); 
-	ini_set('url_rewriter.tags', '');
-	ini_set('session.gc_maxlifetime', Config::value( 'session', 'lifetime' ) );
+	ini_set( 'session.use_trans_sid', false );
+	ini_set( 'session.use_only_cookies', true ); 
+	ini_set( 'url_rewriter.tags', '' );
+	ini_set( 'session.gc_maxlifetime', Config::value( 'session', 'lifetime' ) );
 
 	// set the session name
 	$sessionTitle = Config::value( 'site', 'title' ) . '-' . $req->host();
@@ -93,7 +137,7 @@ if( !$req->isApi() )
 	session_name( $safeSessionTitle );
 	
 	// set the session cookie parameters
-	session_set_cookie_params( 
+	session_set_cookie_params(
 	    Config::value( 'session', 'lifetime' ), // lifetime
 	    '/', // path
 	    $req->host(), // domain
@@ -104,11 +148,7 @@ if( !$req->isApi() )
 	// session handler
 	if( Config::value( 'session', 'adapter' ) == 'redis' )
 	{
-		RedisSession::start(array(
-			'scheme' => Config::value('redis','scheme'),
-			'host'   => Config::value('redis','host'),
-	    	'port'   => Config::value('redis','port')
-		));
+		RedisSession::start( Config::get( 'redis' ) );
 	}
 	// default: database
 	else
@@ -125,6 +165,9 @@ if( !$req->isApi() )
 		$req->host()
 	);
 }
+
+// enable modules autoloader
+spl_autoload_register( 'infuse\\Modules::autoloader' );
 
 // load required modules
 Modules::loadRequired();
@@ -143,8 +186,163 @@ if( $req->isCli() )
 // middleware
 Modules::middleware( $req, $res );
 
-//route request
-Router::route( $req, $res );
+/*
+	1) main config.yml routes
+	2) module routes (i.e. /users/:id/friends)
+	   i) static routes
+	   ii) dynamic routes
+	   iii) automatic api routes
+	3) module admin routes
+	4) view without a controller (i.e. /contact-us displays views/contact-us.tpl)
+	5) not found
+*/
+
+// try to find a match using various techniques in order
+$routed = false;
+$routeStep = 1;
+
+while( !$routed )
+{
+	if( $routeStep == 1 )
+	{
+		/* main routes */
+		$routed = Router::route( Config::get( 'routes' ), $req, $res );
+	}
+	else if( $routeStep == 2 )
+	{
+		/* module routes */
+	
+		// check if the first part of the path is a controller
+		$module = $req->paths( 0 );
+		
+		if( Modules::exists( $module ) )
+		{
+			Modules::load( $module );
+			
+			$moduleInfo = Modules::info( $module );
+
+			$moduleRoutes = $moduleInfo[ 'routes' ];
+			
+			$req->setParams( array( 'controller' => $module ) );
+
+			/* automatic generated API routes */
+						
+			if( $moduleInfo[ 'api' ] )
+			{
+				$models = Modules::models( $module );
+				
+				$defaultModel = false;
+						
+				if( isset( $moduleInfo[ 'default-model' ] ) )
+					$defaultModel = $moduleInfo[ 'default-model' ];
+				
+				if( count( $models ) == 1 )
+				{
+					$modelKeys = array_keys( $models );
+					$defaultModel = $modelKeys[ 0 ];
+				}
+					
+				// this comes from /:module/:model
+				$secondPath = val( $req->paths(), 1 );
+				$possibleModel = Inflector::singularize( Inflector::camelize( $secondPath ) );
+				
+				// default model?
+				if( $defaultModel && !isset( $models[ $possibleModel ] ) )
+				{
+					$req->setParams( array( 'model' => $defaultModel ) );
+					
+					$moduleRoutes = array_merge( $moduleRoutes, array(
+						'get /:controller' => 'findAll',
+						'get /:controller/:id' => 'find',
+						'post /:controller' => 'create',
+						'put /:controller/:id' => 'edit',
+						'delete /:controller/:id' => 'delete'
+					) );
+				}
+				// no default model
+				else
+				{
+					$req->setParams( array( 'model' => $secondPath ) );
+					
+					$moduleRoutes = array_merge( $moduleRoutes, array(
+						'get /:controller/:model' => 'findAll',
+						'get /:controller/:model/:id' => 'find',
+						'post /:controller/:model' => 'create',
+						'put /:controller/:model/:id' => 'edit',
+						'delete /:controller/:model/:id' => 'delete'
+					) );
+				}
+			}
+			
+			$routed = Router::route( $moduleRoutes, $req, $res );
+		}
+	}
+	else if( $routeStep == 3 )
+	{
+		/* admin panel routes */	
+			
+		if( $req->paths( 0 ) == '4dm1n' )
+		{
+			$module = $req->paths( 1 );
+			
+			/* Redirect /4dm1n -> /4dm1n/:default */
+			
+			if( empty( $module ) && $default = Config::value( 'site', 'default-admin-module' ) )
+				return $res->redirect( '/4dm1n/' . $default );
+			
+			if( Modules::exists( $module ) )
+			{
+				Modules::load( $module );
+				
+				$moduleInfo = Modules::info( $module );
+
+				$moduleRoutes = $moduleInfo[ 'routes' ];
+
+				$req->setParams( array( 'controller' => $module ) );
+				
+				ViewEngine::engine()->assignData( array(
+					'modulesWithAdmin' => Modules::modulesWithAdmin(),
+					'selectedModule' => $module,
+					'title' => $moduleInfo[ 'title' ] ) );				
+				
+				$routed = Router::route( $moduleRoutes, $req, $res );
+				
+				/* automatic admin routes */
+				
+				if( !$routed && $req->method() == 'GET' && ( val( $moduleInfo, 'admin' ) ) )
+				{					
+					Modules::controller( $module )->routeAdmin( $req, $res );
+					
+					$routed = true;
+				}
+			}
+		}
+	}
+	else if( $routeStep == 4 )
+	{
+		/* view without a controller */
+		$basePath = $req->basePath();
+		
+		// make sure the route does not peek into admin directory or touch special files
+		if( strpos( $basePath, '/admin/' ) !== 0 && strpos( $basePath, '/emails/' ) !== 0 && !in_array( $basePath, array( '/error', '/parent' ) ) )
+		{
+			$view = INFUSE_VIEWS_DIR . $basePath . '.tpl';
+			if( file_exists( $view ) )
+				$routed = $res->render( $view );
+		}
+	}
+	else
+	{
+		/* not found */
+		
+		$res->setCode( 404 );
+		
+		$routed = true;
+	}
+	
+	// move onto the next step
+	$routeStep++;
+}
 
 // send the response
 $res->send( $req );

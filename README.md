@@ -1,19 +1,11 @@
-infuse v0.1.9
+infuse v0.1.10
 =====
 
-PHP MVC framework for rapid development of web applications
+PHP MVC framework built with infuse/libs
 
 ## What is Infuse?
 
-Infuse is a node.js inspired framework to make developing web applications quick and fun. In addition to MVC goodness, the framework also gives you a free REST API and administrator dashboard for models. This makes Infuse Framework an incredibly powerful tool for building a modern web application today. Infuse does not take long to learn due to its carefully chosen directory structure, which was a main frustration of mine when using other frameworks. Everything outside of core functionality has been contained inside of a module to make navigating the framework easy.
-
-## Why another MVC framework?
-
-Infuse is the culmination of best practices that I learned through developing PHP web applications. After using node.js and switching back to PHP, I immediately missed what node and it's awesome frameworks had to offer. I decided to port over some of the patterns learned from node over to PHP with Infuse, despite an already crowded PHP framework space. I have gotten a lot out of the Infuse Framework so am open sourcing it in hopes that someone else may benefit. This project has been built to my own taste. If something is off base, I would love to hear about it in the issues.
-
-## Demo
-
-A demo has been setup at [infuse.jaredtking.com](http://infuse.jaredtking.com).
+Infuse Framework is an incredibly powerful tool for building a modern web application that is built on top of [infuse/libs](https://github.com/jaredtking/infuse-libs). The goal of Infuse is to bring scalable simplicity to web development. The framework follows MVC conventions and scaffolds a REST API + administrator dashboard for models.
 
 ## Features
 
@@ -26,25 +18,31 @@ A demo has been setup at [infuse.jaredtking.com](http://infuse.jaredtking.com).
 - Flexible URL routing
 - Automatic REST API for models
 - Dashboard to view, create, edit, and delete models
+- Schema generation
 - Templating with [Smarty](http://smarty.net)
 - CSS asset minification with LESS
 - Javascript minification
+- Logging with [monolog](https://github.com/Seldaek/monolog)
 
 ## Requirements
 
 - PHP >= 5.3
+- [Composer](http://getcomposer.org)
 - PDO supported data store
 - mod_rewrite (if using apache)
-- [Composer](http://getcomposer.org)
 
 ### Optional
 
 - memcached (for built-in model caching)
 - redis (for sessions)
 
+## Demo
+
+A demo has been setup at [infuse.jaredtking.com](http://infuse.jaredtking.com).
+
 ## Getting Started
 
-Install with composer:
+### 1. Install with composer
 
 ```
 composer create-project infuse/infuse ./path/to/dir
@@ -52,7 +50,7 @@ composer create-project infuse/infuse ./path/to/dir
 
 Infuse Framework is served through the `/app` directory to prevent the framework files from being publicly accessible. This requires a small amount of configuration for the web server to work properly.
 
-### nginx
+### 2. nginx
 
 Here is a sample configuration:
 
@@ -87,13 +85,17 @@ server {
 }
 ```
 
-### apache
+### 2. apache
 
 A .htaccess file is already included in the `/app` directory for url rewrites. You must also make sure that `DocumentRoot` points to `{FRAMEWORK_PATH}/app`.
 
-### Installer
+### 3. Installer
 
 Fire up the url where the framework is installed and you will be redirected to an installer to setup the database and `config.yml`.
+
+## Why another MVC framework?
+
+Infuse is the culmination of best practices that I learned through developing PHP web applications. My aim is to pass on what I learned for other's benefit. This framework has been built to my own taste. If something does not look right or feels wrong, I would love to hear about it in the issues.
 
 ## Documentation
 

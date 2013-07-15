@@ -3,9 +3,9 @@
 
 <h1>Forgot Password</h1>
 
-{foreach from=$forgotErrors item=error}
+{foreach from=$errorStack->messages('user.forgot') item=error}
 	<div class="alert alert-error">
-		{$error.message}
+		{$error}
 	</div>
 {/foreach}
 
@@ -19,11 +19,10 @@
 		<p class="lead">Please pick a new password.</p>
 		<br />
 		<form action="/users/forgot/{$id}" method="post" class="form-horizontal">
-			<div class="control-group {if $passwordError}error{/if}">
+			<div class="control-group">
 				<label class="control-label">New Password</label>
 				<div class="controls">
 					<input type="password" name="user_password[]" />
-					<label class="help-inline">{$passwordError}</label>
 				</div>
 			</div>
 			<div class="control-group">
@@ -52,11 +51,10 @@
 		<p class="lead">Tell us the e-mail address you used to register and we will send you a link to change your password.</p>
 		<br />
 		<form action="/users/forgot" method="post" class="form-horizontal">
-			<div class="control-group {if $emailError}error{/if}">
+			<div class="control-group">
 				<label class="control-label">E-mail Address</label>
 				<div class="controls">
-					<input type="text" name="email" value="{$smarty.request.email}" />
-					<label class="help-inline">{$emailError}</label>
+					<input type="text" name="email" value="{$email}" />
 				</div>
 			</div>
 			<div class="control-group">

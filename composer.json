@@ -1,7 +1,7 @@
 {
 	"name": "infuse/infuse",
-	"version": "0.1.9",
-	"description": "Rapid-development MVC framework",
+	"version": "0.1.10",
+	"description": "MVC framework built on top of infuse/libs",
 	"type": "library",
 	"keywords": ["mvc","framework","infuse"],
 	"homepage": "http://infuse.jaredtking.com",
@@ -10,8 +10,7 @@
 		{
 			"name": "jaredtking",
 			"email": "j@jaredtking.com",
-			"homepage": "http://jaredtking.com",
-			"role": "Developer"
+			"homepage": "http://jaredtking.com"
 		}
 	],
 	"support": {
@@ -20,7 +19,7 @@
 	},
 	"require": {
 		"php": ">=5.3.0",
-		"infuse/libs": "0.1.9",
+		"infuse/libs": "0.1.10.3",
 		"phpmailer/phpmailer": "5.2.6"
 	}
 }

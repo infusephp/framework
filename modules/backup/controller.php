@@ -64,62 +64,17 @@ class Backup extends \infuse\Controller
 		exit;			
 	}
 	
-	function restoreSite( $req, $res )
-	{
-		if( !$this->can( 'view-admin' ) && $this->can('restore-site') )
-			return $res->setCode( 401 );	
-	
-		exit;
-		// TODO out of date/dangerous
-
-		$tmpDir = "temp/backup/";	
-	
-		$target_path = $tmpDir . basename($_FILES['uploadedfile']['name']);
-
-		$file_type = explode (".", $_FILES['uploadedfile']['name']);
-
-		if (in_array('sql', $file_type))
-		{
-			if(!move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path))
-				$parameters[ 'upload_failure' ] = true;
-
-			if (file_exists ($target_path))
-			{
-				$file = fopen($target_path,"r");
-				$line_count = $backup->restoreSQL($file);
-				fclose($file);
-				if ($line_count > 0)
-					$parameters[ 'success' ] = true;
-				else
-					$parameters[ 'error' ] = true;
-					
-				$backup->cleanTmpDir ($tmpDir);
-			}
-
-		} else
-			$parameters[ 'error' ] = 'invalid_file';
-		
-		$this->adminHome( $req, $res );
-	}
-	
 	function adminHome( $req, $res )
 	{
 		if( !$this->can( 'view-admin' ) )
 			return $res->setCode( 401 );
 
-		$canRestoreSite = $this->can('restore-site');
 		$canBackupSite = $this->can('backup-site');
 
-		$res->render( $this->templateDir() . 'admin/index.tpl', array(
+		$res->render( 'admin/index.tpl', array(
 			'canBackupSite' => $canBackupSite,
-			'canRestoreSite' => $canRestoreSite,
 			'title' => 'Backup'
 		) );
-	}
-		
-	function install()
-	{
-		@mkdir ("temp/backup");
 	}
 	
 	function cron( $command )

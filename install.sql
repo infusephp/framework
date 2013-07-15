@@ -20,4 +20,4 @@ CREATE TABLE `User_Links` (`uid` int(11) NOT NULL, `link` varchar(32) NOT NULL, 
 DROP TABLE IF EXISTS `User_Login_History`;
 CREATE TABLE `User_Login_History` (`id` int(11) NOT NULL auto_increment, PRIMARY KEY (`id`), `uid` int(11) NOT NULL, `timestamp` int(11) NOT NULL, `type` tinyint(1) NOT NULL, `ip` varchar(15) NOT NULL);
 DROP TABLE IF EXISTS `Users`;
-CREATE TABLE `Users` (`uid` int(11) NOT NULL auto_increment, PRIMARY KEY (`uid`), `user_password` char(128) NOT NULL, `user_email` varchar(255) NOT NULL, `first_name` varchar(15) NULL, `last_name` varchar(15) NULL, `ip` varchar(16) NOT NULL, `registered_on` int(11) NOT NULL DEFAULT '0', `enabled` int(1) NULL DEFAULT '0', `time_zone` varchar(20) NULL DEFAULT 'America/Chicago');
+CREATE TABLE `Users` (`uid` int(11) NOT NULL auto_increment, PRIMARY KEY (`uid`), `user_password` char(128) NOT NULL, `user_email` varchar(255) NOT NULL, `first_name` varchar(15) NULL, `last_name` varchar(15) NULL, `ip` varchar(16) NOT NULL, `registered_timestamp` int(11) NOT NULL DEFAULT '0', `enabled` int(1) NULL DEFAULT '0', `time_zone` varchar(20) NULL DEFAULT 'America/Chicago');

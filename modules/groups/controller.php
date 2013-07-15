@@ -28,10 +28,10 @@ class Groups extends \infuse\Controller
 {
 	function find( $req, $res )
 	{
-		$group = new \infuse\models\Group( $req->params( 'id' ) );
-		
 		if( !$req->isHtml() )
 			return parent::find( $req, $res );
+		
+		$group = new \infuse\models\Group( $req->params( 'id' ) );
 		
 		if( !$group->can( 'view' ) )
 			return $res->setCode( 401 );
@@ -39,13 +39,5 @@ class Groups extends \infuse\Controller
 		$res->render( 'view', array(
 			'title' => $group->name(),
 			'group' => $group ) );
-	}
-
-	function get( $url, $params, $accept )
-	{
-		if( $accept == 'html' )
-			return include $this->modulePath() . 'pages/index.php';
-		else
-			return parent::get( $url, $params, $accept );
 	}
 }

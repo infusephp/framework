@@ -7,13 +7,13 @@
 	Welcome, {$currentUser->name()}!
 </p>
 
-{if $accountErrors}
-	{foreach from=$accountErrors item=error}
-		<div class="alert alert-error">
-			{$error.message}
-		</div>
-	{/foreach}
-{else if $deleteError}
+{foreach from=$errorStack->messages('user.set') item=error}
+	<div class="alert alert-error">
+		{$error}
+	</div>
+{/foreach}
+
+{if $deleteError}
 	<div class="alert alert-error">There was a problem when deleting your account. Is the password right?</div>
 {else if $success}
 	<div class="alert alert-success">Thank you for updating your account.</div>
@@ -22,26 +22,23 @@
 <h2>Settings</h2>
 <form action="/users/account" method="post" class="form-horizontal">
 	<fieldset>
-		<div class="control-group {if $currentPasswordError}error{/if}">
+		<div class="control-group">
 			<label class="control-label">Current Password</label>
 			<div class="controls">
 				<input type="password" name="current_password" />
-				<span class="help-inline">{$currentPasswordError}</span>
 			</div>
 		</div>
-		<div class="control-group {if $emailError}error{/if}">
+		<div class="control-group">
 			<label class="control-label">E-mail Address</label>
 			<div class="controls">
 				<input type="text" name="user_email" />
 				<span class="help-inline"><strong>Current: </strong> {$currentUser->getProperty('user_email')}</span>
-				<span class="help-inline">{$emailError}</span>
 			</div>
 		</div>
-		<div class="control-group {if $newPasswordError}error{/if}">
+		<div class="control-group">
 			<label class="control-label">New Password</label>
 			<div class="controls">
 				<input type="password" name="user_password[]" />
-				<span class="help-inline">{$newPasswordError}</span>
 			</div>
 		</div>
 		<div class="control-group">

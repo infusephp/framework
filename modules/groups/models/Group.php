@@ -1,11 +1,6 @@
 <?php
 /**
- * Represents a group
- * @packacge Groups
- * @author Jared King
- * @version
- * @copyright 2012 Groupr
- * @license
+ * TODO this class is a mess
  */
 
 namespace infuse\models;

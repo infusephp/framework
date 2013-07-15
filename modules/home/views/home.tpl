@@ -2,7 +2,7 @@
 {block name="content"}
 	<h1>Welcome to Infuse Framework!</h1>
 	
-	<ul>
+	<ul class="nav nav-list well">
 		<li><a href="https://github.com/jaredtking/infuse/wiki" target="_blank">Documentation</a></li>
 		{if $currentUser->isLoggedIn()}
 			<li>

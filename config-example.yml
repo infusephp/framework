@@ -13,6 +13,8 @@ site:
 	installed: false
 	language: en
 
+logger:
+
 database:
 	type: mysql
 	user: username

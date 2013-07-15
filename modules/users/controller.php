@@ -27,7 +27,6 @@ namespace infuse\controllers;
 use \infuse\models\User as User;
 use \infuse\Modules as Modules;
 use \infuse\Validate as Validate;
-use \infuse\ErrorStack as ErrorStack;
 use \infuse\Config as Config;
 use \infuse\Database as Database;
 
@@ -53,9 +52,9 @@ class Users extends \infuse\Controller
 			$res->redirect( '/' );
 	
 		$res->render( 'login', array(
-			'loginErrors' => ErrorStack::errorsWithContext( 'login' ),
 			'redir' => val( $_SESSION, 'redir' ),
-			'title' => 'Login'
+			'title' => 'Login',
+			'user_email' => $req->request( 'user_email' )
 		) );
 	}
 	
@@ -97,10 +96,10 @@ class Users extends \infuse\Controller
 			$currentUser->logout();
 
 		$res->render( 'forgot', array(
-			'forgotErrors' => ErrorStack::errorsWithContext( 'forgot' ),
 			'success' => $req->params( 'success' ),
 			'title' => 'Forgot Password',
-			'id' => $req->params( 'id' )
+			'id' => $req->params( 'id' ),
+			'email' => $req->request( 'email' )
 		) );
 	}
 	
@@ -143,8 +142,9 @@ class Users extends \infuse\Controller
 			$currentUser->logout();
 
 		$res->render( 'register', array(
-			'signupErrors' => ErrorStack::errorsWithContext( 'create' ),
-			'title' => 'Sign Up'
+			'title' => 'Sign Up',
+			'name' => $req->request( 'name' ),
+			'user_email' => $req->request( 'user_email' )
 		) );
 	}
 	
@@ -217,7 +217,6 @@ class Users extends \infuse\Controller
 		}
 		
 		$res->render( 'account', array(
-			'accountErrors' => ErrorStack::errorsWithContext( 'edit' ),
 			'success' => $req->params( 'success' ),
 			'deleteError' => $req->params( 'deleteError' ),
 			'title' => 'Account Settings' ) );

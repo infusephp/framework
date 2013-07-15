@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html {if $ngApp}ng-app="{$ngApp}"{/if}>
+<html {if isset($ngApp)}ng-app="{$ngApp}"{/if}>
 <head>
 	<title>{$title} :: {$smarty.const.SITE_TITLE} Administration</title>
 	

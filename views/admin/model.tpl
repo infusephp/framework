@@ -1,8 +1,7 @@
 {extends file='admin/parent.tpl'}
 {block name=header}
 <script type="text/javascript">
-	var select_enabled = {if $smarty.request.find}1{else}0{/if};
-	{if $modelJSON}var modelInfo = {$modelJSON};{/if}
+	{if isset($modelJSON)}var modelInfo = {$modelJSON};{/if}
 	var module = '{$moduleName}';
 </script>
 {/block}
@@ -10,11 +9,11 @@
 
 	<ul class="nav nav-pills">
 		{foreach from=$models item=model}
-			<li class="{if $model.model == $modelInfo.model && !$schema}active{/if}">
+			<li class="{if $model.model == $modelInfo.model && !isset($schema)}active{/if}">
 				<a href="/4dm1n/{$moduleName}/{$model.model}#/">{$model.proper_name_plural}</a>
 			</li>
 		{/foreach}
-		<li class="{if $schema}active{/if}">
+		<li class="{if isset($schema)}active{/if}">
 			<a href="/4dm1n/{$moduleName}/schema">Database Schema</a>
 		</li>
 	</ul>
@@ -22,7 +21,7 @@
 
 	{block name=content}{/block}
 	
-	{if $schema}
+	{if isset($schema)}
 		
 		<p class="lead">
 			Infuse Framework will suggest a database schema for your model based on the <a href="https://github.com/jaredtking/infuse/wiki/Models">specified
