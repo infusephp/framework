@@ -95,7 +95,7 @@ class SiteStats
 			'Users',
 			'uid',
 			array(
-				'orderBy' => 'registered_timestamp DESC',
+				'orderBy' => 'registered_on DESC',
 				'single' => true ) );
 
 		// daily signups
@@ -104,7 +104,7 @@ class SiteStats
 			'count(uid)',
 			array(
 				'where' => array(
-					'registered_timestamp > ' . strtotime('today') ),
+					'registered_on > ' . strtotime('today') ),
 				'single' => true ) );
 
 		return $return;

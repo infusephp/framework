@@ -775,14 +775,13 @@ abstract class AbstractUser extends \infuse\Model
 		}, static::$usernameProperties, array_fill( 0, count( static::$usernameProperties ), addslashes( $username ) ) ) ) . ')';
 		
 		// look the user up
-		$users = static::find( array(
+		$user = static::findOne( array(
 			'where' => array(
 				$usernameWhere,
 				'user_password' => Util::encryptPassword( $password ) ) ) );
 		
-		if( $users[ 'count' ] == 1 )
+		if( $user )
 		{
-			$user = $users[ 'models' ][ 0 ];
 			$user->loadProperties();
 			
 			// check if banned
