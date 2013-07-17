@@ -22,7 +22,7 @@
 	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-use \infuse\Config as Config;
+use \infuse\Config;
 
 /* site configuration */
 if( !defined('SITE_TITLE') )

@@ -24,11 +24,9 @@
 
 namespace infuse\controllers;
 
-use \infuse\models\User as User;
-use \infuse\Modules as Modules;
-use \infuse\Validate as Validate;
-use \infuse\Config as Config;
-use \infuse\Database as Database;
+use \infuse\models\User;
+use \infuse\Modules;
+use \infuse\Config;
 
 class Users extends \infuse\Controller
 {
@@ -170,8 +168,6 @@ class Users extends \infuse\Controller
 
 		if( $user ) {
 			// upgrade temporary account
-			Modules::load('validation');
-			
 			if( !$user->upgradeFromTemporary( $info ) )
 				$user = false;
 		} else {

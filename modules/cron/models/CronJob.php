@@ -24,9 +24,9 @@
  
 namespace infuse\models;
 
-use \infuse\libs\Cron as Cron;
-use \infuse\libs\CronDate as CronDate;
-use \infuse\ErrorStack as ErrorStack;
+use \infuse\libs\Cron;
+use \infuse\libs\CronDate;
+use \infuse\ErrorStack;
 
 class CronJob extends \infuse\Model
 {

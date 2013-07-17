@@ -26,7 +26,7 @@
  
 namespace infuse\models;
 
-use \infuse\Database as Database;
+use \infuse\Database;
 
 define( 'BAN_TYPE_IP', 1 );
 define( 'BAN_TYPE_USERNAME', 2 );

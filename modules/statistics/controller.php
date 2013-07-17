@@ -25,9 +25,9 @@
  
 namespace infuse\controllers;
 
-use \infuse\libs\SiteStats as SiteStats;
-use \infuse\Modules as Modules;
-use \infuse\Util as Util;
+use \infuse\libs\SiteStats;
+use \infuse\Modules;
+use \infuse\Util;
 
 class Statistics extends \infuse\Controller
 {

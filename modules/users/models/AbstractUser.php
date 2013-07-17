@@ -26,13 +26,13 @@
  
 namespace infuse\models;
 
-use \infuse\Database as Database;
-use \infuse\Modules as Modules;
-use \infuse\ErrorStack as ErrorStack;
-use \infuse\Validate as Validate;
-use \infuse\Config as Config;
-use \infuse\Messages as Messages;
-use \infuse\Util as Util;
+use \infuse\Database;
+use \infuse\Modules;
+use \infuse\ErrorStack;
+use \infuse\Validate;
+use \infuse\Config;
+use \infuse\Messages;
+use \infuse\Util;
 
 abstract class AbstractUser extends \infuse\Model
 {

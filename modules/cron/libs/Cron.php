@@ -2,10 +2,10 @@
 
 namespace infuse\libs;
 
-use \infuse\Modules as Modules;
-use \infuse\models\CronJob as CronJob;
-use \infuse\Database as Database;
-use \infuse\Config as Config;
+use \infuse\Modules;
+use \infuse\models\CronJob;
+use \infuse\Database;
+use \infuse\Config;
 
 class Cron
 {

@@ -24,8 +24,6 @@
  
 namespace infuse\controllers;
 
-use \infuse\models\User as User;
-
 class Cron extends \infuse\Controller
 {
 	function checkSchedule( $req, $res )

@@ -24,7 +24,7 @@
 
 namespace infuse;
 
-use \infuse\models\User as User;
+use \infuse\models\User;
 
 // set the root app directory
 define( 'INFUSE_BASE_DIR', dirname(__DIR__));
