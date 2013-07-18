@@ -5,11 +5,11 @@ author:
 	name: Jared King
 	email: j@jaredtking.com
 	website: http://jaredtking.com
-model: User
+models:
+	- User
+	- UserLink
 api: true
 admin: true
-minimum-password-length: 5
-forgot-password-allowed: true
 routes:
 	"get /users/login": loginForm
 	"post /users/login": login

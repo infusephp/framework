@@ -75,7 +75,7 @@
 	</div>
 	<div class="span2 stat">
 		<strong>
-			<a target="_blank" href="{$stats.users.newestUser->profileURL()}">{$stats.users.newestUser->name(true)}</a>		
+			<a target="_blank" href="/4dm1n/users/User#/{$stats.users.newestUser->id()}">{$stats.users.newestUser->name(true)}</a>		
 		</strong><br/>
 		Newest User
 	</div>

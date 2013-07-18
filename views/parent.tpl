@@ -1,10 +1,10 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-	<title>{if $title}{$title} - {/if}{$smarty.const.SITE_TITLE}</title>
+	<title>{if isset($title)}{$title} - {/if}{$smarty.const.SITE_TITLE}</title>
 	
 	<meta name="robots" content="{$robots|default:'index,follow'}" />
-	<meta name="description" content="{$metaDescription}" />
+	{if isset($metaDescription)}<meta name="description" content="{$metaDescription}" />{/if}
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 	<link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet" type="text/css" />
@@ -51,7 +51,7 @@
 		</div>
 	</div>
    <div class="container">
-   		{if !$currentUser->isVerified(false)}
+   		{if $currentUser->isLoggedIn() && !$currentUser->isVerified(false)}
    			<p class="alert alert-error">
    				Your account has not been verified yet. Please check your e-mail for instructions on verifying your account.
    			</p>

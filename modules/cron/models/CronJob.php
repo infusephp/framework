@@ -48,27 +48,27 @@ class CronJob extends \infuse\Model
 		'minute' => array(
 			'type' => 'text',
 			'length' => 2,
-			'validation' => array( '\infuse\models\CronJob', 'validateMinute' )
+			'validate' => array( '\infuse\models\CronJob', 'validateMinute' )
 		),
 		'hour' => array(
 			'type' => 'text',
 			'length' => 2,
-			'validation' => array( '\infuse\models\CronJob', 'validateHour' )
+			'validate' => array( '\infuse\models\CronJob', 'validateHour' )
 		),
 		'day' => array(
 			'type' => 'text',
 			'length' => 2,
-			'validation' => array( '\infuse\models\CronJob', 'validateDay' )
+			'validate' => array( '\infuse\models\CronJob', 'validateDay' )
 		),
 		'month' => array(
 			'type' => 'text',
 			'length' => 2,
-			'validation' => array( '\infuse\models\CronJob', 'validateMonth' )
+			'validate' => array( '\infuse\models\CronJob', 'validateMonth' )
 		),
 		'week' => array(
 			'type' => 'text',
 			'length' => 2,
-			'validation' => array( '\infuse\models\CronJob', 'validateWeek' )
+			'validate' => array( '\infuse\models\CronJob', 'validateWeek' )
 		),
 		'next_run' => array(
 			'type' => 'date'
@@ -112,9 +112,14 @@ class CronJob extends \infuse\Model
 		return self::validateCronTimePiece( $week, 0, 6 );
 	}
 	
-	function preCreateHook( &$data )
+	function postCreateHook()
 	{
-		$data[ 'next_run' ] = self::calcNextRun( $data[ 'minute' ], $data[ 'hour' ], $data[ 'day' ],$data[ 'month' ],$data[ 'week' ] );
+		$data[ 'next_run' ] = self::calcNextRun(
+			$this->get( 'minute' ),
+			$this->get( 'hour' ),
+			$this->get( 'day' ),
+			$this->get( 'month' ),
+			$this->get( 'week' ) );
 
 		return true;
 	}

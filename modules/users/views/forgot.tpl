@@ -3,7 +3,7 @@
 
 <h1>Forgot Password</h1>
 
-{foreach from=$errorStack->messages('user.forgot') item=error}
+{foreach from=$errorStack->messages() item=error}
 	<div class="alert alert-error">
 		{$error}
 	</div>

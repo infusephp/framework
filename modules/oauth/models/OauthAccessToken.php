@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @package Infuse
+ * @package nFuse
  * @author Jared King <j@jaredtking.com>
  * @link http://jaredtking.com
  * @version 1.0
@@ -22,24 +22,34 @@
 	WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
- 
+
 namespace infuse\models;
 
-class GroupMember extends \infuse\Model
+class OauthAccessToken extends \infuse\Model
 {
-	public static $idProperty = array(
-		'gid',
-		'uid'
-	);
-
+	public static $idProperty = 'oauth_token';
+	
 	public static $properties = array(
-		'gid' => array(
+		'oauth_token' => array(
 			'type' => 'id',
+			'db_type' => 'varchar',
+			'length' => 40,
 			'mutable' => true
 		),
+		'client_id' => array(
+			'type' => 'text',
+			'length' => 20
+		),
 		'uid' => array(
-			'type' => 'id',
-			'mutable' => true
+			'type' => 'id'
+		),
+		'expires' => array(
+			'type' => 'date'
+		),
+		'scope' => array(
+			'type' => 'text',
+			'length' => 200,
+			'truncate' => false
 		)
 	);
 }

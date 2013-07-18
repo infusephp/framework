@@ -7,7 +7,7 @@
 		{if $currentUser->isLoggedIn()}
 			<li>
 				Logged in as:<br />
-				<a href="{$currentUser->profileURL()}">
+				<a href="{$currentUser->url()}">
 					<img src="{$currentUser->profilePicture()}" height="20" width="20" />
 					{$currentUser->name()}
 				</a>

@@ -39,7 +39,7 @@
 						<select class="input-xlarge" name="{{property.name}}" ng-options="key as value for (key,value) in property.enum" ng-model="model[property.name]"></select>
 					</div>
 					<div ng-switch-when="password">
-						<input class="input-large" type="password" name="{{property.name}}" autocomplete="off" />
+						<input class="input-large" type="password" name="{{property.name}}" ng-model="model[property.name]" autocomplete="off" />
 					</div>
 					<div ng-switch-when="number">
 						<input class="input-large" type="text" name="{{property.name}}" ng-model="model[property.name]" />

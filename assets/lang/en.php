@@ -42,6 +42,7 @@ class Messages
 	'user_forgot_password_success' => '<strong>Success!</strong> Your password has been changed.',
 	'user_forgot_email_no_match' => 'We could not find a match for that e-mail address.',
 	'user_forgot_expired_invalid' => 'This link has expired or is invalid.',
+	'invalid_password' => 'Oops, looks like the password is incorrect.',
 	
 	/* Validation */
 	'validation_failed' => '{{field_name}} is invalid',

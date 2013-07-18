@@ -3,8 +3,6 @@
 	<div class="body login-holder">
 		<form method="post" action="/users/login" class="login">
 			<fieldset>
-				<input type="hidden" name="redir" value="{$params.redir}" />
-				
 				<legend>Login</legend>
 				
 				{foreach from=$errorStack->messages('user.login') item=error}

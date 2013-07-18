@@ -33,6 +33,7 @@ use \infuse\Validate;
 use \infuse\Config;
 use \infuse\Messages;
 use \infuse\Util;
+use \infuse\Logger;
 
 abstract class AbstractUser extends \infuse\Model
 {
@@ -46,13 +47,12 @@ abstract class AbstractUser extends \infuse\Model
 	
 	public static $properties = array(
 		'uid' =>  array(
-			'type' => 'id',
-			'filter' => '<a href="/users/{uid}" target="_blank">{uid}</a>'
+			'type' => 'id'
 		),
 		'user_email' => array(
 			'type' => 'text',
 			'filter' => '<a href="mailto:{user_email}">{user_email}</a>',
-			'validation' => array('\infuse\Validate','email'),
+			'validate' => 'email',
 			'required' => true,
 			'unique' => true,
 			'title' => 'E-mail'
@@ -60,19 +60,18 @@ abstract class AbstractUser extends \infuse\Model
 		'user_password' => array(
 			'type' => 'password',
 			'length' => 128,
-			'validation' => array('\infuse\Validate','password'),
+			'validate' => 'matching|password:8',
 			'required' => true,
 			'title' => 'Password'
 		),
 		'first_name' => array(
 			'type' => 'text',
-			'validation' => array('\infuse\Validate','firstName'),
+			'validate' => 'string:1',
 			'required' => true
 		),
 		'last_name' => array(
 			'name' => 'last_name',
-			'type' => 'text',
-			'validation' => array('\infuse\Validate','lastName')
+			'type' => 'text'
 		),
 		'ip' => array(
 			'type' => 'text',
@@ -82,12 +81,14 @@ abstract class AbstractUser extends \infuse\Model
 		),
 		'registered_on' => array(
 			'type' => 'date',
+			'validate' => 'timestamp',
 			'required' => true,
-			'nowrap' => true
+			'no_wrap' => true,
+			'default' => 'today'
 		),
 		'enabled' => array(
 			'type' => 'boolean',
-			'validation' => array('\infuse\Validate','boolean_'),
+			'validate' => 'boolean',
 			'required' => true,
 			'default' => true
 		)	
@@ -102,6 +103,8 @@ abstract class AbstractUser extends \infuse\Model
 	protected static $currentUser;
 	
 	protected static $verifyTimeWindow = 86400; // one day
+	
+	protected static $forgotLinkTimeframe = 1800; // 30 minutes
 	
 	protected static $usernameProperties = array( 'user_email' );	
 	
@@ -148,11 +151,10 @@ abstract class AbstractUser extends \infuse\Model
 			$requester = static::currentUser();
 		
 		// allow user registrations
-		if( $permission == 'create' && !$requester->isLoggedIn() ) {
+		if( $permission == 'create' && !$requester->isLoggedIn() )
 			return true;
-		} else if( $permission == 'edit' && $requester->id() == $this->id ) {
+		else if( $permission == 'edit' && $requester->id() == $this->id )
 			return true;
-		}
 
 		return parent::can( $permission, $requester );
 	}
@@ -164,15 +166,7 @@ abstract class AbstractUser extends \infuse\Model
 	*/
 	function isTemporary()
 	{
-		return Database::select(
-			'User_Links',
-			'link',
-			array(
-				'where' => array(
-					'uid' => $this->id,
-					'link_type' => 2 // 0 = forgot, 1 = verify, 2 = temporary
-				),
-				'single' => true ) );
+		return UserLink::totalRecords( array( 'uid' => $this->id, 'link_type' => 2 ) ) > 0;
 	}
 	
 	/**
@@ -186,16 +180,10 @@ abstract class AbstractUser extends \infuse\Model
 	{
 		$timeWindow = ( $withinTimeWindow ) ? time() - static::$verifyTimeWindow : time() + 100;
 		
-		return Database::select(
-			'User_Links',
-			'count(*)',
-			array(
-				'where' => array(
-					'uid' => $this->id,
-					'link_type' => 1, // 0 = forgot, 1 = verify, 2 = temporary
-					'link_timestamp < ' . $timeWindow
-				),
-				'single' => true ) ) == 0;
+		return UserLink::totalRecords( array(
+			'uid' => $this->id,
+			'link_type' => 1,
+			'link_timestamp < ' . $timeWindow ) ) == 0;
 	}
 	
 	/**
@@ -279,18 +267,6 @@ abstract class AbstractUser extends \infuse\Model
 	}
 	
 	/**
-	 * Gets the date the user joined
-	 *
-	 * @param $format string PHP date format string
-	 *
-	 * @return string date
-	 */
-	function registerDate( $format = 'F j, Y' )
-	{
-		return date( $format, $this->get( 'registered_on' ) );
-	}
-	
-	/**
 	* Checks if the user is a member of a group
 	*
 	* @param int $gid group ID
@@ -324,9 +300,10 @@ abstract class AbstractUser extends \infuse\Model
 	
 	/**
 	* Gets the URL of the profile for the user
+	*
 	* @return string URL
 	*/
-	function profileURL()
+	function url()
 	{
 		if( $this->id > 0 )
 			return 'http://' . Config::value( 'site', 'host-name' ) . '/users/' . Util::seoUrl( $this->name(true), $this->id );
@@ -350,26 +327,27 @@ abstract class AbstractUser extends \infuse\Model
 		return "https://secure.gravatar.com/avatar/$hash?s=$size&d=mm";
 	}
 	
+	/**
+	 * Gets a temporary user from an e-mail address if one exists
+	 *
+	 * @param string $email e-mail address
+	 *
+	 * @return User|false
+	 */
 	static function getTemporaryUser( $email )
 	{
-		Modules::load( 'validation' );
+		if( !Validate::is( $email, 'email' ) )
+			return false;
 		
-		if( !Validate::email( $email, array( 'skipRegisteredCheck' => true ) ) )
-			return false;
-	
-		$uid =  Database::select(
-			'Users NATURAL JOIN User_Links',
-			'*',
-			array(
-				'where' => array(
-					'user_email' => $email,
-					'(link_type = 1 OR link_type = 2)' ),
-				'single' => true ) );
-
-		if( Database::numrows() == 1 )
-			return new User( $uid );
-		else
-			return false;
+		if( $user = User::findOne( array(
+			'where' => array(
+				'user_email' => $email ) ) ) )
+		{
+			if( $user->isTemporary() )
+				return $user;
+		}
+			
+		return false;
 	}
 		
 	///////////////////////////////
@@ -379,8 +357,7 @@ abstract class AbstractUser extends \infuse\Model
 	function preCreateHook( &$data )
 	{
 		$data[ 'ip' ] = $_SERVER[ 'REMOTE_ADDR' ];
-		$data[ 'registered_on' ] = time();
-
+		
 		return true;
 	}
 	
@@ -400,24 +377,15 @@ abstract class AbstractUser extends \infuse\Model
 		{
 			if( !$verifiedEmail )
 			{
-				// verify key
-				$verify = md5(uniqid( rand(), true ));
-			
-				// create the verification link
-				Database::insert(
-					'User_Links',
-					array(
-						'uid' => $user->id(),
-						'link_type' => 1, // 0 = forgot, 1 = verify, 2 = temporary
-						'link' => $verify,
-						'link_timestamp' => time() ) );
-				
-				// ask the user to verify their e-mail
-				$user->sendEmail( 'email-verification', array( 'verify' => $verify ) );
+				// create the verification link and send user an e-mail
+				if( $link = UserLink::create( array( 'uid' => $user->id(), 'link_type' => 1 ) ) )
+					$user->sendEmail(
+						'email-verification',
+						array( 'verify' => $link->get( 'link' ) ) );
 			}
 			else
 				// send the user a welcome message
-				$user->sendEmail( 'registration-welcome', array() );
+				$user->sendEmail( 'registration-welcome' );
 		}
 		
 		return $user;
@@ -432,12 +400,9 @@ abstract class AbstractUser extends \infuse\Model
 	 */
 	static function createTemporary( $data )
 	{
-		if( !Validate::email( $data[ 'user_email' ], true, true ) )
+		if( !Validate::is( $data[ 'user_email' ], 'email' ) )
 			return false;
 
-		// temporary string
-		$temporary = md5(uniqid( rand(), true ));
-		
 		$insertArray = array(
 			'user_email' => $data[ 'user_email' ],
 			'ip' => $_SERVER[ 'REMOTE_ADDR' ],
@@ -451,17 +416,10 @@ abstract class AbstractUser extends \infuse\Model
 			$uid = Database::lastInsertID();
 			
 			// create the temporary link
-			Database::insert(
-				'User_Links',
-				array(
-					'uid' => $uid,
-					'link_type' => 2, // 0 = forgot, 1 = verify, 2 = temporary
-					'link' => $temporary,
-					'link_timestamp' => time() ) );
+			UserLink::create( array( 'uid' => $uid, 'link_type' => 2 ) );
 			
 			return new User( $uid );
 		}
-			
 		else
 			return false;	
 	}	
@@ -491,7 +449,10 @@ abstract class AbstractUser extends \infuse\Model
 				if( in_array( $key, $protectedFields ) )
 				{
 					if (strlen(implode((array)$value)) == 0)
+					{
+						unset( $data[ $key ] );
 						continue;
+					}
 					
 					$passwordRequired = true;
 				}			
@@ -502,7 +463,7 @@ abstract class AbstractUser extends \infuse\Model
 		
 		if( $passwordRequired && !$passwordValidated && !static::currentUser()->isAdmin() )
 		{
-			ErrorStack::add( 'Oops, looks like the password is incorrect.' );
+			ErrorStack::add( array( 'error' => 'invalid_password' ) );
 			return false;
 		}
 		
@@ -518,46 +479,36 @@ abstract class AbstractUser extends \infuse\Model
 	 */
 	function upgradeFromTemporary( $data )
 	{
-		ErrorStack::setContext( 'user.create' );
-		
 		if( !$this->isTemporary() )
 			return true;
 		
-		$validated = true;
-			
-		if( !Validate::firstName( $data[ 'first_name' ] ) )
-			$validated = false;
-		
-		if( !Validate::password( $data[ 'user_password' ] ) )
-			$validated = false;
-
-		$updateArray = array(
-			'uid' => $this->id,
-			'first_name' => $data[ 'first_name' ],
-			'last_name' => $data[ 'last_name' ],
-			'user_password' => $data[ 'user_password' ],
+		$updateArray = array_replace( $data, array(
 			'registered_on' => time(),
 			'ip' => $_SERVER[ 'REMOTE_ADDR' ],
-			'enabled' => 1 );
-
-		if ( $validated &&
-			Database::update(
-				'Users',
-				$updateArray,
-				array( 'uid' ) ) &&
+			'enabled' => 1 ) );
+		
+		$success = false;
+		
+		User::currentUser()->elevateToSuperUser();
+		
+		if( $this->set( $updateArray ) )
+		{
+			// remove temporary and unverified links
 			Database::delete(
-				'User_Links',
+				'UserLinks',
 				array(
 					'uid' => $this->id,
-					'link_type = 1 OR link_type = 2' ) ) )
-		{
+					'link_type = 1 OR link_type = 2' ) );
+			
 			// send the user a welcome message
-			$this->sendEmail( 'registration-welcome', array() );
-		
-			return true;
+			$this->sendEmail( 'registration-welcome' );
+
+			$success = true;
 		}
 		
-		return false;
+		User::currentUser()->returnFromSuperUser();
+
+		return $success;
 	}
 	
 	/**
@@ -565,42 +516,27 @@ abstract class AbstractUser extends \infuse\Model
 	 *
 	 * @param string $verify verification hash
 	 *
-	 * @return boolean success
+	 * @return User|false
 	*/
 	static function verifyEmail( $verify )
 	{
-		$uid = Database::select(
-			'User_Links',
-			'uid',
-			array(
-				'where' => array(
-					'link' => $verify,
-					'link_type' => 1 // 0 = forgot, 1 = verify, 2 = temporary
-				),
-				'single' => true ) );
-
-		// enable the user and delete the verify link
-		if(
-			Database::numrows() == 1 &&
-			Database::update(
-				'Users',
-				array(
-					'uid' => $uid,
-					'enabled' => 1 ),
-				array( 'uid' ) ) &&
-			Database::delete(
-				'User_Links',
-				array(
-					'uid' => $uid,
-					'link_type' => 1 ) ) ) {
+		ErrorStack::setContext( 'user.verify' );
+		
+		if( $link = UserLink::findOne( array( 'where' => array( 'link' => $verify, 'link_type' => 1 ) ) ) )
+		{
+			$user = new User( $link->get( 'uid' ) );
+		
+			User::currentUser()->elevateToSuperUser();
 			
-			// log the user in
-			static::$currentUser = new User( $uid, false, true );
+			// enable the user and delete the verify link
+			$success = $user->set( 'enabled', 1 ) && $link->delete();
+			
+			User::currentUser()->returnFromSuperUser();
 			
 			// send a welcome e-mail
-			static::$currentUser->sendEmail( 'registration-welcome' );
+			$user->sendEmail( 'registration-welcome' );
 			
-			return true;
+			return $user;
 		}
 			
 		return false;
@@ -617,38 +553,28 @@ abstract class AbstractUser extends \infuse\Model
 	{
 		ErrorStack::setContext( 'user.forgot' );
 		
-		if( Validate::email( $email ) )
+		if( Validate::is( $email, 'email' ) )
 		{
-			$uid = Database::select(
-				'Users',
-				"uid",
-				array(
-					'where' => array(
-						'user_email' => $email ),
-					'single' => true ) );
-
-			if( Database::numrows() == 1 )
+			if( $user = User::findOne( array( 'where' => array( 'user_email' => $email ) ) ) )
 			{
-				$user = new User( $uid );
-				$user->loadProperties();
-							
-				// Generate a forgot password link guid
-				$guid = str_replace( '-', '', Util::guid() );
-
-				if( Database::insert(
-					'User_Links',
-					array(
-						'uid' => $uid,
-						'link_type' => 0, // 0 = forgot, 1 = verify, 2 = temporary
-						'link' => $guid,
-						'link_timestamp' => time() ) ) )
+				$user->load();
+				
+				// make sure there are no other forgot links
+				$oldLinks = UserLink::totalRecords( array(
+					'link_type' => 0,
+					'link_timestamp > ' . (time() - static::$forgotLinkTimeframe) ) );
+				
+				if( $oldLinks > 0 )
+					return true;
+				
+				if( $link = UserLink::create( array( 'uid' => $user->id(), 'link_type' => 0 ) ) )
 				{
 					// send the user the forgot link
 					$user->sendEmail(
 						'forgot-password',
 						array(
 							'ip' => $_SERVER[ 'REMOTE_ADDR' ],
-							'forgot' => $guid ) );
+							'forgot' => $link->get( 'link' ) ) );
 					
 					return true;
 				}
@@ -665,8 +591,6 @@ abstract class AbstractUser extends \infuse\Model
 					'field' => 'email',
 					'field_name' => 'Email' ) ) );
 		}
-
-		ErrorStack::clearContext();		
 		
 		return false;
 	}	
@@ -681,40 +605,35 @@ abstract class AbstractUser extends \infuse\Model
 	 */
 	static function forgotStep2( $token, $password )
 	{
-		// set the context
 		ErrorStack::setContext( 'user.forgot' );
+		
+		$link = UserLink::findOne( array(
+			'where' => array(
+				'link' => $token,
+				'link_type' => 0,
+				'link_timestamp > ' . (time() - static::$forgotLinkTimeframe) ) ) );
+		
+		if( $link )
+		{
+			$user = new User( $link->get( 'uid' ) );
 			
-		if( !$uid = Database::select(
-			'User_Links',
-			'uid',
-			array(
-				'where' => array(
-					'link' => $token,
-					'link_type' => 0, // 0 = forgot, 1 = verify, 2 = temporary
-					'link_timestamp > ' . strtotime( '-30 minutes' ) ),
-				'single' => true ) ) ) {
+			User::currentUser()->elevateToSuperUser();
+			
+			// Update the password
+			$success = $user->set( 'user_password', $password );
+			
+			if( $success )
+				$link->delete();
+
+			User::currentUser()->returnFromSuperUser();
+				
+			return $success;
+		}
+		else
+		{
 			ErrorStack::add( 'user_forgot_expired_invalid' );
 			return false;
 		}
-		
-		$user = new User( $uid );		
-		
-		// Validate the password
-		if( !Validate::password( $password ) )
-			return false;
-
-		// Update the password
-		return Database::update(
-			'Users',
-			array(
-				'uid' => $user->id(),
-				'user_password' => $password ),
-			array( 'uid' ) ) &&
-			Database::delete(
-				'User_Links',
-				array(
-					'uid' => $user->id(),
-					'link_type' => 0 ) );
 	}
 	
 	///////////////////////////////////
@@ -726,7 +645,7 @@ abstract class AbstractUser extends \infuse\Model
 	 * to everything. BE CAREFUL. Typically, this is reserved for cron jobs that need
 	 * to work with models belonging to other users.
 	 *
-	 * WARNING: do not forget to remove super user permissions when done with endSuperUser()
+	 * WARNING: do not forget to remove super user permissions when done with returnFromSuperUser()
 	 * or else the user will have free reign to do anything
 	 */
 	static function elevateToSuperUser()
@@ -740,7 +659,7 @@ abstract class AbstractUser extends \infuse\Model
 	 * Removes super user permission.
 	 *
 	 */
-	static function endSuperUser()
+	static function returnFromSuperUser()
 	{
 		static::currentUser();
 		if( isset( static::$currentUser->oldUid ) )
@@ -782,7 +701,7 @@ abstract class AbstractUser extends \infuse\Model
 		
 		if( $user )
 		{
-			$user->loadProperties();
+			$user->load();
 			
 			// check if banned
 			// TODO

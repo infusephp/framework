@@ -4,7 +4,7 @@
 		<fieldset>
 			<legend>Create Account</legend>
 			
-			{foreach from=$errorStack->messages('user.create') item=error}
+			{foreach from=$errorStack->messages() item=error}
 				<div class="alert alert-error">
 					{$error}
 				</div>

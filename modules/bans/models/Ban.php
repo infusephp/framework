@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This class represents a ban. Bans may be on IP addresses, e-mail addressses, or user name
  *
@@ -44,7 +45,7 @@ class Ban extends \infuse\Model
 				1 => 'IP',
 				2 => 'Username',
 				3 => 'E-mail Address' ),
-			'enumType' => 'tinyint',
+			'db_type' => 'tinyint',
 			'length' => 1
 		),
 		'value' => array(
@@ -67,16 +68,6 @@ class Ban extends \infuse\Model
 	 */
 	static function isBanned( $value, $type )
 	{
-		if( !in_array( $type, array( BAN_TYPE_IP, BAN_TYPE_USERNAME, BAN_TYPE_EMAIL ) ) )
-			return false;
-		
-		return Database::select(
-			static::tablename(),
-			'count(*)',
-			array(
-				'where' => array(
-					'type' => $type,
-					'value' => $value ),
-				'single' => true ) ) > 0;
+		return Ban::totalRecords( array( 'type' => $type, 'value' => $value ) ) > 0;
 	}
 }

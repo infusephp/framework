@@ -1,4 +1,5 @@
 <?php
+
 /*
  * @package Infuse
  * @author Jared King <j@jaredtking.com>
@@ -36,7 +37,7 @@ class Users extends \infuse\Controller
 		
 		if( $currentUser->isLoggedIn() )
 		{
-			$currentUser->loadProperties();
+			$currentUser->load();
 			
 			// Try to get user's preferred time zone.
 			if( $currentUser->hasProperty( 'time_zone' ) && $time_zone = $currentUser->get( 'time_zone' ) )
@@ -58,8 +59,16 @@ class Users extends \infuse\Controller
 	
 	function login( $req, $res )
 	{
-		$success = User::currentUser()->login( $req->request( 'user_email' ), $req->request( 'password' ), $req->request( 'remember' ) );
-	
+		$password = $req->request( 'password' );
+		
+		if( is_array( $req->request( 'user_password' ) ) )
+		{
+			$password = $req->request( 'user_password' );
+			$password = reset( $password );
+		}
+		
+		$success = User::currentUser()->login( $req->request( 'user_email' ), $password, $req->request( 'remember' ) );
+		
 		if( $req->isHtml() )
 		{
 			if( $success )
@@ -86,9 +95,6 @@ class Users extends \infuse\Controller
 	
 	function forgotForm( $req, $res )
 	{
-		if( !Modules::info( 'users' )[ 'forgot-password-allowed' ] )
-			return $res->setCode( 404 );
-	
 		$currentUser = User::currentUser();
 		if( $currentUser->isLoggedIn() )
 			$currentUser->logout();
@@ -165,41 +171,43 @@ class Users extends \infuse\Controller
 		
 		// is this a temporary account?
 		$user = User::getTemporaryUser( $info[ 'user_email' ] );
-
-		if( $user ) {
-			// upgrade temporary account
+		
+		// upgrade
+		if( $user )
+		{
 			if( !$user->upgradeFromTemporary( $info ) )
 				$user = false;
-		} else {
-			// create a new account
-			$user = User::create( $info );
 		}
-		if( $user ) {
-			if( !$req->isApi() )
-				User::currentUser()->login( $info[ 'user_email' ], $info[ 'user_password' ][ 0 ] );
-			
+		// new account
+		else
+			$user = User::create( $info );
+
+		if( $user )
+		{
 			if( $req->isHtml() )
-				$res->redirect( '/' );
+				$this->login( $req, $res );
 			else if( $req->isJson() )
 				$req->setBodyJson( array(
 					'user' => $user->toArray(),
 					'success' => true ) );
 			else
 				$req->setCode( 404 );
-		} else {
-			$this->signupForm( $req, $res );
 		}
+		else
+			$this->signupForm( $req, $res );
 	}
 	
 	function verifiyEmail( $req, $res )
 	{
-		$currentUser = User::currentUser();
+		$user = User::verifyEmail( $req->params( 'id' ) );
 		
-		$success = User::verifyEmail( $req->params( 'id' ) );
+		// log the user in
+		if( $user )
+			User::currentUser()->loginForUid( $user->id );
 
 		$res->render( 'verifyEmail', array(
 			'title' => 'Verify E-mail',
-			'success' => $success ) );
+			'success' => $user ) );
 	}
 	
 	function accountSettings( $req, $res )
