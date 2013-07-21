@@ -107,6 +107,8 @@ footer {
 	text-align: center;
 }
 
+/* Models */
+
 .models-holder {
 	overflow-x: auto;
 	overflow-y: visible !important;
@@ -130,6 +132,80 @@ footer {
 	min-height: 20px;
 	max-width: 530px;
 	margin-bottom: 35px;
+}
+
+/* Header Controls */
+
+#models-table th .btn-link {
+	padding: 0;
+}
+
+#models-table th .btn-link:first-child {
+	padding-left: 5px;
+}
+
+#models-table th button .caret {
+	border-top-color: #fff;
+	border-bottom-color: #fff;
+}
+
+#models-table th .sort-none .caret-1 {
+	border-top: none;
+	border-bottom: 4px solid #fff;
+	border-left: 4px solid transparent;
+	border-right: 4px solid transparent;
+	float: left;
+	margin: -2px 0 0;
+}
+
+#models-table th .sort-none .caret-2 {
+	border-bottom: none;
+	border-top: 4px solid #fff;
+	border-left: 4px solid transparent;
+	border-right: 4px solid transparent;
+	float: left;
+	clear: both;
+	margin: 3px 0 0 -1px;
+}
+
+#models-table th .sort-asc .caret-2, #models-table th .sort-desc .caret-2 {
+	display: none;
+}
+
+#models-table th .sort-asc .caret-1 {
+	margin: 8px 0 0;
+	border-top: none;
+	border-bottom: 4px solid #fff;
+	border-left: 4px solid transparent;
+	border-right: 4px solid transparent;
+}
+
+#models-table th .sort-desc .caret-1 {
+	margin: 8px 0 0;
+	border-bottom: none;
+	border-top: 4px solid #fff;
+	border-left: 4px solid transparent;
+	border-right: 4px solid transparent;
+}
+
+#models-table th > button .caret, #models-table th > button i {
+	opacity: .75;
+}
+
+#models-table th button:hover {
+	text-decoration: none;
+}
+
+#models-table th button:hover .caret, #models-table th button:hover i {
+	opacity: 1;
+}
+
+#models-table th .input-append {
+	margin: 0;
+}
+
+#models-table th input {
+	border: 1px solid #08c;
 }
 
 @media (max-width: 767px) {

@@ -1,34 +1,27 @@
-/*
-
-Header Params:
-	name
-	title
-	type
-	filter
-	nosort
-	nowrap
-	truncate
-	enum
-
-Types:
-	system - reserved for arbitrary fields (edit, delete, etc.)
-	id
-	text
-	longtext
-	number
-	boolean
-	enum = [db value, string value, keys array, values array]
-	password
-	date
-	hidden
-	file = [value, url]
-	custom = [value, html]
-	html - no form field, just static html
-
-Filter i.e. <a href='mailto:![value[email_address]!'>![value[name]]!</a>
-
-*/
-
+/**
+ * JS for models in admin dashboard
+ * 
+ * @author Jared King <j@jaredtking.com>
+ * @link http://jaredtking.com
+ * @version 1.0
+ * @copyright 2013 Jared King
+ * @license MIT
+	Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+	associated documentation files (the "Software"), to deal in the Software without restriction,
+	including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
+	and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so,
+	subject to the following conditions:
+	
+	The above copyright notice and this permission notice shall be included in all copies or
+	substantial portions of the Software.
+	
+	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
+	LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+	IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+	WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+ 
 if (typeof angular != 'undefined') {
 	
 	var app = angular.module('models', ['ngResource','ui.bootstrap','ui.date']);
@@ -136,18 +129,36 @@ if (typeof angular != 'undefined') {
 			$scope.deleteModel = false;
 			$scope.models = [];
 			$scope.loading = false;
+			$scope.sort = [];
+			$scope.sortStates = {'0':'1','1':'-1','-1':'0'};
+			$scope.sortMap = {'1':'asc','-1':'desc'};
+			$scope.filter = {};
+			$scope.hasFilter = {};
 			
 			$scope.loadModels = function() {
 				var start = ($scope.page - 1) * $scope.limit;
 			
 				$scope.loading = true;
-			
-				Model.findAll({
+				
+				var params = {
 					search: $scope.query,
 					start: start,
-					limit: $scope.limit,
-					sort: ''
-				}, function(result) {
+					limit: $scope.limit
+				};
+				
+				// convert $scope.sort array into a properly formatted string
+				var sorted = [];
+				for (var i in $scope.sort)
+					sorted.push($scope.sort[i].name + ' ' + $scope.sortMap[$scope.sort[i].direction]);
+				params.sort = sorted.join(',');
+				
+				// find out which properties are filtered
+				for (var i in $scope.hasFilter) {
+					if ($scope.hasFilter[i] && $scope.filter[i])
+						params['filter[' + i + ']'] = $scope.filter[i];
+				}
+			
+				Model.findAll(params, function(result) {
 				
 					$scope.filtered_count = result.filtered_count,
 					$scope.links = result.links,
@@ -169,6 +180,68 @@ if (typeof angular != 'undefined') {
 					$scope.loading = false;
 					
 				});
+			};
+
+			$scope.noModels = function() {
+				if ($scope.models.length > 0)
+					return false;
+
+				for (var i in $scope.hasFilter)
+				{
+					if ($scope.hasFilter[i])
+						return false;
+				}
+
+				return true;
+			};
+			
+			$scope.sortDirection = function(property) {
+				for (var i in $scope.sort) {
+					if ($scope.sort[i].name == property.name)
+						return $scope.sort[i].direction;
+				}
+				
+				return 0;
+			};
+			
+			$scope.toggleSort = function(property) {
+				var current = $scope.sortDirection(property);
+				
+				// add to the sort list
+				var nextState = $scope.sortStates[current];
+				
+				if (current == 0)
+					$scope.sort.push({name:property.name, direction:nextState});
+				else
+				{
+					// find the index of the property
+					var index = -1;
+					for (var i in $scope.sort) {
+						if ($scope.sort[i].name == property.name) {
+							index = i;
+							break;
+						}
+					}
+					
+					// remove
+					if (nextState == 0)
+						$scope.sort.splice(index, 1);
+					// update
+					else
+						$scope.sort[index].direction = nextState;
+				}
+				
+				$scope.loadModels();
+			};
+			
+			$scope.showFilter = function(property) {
+				$scope.hasFilter[property.name] = true;
+				$scope.loadModels();
+			};
+			
+			$scope.hideFilter = function(property) {
+				$scope.hasFilter[property.name] = false;
+				$scope.loadModels();
 			};
 				
 			$scope.currentPages = function(n) {
@@ -416,6 +489,9 @@ if (typeof angular != 'undefined') {
 					model[property.name] = new Date();
 				else
 					model[property.name] = moment.unix(value).toDate();
+			break;
+			case 'password':
+				model[property.name] = '';
 			break;
 			case 'boolean':
 				model[property.name] = (value > 0) ? true : false;

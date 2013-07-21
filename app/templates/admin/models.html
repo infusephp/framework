@@ -18,7 +18,7 @@
 	</select>
 </div>
 
-<div ng-show="models.length>0&&!loading">
+<div ng-hide="noModels()">
 	<div class="models-holder">
 		<table class="table table-striped" id="models-table">
 			<thead>
@@ -26,8 +26,24 @@
 					<th></th>
 					<th ng-repeat="property in modelInfo.properties">
 						{{property.title}}
+						<button class="btn-link" ng-class="{'sort-none':sortDirection(property)==0,'sort-asc':sortDirection(property)==1,'sort-desc':sortDirection(property)==-1}" ng-click="toggleSort(property)">
+							<b class="caret caret-1"></b>
+							<b class="caret caret-2"></b>
+						</button>
+						<button class="btn-link" ng-hide="hasFilter[property.name]" ng-click="showFilter(property)">
+							<i class="icon-filter icon-white"></i>
+						</button>
+						<div class="input-append" ng-show="hasFilter[property.name]">
+							<input class="input-small" type="text" placeholder="Filter..." ng-model="filter[property.name]" />
+							<button class="btn btn-success" type="button" ng-click="loadModels()">
+								<i class="icon-ok icon-white"></i>
+							</button>
+							<button class="btn btn-danger" type="button" ng-click="hideFilter(property)">
+								<i class="icon-remove icon-white"></i>
+							</button>
+						</div>
 					</th>
-				</tr>		
+				</tr>
 			</thead>
 			<tbody>
 				<tr ng-repeat="model in models">
@@ -57,7 +73,7 @@
 		</table>
 	</div>
 		
-	<div class="pagination pull-right">
+	<div class="pagination pull-right" ng-show="page_count>1">
 	    <ul>
 		    <li ng-class="{disabled:page==1}">
 		    	<a href="#" ng-click="prevPage()" eat-click>&larr;</a>
@@ -71,7 +87,7 @@
 	    </ul>
 	</div>
 	
-	<p>
+	<p ng-show="models.length>0">
 		<br/>
 		<strong>{{total_count}} {{modelInfo.proper_name_plural}}</strong><br/>
 		<span ng-show="models.length>0">Showing <em>{{(page-1)*limit+1}}-{{((page-1)*limit)+models.length}}</em> of <em>{{filtered_count}}</em> found</span>
