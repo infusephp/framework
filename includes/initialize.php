@@ -145,16 +145,15 @@ if( !$req->isApi() )
 	    true // http only
 	);
 
-	// session handler
+	// redis sessions
 	if( Config::value( 'session', 'adapter' ) == 'redis' )
-	{
 		RedisSession::start( Config::get( 'redis' ) );
-	}
 	// default: database
-	else
-	{
+	else if( Config::value( 'session', 'adapter' ) == 'database' )
 		DatabaseSession::start();
-	}
+	// default: built-in sessions
+	else
+		session_start();
 	
 	// set the cookie by sending it in a header.
 	Util::set_cookie_fix_domain(
