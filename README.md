@@ -1,4 +1,4 @@
-infuse v0.1.12
+infuse v0.1.13
 =====
 
 PHP MVC framework built with infuse/libs

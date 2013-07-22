@@ -29,8 +29,6 @@
 			accept the suggested schema.
 		</p>
 
-		<p class="alert alert-info">You are responsible for manually renaming or dropping columns. This is to ensure no data is accidentally deleted.</p>
-
 		{if $success}
 			<p class="alert alert-success">The schema was updated!</p>
 		{elseif $error}
@@ -62,6 +60,9 @@
 					{/if}
 	
 					<p>
+						{if count($extraFields[$model]) > 0}
+							<a href="/4dm1n/{$moduleName}/schema/clean/{$model}" class="btn btn-large btn-danger pull-right">Delete Old Fields</a>
+						{/if}
 						<a href="/4dm1n/{$moduleName}/schema/update/{$model}" class="btn btn-large btn-success">&larr; Update</a>
 					</p>
 				
