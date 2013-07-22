@@ -19,7 +19,7 @@
 	},
 	"require": {
 		"php": ">=5.3.0",
-		"infuse/libs": "0.1.12.1",
+		"infuse/libs": "0.1.12.2",
 		"phpmailer/phpmailer": "5.2.6"
 	}
 }
