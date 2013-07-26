@@ -3,3 +3,5 @@ Desktop.ini
 .DS_Store
 /composer.phar
 /vendor
+._.DS_Store
+composer.lock
