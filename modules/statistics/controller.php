@@ -31,6 +31,24 @@ use \infuse\Util;
 
 class Statistics extends \infuse\Controller
 {
+	public static $properties = array(
+		'title' => 'Statistics',
+		'description' => 'Displays statistics for the site in the admin panel.',
+		'version' => '1.1',
+		'author' => array(
+			'name' => 'Jared King',
+			'email' => 'j@jaredtking.com',
+			'website' => 'http://jaredtking.com'
+		),
+		'admin' => true,
+		'defaultHistoryMetric' => 'users.numUsers',
+		'routes' => array(
+			'get /4dm1n/statistics' => 'adminHome',
+			'get /4dm1n/statistics/history' => 'adminHistoryDefault',
+			'get /4dm1n/statistics/history/:metric' => 'adminHistory'
+		)
+	);
+
 	function adminHome( $req, $res )
 	{
 		if( !$this->can( 'view-admin' ) )

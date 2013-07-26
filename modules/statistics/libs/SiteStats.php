@@ -1,9 +1,32 @@
 <?php
 
+/**
+ * @package Infuse
+ * @author Jared King <j@jaredtking.com>
+ * @link http://jaredtking.com
+ * @version 1.0
+ * @copyright 2013 Jared King
+ * @license MIT
+	Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+	associated documentation files (the "Software"), to deal in the Software without restriction,
+	including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
+	and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so,
+	subject to the following conditions:
+	
+	The above copyright notice and this permission notice shall be included in all copies or
+	substantial portions of the Software.
+	
+	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
+	LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+	IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+	WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
 namespace infuse\libs;
 
-use \infuse\Config as Config;
-use \infuse\Database as Database;
+use \infuse\Config;
+use \infuse\Database;
 
 class SiteStats
 {
@@ -156,7 +179,7 @@ class SiteStats
 		{
 			$decoded = json_decode( $day[ 'stats' ], true );
 			
-			$series[ date( 'm/d/Y', $day[ 'timestamp' ] ) ] = self::getNestedVar( $decoded, $metric );
+			$series[ date( 'm/d/Y', $day[ 'timestamp' ] ) ] = Util::array_value( $decoded, $metric );
 		}
 		
 		return $series;
@@ -176,7 +199,7 @@ class SiteStats
 		$stats = array();
 		
 		foreach( self::$historyMetrics as $metric )
-			self::setNestedVar( $stats, $metric, self::getNestedVar( $snapshot, $metric ) );
+			Util::array_set( $stats, $metric, Util::array_value( $snapshot, $metric ) );
 		
 		// save it in the DB
 		return Database::insert(
@@ -186,35 +209,5 @@ class SiteStats
 				'stats' => json_encode( $stats )
 			)
 		);
-	}
-	
-	/**
-	 * Looks up an element in an array using dot notation (i.e. fruit.apples.qty => ['fruit']['apples']['qty']
-	 *
-	 */
-	private static function getNestedVar(&$context, $name)
-	{
-	    $pieces = explode('.', $name);
-	    foreach ($pieces as $piece) {
-	        if (!is_array($context) || !array_key_exists($piece, $context)) {
-	            // error occurred
-	            return null;
-	        }
-	        $context = &$context[$piece];
-	    }
-	    return $context;
-	}
-	
-	/**
-	 * Sets an element in an array using dot notation (i.e. fruit.apples.qty sets ['fruit']['apples']['qty']
-	 *
-	 */
-	private static function setNestedVar(&$context, $name, $value)
-	{
-	    $pieces = explode('.', $name);
-	    foreach ($pieces as $k => $piece)
-	        $context = &$context[$piece];
-	    
-	    return $context = $value;
 	}
 }

@@ -26,4 +26,18 @@
 namespace infuse\controllers;
  
 class Permissions extends \infuse\Controller
-{ }
+{
+	public static $properties = array(
+		'title' => 'Permissions',
+		'description' => 'Admin panel for modifying the ACL',
+		'version' => '1.0',
+		'author' => array(
+			'name' => 'Jared King',
+			'email' => 'j@jaredtking.com',
+			'website' => 'http://jaredtking.com'
+		),
+		'admin' => true,
+		'api' => true,
+		'model' => 'Permission'
+	);
+}

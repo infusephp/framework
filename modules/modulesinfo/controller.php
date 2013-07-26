@@ -24,4 +24,20 @@
  
 namespace infuse\controllers;
  
-class Modulesinfo extends \infuse\Controller { }
+class Modulesinfo extends \infuse\Controller {
+	public static $properties = array(
+		'title' => 'Modules',
+		'description' => 'Displays information about installed modules in admin dashboard',
+		'version' => '1.0',
+		'author' => array(
+			'name' => 'Jared King',
+			'email' => 'j@jaredtking.com',
+			'website' => 'http://jaredtking.com'
+		),
+		'admin' => true,
+		'api' => true,
+		'model' => 'Module',
+		'routes' => array(
+		)
+	);
+}

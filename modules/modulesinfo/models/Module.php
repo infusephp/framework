@@ -66,8 +66,9 @@ class Module extends \infuse\Model
 		$return = array('models'=>array());
 		
 		$modules = \infuse\Modules::all();
-		foreach( $modules as $info )
-			$return['models'][] = new Module( $info[ 'name' ] );
+		
+		foreach( $modules as $module )
+			$return['models'][] = new Module( $module );
 		
 		$return['count'] = count( $modules );
 		

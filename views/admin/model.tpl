@@ -9,7 +9,7 @@
 
 	<ul class="nav nav-pills">
 		{foreach from=$models item=model}
-			<li class="{if $model.model == $modelInfo.model && !isset($schema)}active{/if}">
+			<li class="{if !isset($schema) && $model.model == $modelInfo.model}active{/if}">
 				<a href="/4dm1n/{$moduleName}/{$model.model}#/">{$model.proper_name_plural}</a>
 			</li>
 		{/foreach}
@@ -31,9 +31,10 @@
 
 		{if $success}
 			<p class="alert alert-success">The schema was updated!</p>
-		{elseif $error}
-			<p class="alert alert-error">{$error}</p>
 		{/if}
+		{foreach from=$errorStack->messages() item=error}
+			<p class="alert alert-error">{$error}</p>
+		{/foreach}
 		
 		{foreach from=$models key=model item=info}
 		
@@ -43,27 +44,29 @@
 				<div class="span6">
 					<h3>Current Schema</h3>
 	
-					{if !$currentSchema[$model]}
-						<pre>{$tablename[$model]} does not exist in the database</pre>
+					{if !$schema[$model].currentSql}
+						<pre>{$schema[$model].tablename} does not exist in the database</pre>
 					{else}
-						<pre>{$currentSchema[$model]}</pre>
+						<pre>{$schema[$model].currentSql}</pre>
 					{/if}
 	
 				</div>
 				<div class="span6">
 					<h3>Suggested Schema</h3>
 					
-					{if !$suggestedSchema[$model]}
+					{if !$schema[$model].suggestedSql}
 						<pre>No suggestions</pre>
 					{else}
-						<pre>{$suggestedSchema[$model]}</pre>
+						<pre>{$schema[$model].suggestedSql}</pre>
 					{/if}
 	
 					<p>
-						{if count($extraFields[$model]) > 0}
-							<a href="/4dm1n/{$moduleName}/schema/clean/{$model}" class="btn btn-large btn-danger pull-right">Delete Old Fields</a>
+						{if count($schema[$model].extraFields) > 0}
+							<a href="/4dm1n/{$moduleName}/schema/cleanup/{$model}" class="btn btn-large btn-danger pull-right">Delete Old Fields</a>
 						{/if}
-						<a href="/4dm1n/{$moduleName}/schema/update/{$model}" class="btn btn-large btn-success">&larr; Update</a>
+						{if $schema[$model].different}
+							<a href="/4dm1n/{$moduleName}/schema/update/{$model}" class="btn btn-large btn-success">&larr; Update</a>
+						{/if}
 					</p>
 				
 				</div>

@@ -31,9 +31,41 @@ use \infuse\Config;
 
 class Users extends \infuse\Controller
 {
+	public static $properties = array(
+		'title' => 'Users',
+		'description' => 'Authentication and user support.',
+		'version' => '1.0',
+		'author' => array(
+			'name' => 'Jared King',
+			'email' => 'j@jaredtking.com',
+			'website' => 'http://jaredtking.com'
+		),
+		'admin' => true,
+		'api' => true,
+		'models' => array(
+			'User',
+			'UserLink'
+		),
+		'routes' => array(
+			'get /users/login' => 'loginForm',
+			'post /users/login' => 'login',
+			'get /users/logout' => 'logout',
+			'get /users/forgot' => 'forgotForm',
+			'post /users/forgot' => 'forgotStep1',
+			'get /users/forgot/:id' => 'forgotForm',
+			'post /users/forgot/:id' => 'forgotStep2',
+			'get /users/signup' => 'signupForm',
+			'post /users/signup' => 'signup',
+			'get /users/account' => 'accountSettings',
+			'post /users/account' => 'editAccountSettings',
+			'get /users/verifyEmail/:id' => 'verifiyEmail',
+			'get /users/:slug' => 'profile'
+		)
+	);
+
 	function middleware( $req, $res )
 	{
-		$currentUser = User::currentUser();
+		$currentUser = User::currentUser( $req );
 		
 		if( $currentUser->isLoggedIn() )
 		{
@@ -66,8 +98,8 @@ class Users extends \infuse\Controller
 			$password = $req->request( 'user_password' );
 			$password = reset( $password );
 		}
-		
-		$success = User::currentUser()->login( $req->request( 'user_email' ), $password, $req->request( 'remember' ) );
+
+		$success = User::currentUser()->login( $req->request( 'user_email' ), $password, $req, $req->request( 'remember' ) );
 		
 		if( $req->isHtml() )
 		{
@@ -97,7 +129,7 @@ class Users extends \infuse\Controller
 	{
 		$currentUser = User::currentUser();
 		if( $currentUser->isLoggedIn() )
-			$currentUser->logout();
+			$currentUser->logout( $req );
 
 		$res->render( 'forgot', array(
 			'success' => $req->params( 'success' ),
@@ -131,7 +163,7 @@ class Users extends \infuse\Controller
 	
 	function logout( $req, $res )
 	{
-		User::currentUser()->logout();
+		User::currentUser()->logout( $req );
 		
 		if( $req->isHtml() )
 			$res->redirect( '/' );
@@ -143,7 +175,7 @@ class Users extends \infuse\Controller
 	{
 		$currentUser = User::currentUser();
 		if( $currentUser->isLoggedIn() )
-			$currentUser->logout();
+			$currentUser->logout( $req );
 
 		$res->render( 'register', array(
 			'title' => 'Sign Up',
@@ -266,9 +298,9 @@ class Users extends \infuse\Controller
 	{
 		if( !$req->isHtml() )
 		{
-			if( $req->params( 'slug' ) == 'users' )
+			if( in_array( $req->params( 'slug' ), array( 'users', 'user_links' ) ) )
 			{
-				$req->setParams( array( 'model' => 'users' ) );
+				$req->setParams( array( 'model' => $req->params( 'slug' ) ) );
 
 				return parent::findAll( $req, $res );
 			}

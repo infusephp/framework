@@ -3,27 +3,26 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "ad6c83adfd3262ee7d54b9e1fb2b2bfe",
+    "hash": "c8c89e995943505c03ac888e78043988",
     "packages": [
         {
             "name": "infuse/libs",
-            "version": "0.1.10.3",
+            "version": "0.1.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jaredtking/infuse-libs.git",
-                "reference": "0.1.10.3"
+                "reference": "0.1.13"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jaredtking/infuse-libs/zipball/0.1.10.3",
-                "reference": "0.1.10.3",
+                "url": "https://api.github.com/repos/jaredtking/infuse-libs/zipball/0.1.13",
+                "reference": "0.1.13",
                 "shasum": ""
             },
             "require": {
                 "leafo/lessphp": "v0.3.9",
                 "linkorb/jsmin-php": "1.0.0",
                 "monolog/monolog": "1.5.0",
-                "mustangostang/spyc": "0.5.1",
                 "php": ">=5.3.0",
                 "smarty/smarty": "v3.1.14"
             },
@@ -51,7 +50,7 @@
                 "infuse",
                 "libs"
             ],
-            "time": "2013-07-15 18:10:29"
+            "time": "2013-07-25 02:49:25"
         },
         {
             "name": "leafo/lessphp",
@@ -212,53 +211,6 @@
                 "psr-3"
             ],
             "time": "2013-04-23 10:09:48"
-        },
-        {
-            "name": "mustangostang/spyc",
-            "version": "0.5.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/mustangostang/spyc.git",
-                "reference": "0.5.1"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/mustangostang/spyc/zipball/0.5.1",
-                "reference": "0.5.1",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.1"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "0.5.x-dev"
-                }
-            },
-            "autoload": {
-                "files": [
-                    "Spyc.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT License"
-            ],
-            "authors": [
-                {
-                    "name": "mustangostang",
-                    "email": "vlad.andersen@gmail.com"
-                }
-            ],
-            "description": "A simple YAML loader/dumper class for PHP",
-            "homepage": "https://github.com/mustangostang/spyc/",
-            "keywords": [
-                "spyc",
-                "yaml",
-                "yml"
-            ],
-            "time": "2013-02-21 10:52:01"
         },
         {
             "name": "phpmailer/phpmailer",

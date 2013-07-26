@@ -91,7 +91,7 @@ abstract class AbstractUser extends \infuse\Model
 			'validate' => 'boolean',
 			'required' => true,
 			'default' => true
-		)	
+		)
 	);
 					
 	/////////////////////////////////////
@@ -106,14 +106,18 @@ abstract class AbstractUser extends \infuse\Model
 	
 	protected static $forgotLinkTimeframe = 1800; // 30 minutes
 	
-	protected static $usernameProperties = array( 'user_email' );	
+	protected static $persistentSessionLength = 7776000; // 3 months
+	
+	protected static $usernameProperties = array( 'user_email' );
 	
 	/**
-	* Constructor
-	* @param int $id id
-	* @param boolean $check_logged_in check if the user is logged in
-	*/
-	function __construct( $id = false, $check_logged_in = false, $logged_in = false )
+	 * Creates a new user
+	 *
+	 * @param int $id
+	 * @param Request|false $req if supplied will be used to check if the user is logged in
+	 * @param boolean $isLoggedIn overrides the login check CAREFUL
+	 */
+	function __construct( $id = false, $req = false, $isLoggedIn = false )
 	{
 		if( is_numeric( $id ) )
 			$this->id = $id;
@@ -127,16 +131,21 @@ abstract class AbstractUser extends \infuse\Model
 				$this->id = -1;
 		}
 			
-		if( $logged_in && $this->id > 0 )
+		if( $isLoggedIn && $this->id > 0 )
 			$this->logged_in = true;
-		else if( $check_logged_in )
-			$this->logged_in = $this->logged_in_();
+		else if( $req )
+			$this->logged_in = $this->authenticate( $req );
 	}
 	
-	static function currentUser()
+	/**
+	 * Gets the current user
+	 *
+	 * @param Request|false $req
+	 */
+	static function currentUser( $req = false )
 	{
 		if( !static::$currentUser )
-			static::$currentUser = new User( -1, true );
+			static::$currentUser = new User( -1, $req );
 		
 		return static::$currentUser;
 	}
@@ -741,12 +750,12 @@ abstract class AbstractUser extends \infuse\Model
 	 *
 	 * @param string $username username
 	 * @param string $password password
-	 * @param boolean $remember remember me
-	 * @param bool $setSessionVars when true sets the $_SESSION with user info
+	 * @param Request|false $req used to add user info to the session if supplied
+	 * @param boolean $persistent make the session persistent
 	 *
 	 * @return boolean true if successful
 	*/
-	function login( $username, $password, $remember = false, $setSessionVars = true )
+	function login( $username, $password, $req = false, $persistent = false )
 	{
 		if( $this->logged_in )
 			return true;
@@ -754,7 +763,7 @@ abstract class AbstractUser extends \infuse\Model
 		ErrorStack::setContext( 'user.login' );
 		
 		if( $user = static::checkLogin( $username, $password ) )
-			return $this->loginForUid( $user->id(), 0, $remember, $setSessionVars );
+			return $this->loginForUid( $user->id(), 0, $req, $persistent );
 	}
 	
 	/**
@@ -765,41 +774,29 @@ abstract class AbstractUser extends \infuse\Model
 	 *
 	 * @param int $uid
 	 * @param int $type an integer flag to denote the login type (regular = 0)
-	 * @param boolean $persistent true if the user should be logged in for a very long time
-	 * @param boolean $setSessionVars true if the login should be saved to sessions
+	 * @param Request|false $req used to add user info to the session if supplied
+	 * @param boolean $persistent keeps the user logged in for a very long time
 	 *
 	 * @return boolean
 	 */
-	function loginForUid( $uid, $type = 0, $persistent = false, $setSessionVars = true )
+	function loginForUid( $uid, $type = 0, $req = false, $persistent = false )
 	{
 		$this->id = $uid;
 	
-		if( $setSessionVars )
+		if( $req )
 		{
 			// update the session with the user's id
-			$this->changeSessionUserID( $uid );
-		
-			// store the user agent
-			$_SESSION[ 'user_agent' ] = $_SERVER[ 'HTTP_USER_AGENT' ];
-		}
-
-		if( $persistent )
-		{
-			$series = $this->generateToken();
-			$token = $this->generateToken();
-			setcookie( 'persistent', $this->get( 'user_email' ) . '!-!' . $series . '!-!' . $token . '!-!' . $_SERVER[ 'HTTP_USER_AGENT' ], time() + 3600*24*30*3, '/', $_SERVER[ 'HTTP_HOST' ], false, true );
+			$this->changeSessionUserID( $req );
 			
-			Database::insert(
-				'Persistent_Sessions',
-				array(
-					'user_email' => $this->get( 'user_email' ),
-					'series' => Util::encryptPassword( $series ),
-					'token' => Util::encryptPassword( $token ),
-					'created' => time()
-				)
-			);
+			if( $persistent )
+			{
+				$series = $this->generateToken();
+				$token = $this->generateToken();
+				
+				static::createPersistentCookie( $req, $this->get( 'user_email' ) );
+			}
 		}
-
+		
 		// create an entry in the login history table
 		Database::insert(
 			'User_Login_History',
@@ -807,9 +804,7 @@ abstract class AbstractUser extends \infuse\Model
 				'uid' => $uid,
 				'timestamp' => time(),
 				'type' => $type,
-				'ip' => $_SERVER[ 'REMOTE_ADDR' ]
-			)
-		);
+				'ip' => ($req) ? $req->ip() : $_SERVER[ 'REMOTE_ADDR' ] ) );
 
 		$this->logged_in = true;
 		
@@ -818,24 +813,42 @@ abstract class AbstractUser extends \infuse\Model
 	
 	/**
 	* Logs the user out
+	*
+	* @param Request $req
+	*
 	* @return boolean true if successful
 	*/
-	function logout()
+	function logout( $req )
 	{
 		if( $this->isLoggedIn() )
 		{
-			Database::Delete( 'Persistent_Sessions', array( 'user_email' => $this->get( 'user_email' ) ) ); // Delete all persistent sessions
-		    $params = session_get_cookie_params(); // empty the session cookie
-			setcookie(session_name(), '', time() - 42000,
-				$params["path"], $params["domain"],
-				$params["secure"], $params["httponly"]
-			);
-			$_SESSION = array(); // Destroy the variables.
-			session_destroy(); // Destroy the session itself.
-			$this->id = -1;
-			$this->changeSessionUserID( -1 ); // back to a guest...
+			// delete all persistent sessions
+			Database::delete(
+				'Persistent_Sessions',
+				array(
+					'user_email' => $this->get( 'user_email' ) ) );
 			
+			// empty the session cookie
+		    $sessionCookie = session_get_cookie_params();
+			$req->setCookie(
+				session_name(),
+				'',
+				time() - 42000,
+				$sessionCookie[ 'path' ],
+				$sessionCookie[ 'domain' ],
+				$sessionCookie[ 'secure' ],
+				$sessionCookie[ 'httponly' ] );
+			
+			// destroy the session variables
+			$req->destroySession();
+			
+			// actually destroy the session now
+			session_destroy();
+			
+			// back to a guest...
+			$this->id = -1;
 			$this->logged_in = false;
+			$this->changeSessionUserID( $req );
 			
 			return true;
 		}
@@ -979,83 +992,122 @@ abstract class AbstractUser extends \infuse\Model
 	// PROTECTED FUNCTIONS
 	/////////////////////////
 	
-	protected function logged_in_()
+	/** 
+	 * Checks if the user is logged in using various strategies
+	 *
+	 * @param Request $req
+	 *
+	 * @return boolean
+	 */
+	protected function authenticate( $req )
 	{
-		// check if the user's session is already logged in
-		if( isset( $_SESSION[ 'user_agent' ] ) && $_SESSION[ 'user_agent' ] == $_SERVER[ 'HTTP_USER_AGENT' ] && isset( $_SESSION[ 'user_id' ] ) && $_SESSION[ 'user_id' ] > 0 )
+		// check if the user's session is already logged in and valid
+		if( $req->session( 'user_agent' ) == $req->agent() && $req->session( 'user_id' ) > 0 )
 		{
-			$this->id = $_SESSION[ 'user_id' ];
+			$this->id = $req->session( 'user_id' );
 
-			if( !$this->exists() ) {
+			if( !$this->exists() )
+			{
+				// back to guest
 				$this->id = -1;
-				$_SESSION[ 'user_id' ] = -1;
+				$this->changeSessionUserID( $req );
+				
 				return false;
 			}
 			
 			return true;
 		}
-		// check for 'remember me'
-		else if( isset( $_COOKIE[ 'persistent' ] ) )
+		// check for persistent sessions
+		else if( $cookie = $req->cookies( 'persistent' ) )
 		{
-			$cookieParams = explode( '!-!', $_COOKIE[ 'persistent' ] );
-			$uid = Database::select( 'Users', 'uid', array( 'where' => array( 'user_email' => $cookieParams[ 0 ] ), 'single' => true ) );
-			if( Database::numrows() == 1 )
-			{ // check if the email has changed, if it has changed persistent sessions are no longer valid
-				$email = $cookieParams[ 0 ];
-				$series = $cookieParams[ 1 ];
-				$seriesEnc = Util::encryptPassword( $cookieParams[ 1 ] );
-				$token = $cookieParams[ 2 ];
-				$tokenEnc = Util::encryptPassword( $cookieParams[ 2 ] );
-				$tokenDB = Database::select( 'Persistent_Sessions', 'token', array( 'where' => array( 'user_email' => $email, 'created > ' . (time() - 3600*24*30*3), 'series' => $seriesEnc ), 'single' => true ) );
-				if( Database::numrows() == 1 && $cookieParams[3] == $_SERVER[ 'HTTP_USER_AGENT' ] )
-				{ // so good, so far
-					if( $tokenDB == $tokenEnc )
-					{ // we have a persistent session
-						// update the token
-						Database::delete( 'Persistent_Sessions', array( 'user_email' => $email, 'series' => $seriesEnc, 'token' => $tokenEnc ) );
-						
-						$newToken = $this->generateToken();
-						Database::insert( 'Persistent_Sessions', array( 'user_email' => $email, 'series' => $seriesEnc, 'token' => Util::encryptPassword( $newToken ), 'created' => time() ) );
-						setcookie( 'persistent', $email . '!-!' . $series . '!-!' . $newToken . '!-!' . $_SERVER[ 'HTTP_USER_AGENT' ], time() + 3600*24*30*3, '/', $_SERVER[ 'HTTP_HOST' ], false, true );
-						
-						$this->id = $uid;
-						$this->changeSessionUserID( $uid );
-						$_SESSION[ 'user_agent' ] = $_SERVER[ 'HTTP_USER_AGENT' ];
-						$_SESSION[ 'persistent' ] = true;
-
-						// create an entry in the login history table
-						Database::insert(
-							'User_Login_History',
-							array(
-								'uid' => $this->id,
-								'timestamp' => time(),
-								'type' => 0, // regular = 0
-								'ip' => $_SERVER['REMOTE_ADDR'] ) );						
-						
-						return true;
-					}
-					else
-					{ // same series, but different token.
-					// the user is trying to use an older token
-					// most likely an attack
-						Database::delete( 'Persistent_Sessions', array( 'user_email' => $email ) ); // flush all sessions
+			// decode the cookie
+			$cookieParams = json_decode( $cookie );
+			
+			if( $cookieParams )
+			{
+				$user = static::findOne( array( 'where' => array( 'user_email' => $cookieParams->user_email ) ) );
+				
+				if( $user )
+				{
+					$user->load();
+					
+					// encrypt series and token for matching with the db
+					$seriesEnc = Util::encryptPassword( $cookieParams->series );
+					$tokenEnc = Util::encryptPassword( $cookieParams->token );
+	
+					// first, make sure all of the parameters match, except the token
+					// we match the token separately in case all of the other information matches,
+					// which means an older session is being used, and then we run away					
+					
+					$tokenDB = Database::select(
+						'Persistent_Sessions',
+						'token',
+						array(
+							'where' => array(
+								'user_email' => $cookieParams->user_email,
+								'created > ' . (time() - static::$persistentSessionLength),
+								'series' => $seriesEnc ),
+								'single' => true ) );
+					
+					if( Database::numrows() == 1 && $cookieParams->agent == $req->agent() )
+					{
+						if( $tokenDB == $tokenEnc )
+						{
+							// remove the token
+							Database::delete(
+								'Persistent_Sessions',
+								array(
+									'user_email' => $cookieParams->user_email,
+									'series' => $seriesEnc,
+									'token' => $tokenEnc ) );
+							
+							// generate a new cookie for the next time
+							static::createPersistentCookie( $req, $cookieParams->user_email, $cookieParams->series );
+							
+							// log the user in
+							$this->id = $user->id();
+							$this->changeSessionUserID( $req );
+							$req->setSession( 'persistent', true );
+	
+							// create an entry in the login history table
+							Database::insert(
+								'User_Login_History',
+								array(
+									'uid' => $this->id,
+									'timestamp' => time(),
+									'type' => 0, // regular = 0
+									'ip' => $req->ip() ) );
+							
+							return true;
+						}
+						else
+						{
+							// same series, but different token.
+							// the user is trying to use an older token
+							// most likely an attack, so flush all sessions
+							Database::delete( 'Persistent_Sessions', array( 'user_email' => $email ) );
+						}
 					}
 				}
 			}
 		}
 
-		$this->id = -1; // guest
-		$_SESSION[ 'user_id' ] = -1;
+		// back to guest
+		$this->id = -1;
+		$this->changeSessionUserID( $req );
+		
 		return false;
 	}
 		
-	protected function changeSessionUserID( $newId )
+	protected function changeSessionUserID( $req )
 	{
 		// regenerate session id to prevent session hijacking
 		session_regenerate_id();
 		
 		// set the user id
-		$_SESSION[ 'user_id' ] = $newId;
+		$req->setSession( array(
+			'user_id' => $this->id,
+			'user_agent' => $req->agent() ) );
 	}
 	
 	protected function generateToken()
@@ -1064,5 +1116,35 @@ abstract class AbstractUser extends \infuse\Model
 		for ($i=0; $i<16; $i++)
 			$str.=base_convert(mt_rand(1,36),10,36);
 		return $str;
+	}
+	
+	protected function createPersistentCookie( $req, $email, $series = null, $token = null )
+	{
+		if( !$series )
+			$series = $this->generateToken();
+		
+		if( !$token )
+			$token = $this->generateToken();
+	
+		$req->setCookie(
+			'persistent',
+			json_encode( array(
+				'user_email' => $email,
+				'series' => $series,
+				'token' => $token,
+				'agent' => $req->agent() ) ),
+			time() + static::$persistentSessionLength,
+			'/',
+			$req->host(),
+			$req->isSecure(),
+			true );
+		
+		Database::insert(
+			'Persistent_Sessions',
+			array(
+				'user_email' => $email,
+				'series' => Util::encryptPassword( $series ),
+				'token' => Util::encryptPassword( $token ),
+				'created' => time() ) );	
 	}
 }

@@ -26,6 +26,20 @@ namespace infuse\controllers;
 
 class Bans extends \infuse\Controller
 {
+	public static $properties = array(
+		'title' => 'Bans',
+		'description' => 'Ban users by various criteria.',
+		'version' => '1.0',
+		'author' => array(
+			'name' => 'Jared King',
+			'email' => 'j@jaredtking.com',
+			'website' => 'http://jaredtking.com'
+		),
+		'admin' => true,
+		'api' => true,
+		'model' => 'Ban'
+	);
+
 	function middleware( $req, $res )
 	{
 		// check if ip is banned

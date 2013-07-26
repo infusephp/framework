@@ -26,6 +26,24 @@ namespace infuse\controllers;
 
 class Backup extends \infuse\Controller
 {
+	public static $properties = array(
+		'title' => 'Backup',
+		'description' => 'Backup the app database',
+		'version' => '1.0',
+		'author' => array(
+			'name' => 'Jared King',
+			'email' => 'j@jaredtking.com',
+			'website' => 'http://jaredtking.com'
+		),
+		'admin' => true,
+		'routes' => array(
+			'get /4dm1n/backup' => 'adminHome',
+			'get /4dm1n/backup/optimize' => 'optimizeDb',
+			'post /4dm1n/backup/restore' => 'restoreDb',
+			'get /4dm1n/backup/download' => 'backupDb'
+		)
+	);
+	
 	function optimizeDb( $req, $res )
 	{
 		if( \infuse\libs\Backup::optimizeDatabase() )

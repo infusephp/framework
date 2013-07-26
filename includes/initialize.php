@@ -1,4 +1,5 @@
 <?php
+
 /*
  * @package Infuse
  * @author Jared King <j@jaredtking.com>
@@ -34,7 +35,10 @@ set_include_path( get_include_path() . PATH_SEPARATOR . INFUSE_BASE_DIR );
 require 'vendor/autoload.php';
 
 // load configuration
-Config::load( INFUSE_BASE_DIR . '/config.yml' );
+$config = @include 'config.php';
+if( !is_array( $config ) )
+	die( 'Could not load configuration' );
+Config::load( $config );
 
 // setup logging
 Logger::setConfig( Config::get( 'logging' ) );
@@ -44,12 +48,18 @@ function handleError( $errno, $errstr, $errfile, $errline, $errcontext )
 {
 	$formattedErrorString = Logger::formatPhpError( $errno, $errstr, $errfile, $errline, $errcontext );
 	
+	if( !Config::get( 'site', 'production-level' ) )
+		echo "<pre>$formattedErrorString</pre>";
+
 	switch( $errno )
 	{
-	case E_ERROR:
 	case E_CORE_ERROR:
 	case E_COMPILE_ERROR:
+	case E_ERROR:
 	case E_PARSE:
+		Logger::error( $formattedErrorString );
+		die();
+	break;
 	case E_USER_ERROR:
 	case E_RECOVERABLE_ERROR:
 		Logger::error( $formattedErrorString );
@@ -67,18 +77,22 @@ function handleError( $errno, $errstr, $errfile, $errline, $errcontext )
 	break;
 	}
 	
-	if( !Config::value( 'site', 'production-level' ) )
-		echo "<pre>$formattedErrorString</pre>";
-	
 	return true;
 }
 
-set_error_handler( '\infuse\handleError', E_ALL | E_STRICT );
+set_error_handler( '\infuse\handleError' );
 
 // exception handling
 set_exception_handler( function( $exception )
 {
-	Logger::error( Logger::formatException( $exception ) );
+	$formattedExceptionString = Logger::formatException( $exception );
+		
+	if( !Config::get( 'site', 'production-level' ) )
+		echo $formattedExceptionString;
+
+	Logger::error( $formattedExceptionString );
+	
+	die();
 } );
 
 // show errors on shutdown
@@ -90,16 +104,16 @@ register_shutdown_function( function()
     }
 } );
 
-ini_set( 'display_errors', 0 );
+ini_set( 'display_errors', !Config::get( 'site', 'production-level' ) );
 ini_set( 'log_errors', 1 );
 error_reporting( E_ALL | E_STRICT );
 
 // time zone
-if( Config::value( 'site', 'time-zone' ) )
-	date_default_timezone_set( Config::value( 'site', 'time-zone' ) );
+if( Config::get( 'site', 'time-zone' ) )
+	date_default_timezone_set( Config::get( 'site', 'time-zone' ) );
 
 // load messages for site language
-require_once 'assets/lang/' . Config::value( 'site', 'language' ) . '.php';
+require_once 'assets/lang/' . Config::get( 'site', 'language' ) . '.php';
 
 // setup some useful constants and functions
 require_once 'includes/constants.php';
@@ -109,14 +123,14 @@ $req = new Request();
 $res = new Response();
 
 // check if site disabled, still allow access to admin panel
-if( Config::value( 'site', 'disabled' ) && $req->paths( 0 ) != '4dm1n' )
+if( Config::get( 'site', 'disabled' ) && $req->paths( 0 ) != '4dm1n' )
 {
-	$res->setBody( Config::value( 'site', 'disabled-message' ) );
+	$res->setBody( Config::get( 'site', 'disabled-message' ) );
 	$res->send();
 } 
 
 // run installer if the framework has not been installed yet, cli requests exlcuded
-if( !Config::value( 'site', 'installed' ) && !$req->isCli() )
+if( !Config::get( 'site', 'installed' ) && !$req->isCli() )
 {
 	include 'install.php';
 	exit;
@@ -129,16 +143,16 @@ if( !$req->isApi() )
 	ini_set( 'session.use_trans_sid', false );
 	ini_set( 'session.use_only_cookies', true ); 
 	ini_set( 'url_rewriter.tags', '' );
-	ini_set( 'session.gc_maxlifetime', Config::value( 'session', 'lifetime' ) );
+	ini_set( 'session.gc_maxlifetime', Config::get( 'session', 'lifetime' ) );
 
 	// set the session name
-	$sessionTitle = Config::value( 'site', 'title' ) . '-' . $req->host();
+	$sessionTitle = Config::get( 'site', 'title' ) . '-' . $req->host();
 	$safeSessionTitle = str_replace( array ( '.',' ',"'", '"' ), array( '','_','','' ), $sessionTitle );
 	session_name( $safeSessionTitle );
 	
 	// set the session cookie parameters
 	session_set_cookie_params(
-	    Config::value( 'session', 'lifetime' ), // lifetime
+	    Config::get( 'session', 'lifetime' ), // lifetime
 	    '/', // path
 	    $req->host(), // domain
 	    $req->isSecure(), // secure
@@ -146,10 +160,10 @@ if( !$req->isApi() )
 	);
 
 	// redis sessions
-	if( Config::value( 'session', 'adapter' ) == 'redis' )
+	if( Config::get( 'session', 'adapter' ) == 'redis' )
 		RedisSession::start( Config::get( 'redis' ) );
 	// default: database
-	else if( Config::value( 'session', 'adapter' ) == 'database' )
+	else if( Config::get( 'session', 'adapter' ) == 'database' )
 		DatabaseSession::start();
 	// default: built-in sessions
 	else
@@ -159,17 +173,20 @@ if( !$req->isApi() )
 	Util::set_cookie_fix_domain(
 		session_name(),
 		session_id(),
-		time() + Config::value( 'session', 'lifetime' ),
+		time() + Config::get( 'session', 'lifetime' ),
 		'/',
 		$req->host()
 	);
+	
+	// update the session in our request
+	$req->setSession( $_SESSION );
 }
 
 // enable modules autoloader
 spl_autoload_register( 'infuse\\Modules::autoloader' );
 
 // load required modules
-Modules::loadRequired();
+Modules::load( Config::get( 'site', 'required-modules' ) );
 
 // handle cli requests
 if( $req->isCli() )
@@ -185,12 +202,28 @@ if( $req->isCli() )
 // middleware
 Modules::middleware( $req, $res );
 
+if( $req->isHtml() )
+{
+	$engine = ViewEngine::engine();
+	
+	// CSS asset compilation
+	$cssFile = INFUSE_BASE_DIR . '/assets/css/styles.less';
+	if( file_exists( $cssFile ) )
+		$engine->compileLess( $cssFile, 'styles.css');
+	
+	// JS asset compilation
+	$jsFile = INFUSE_BASE_DIR . '/assets/js';
+	if( file_exists( $jsFile ) )
+		$engine->compileJs( $jsFile, 'header.js' );
+}
+
 /*
+	Routing Steps:
 	1) main config.yml routes
 	2) module routes (i.e. /users/:id/friends)
 	   i) static routes
 	   ii) dynamic routes
-	   iii) automatic api routes
+	   iii) api scaffolding
 	3) module admin routes
 	4) view without a controller (i.e. /contact-us displays views/contact-us.tpl)
 	5) not found
@@ -224,11 +257,11 @@ while( !$routed )
 			
 			$req->setParams( array( 'controller' => $module ) );
 
-			/* automatic generated API routes */
+			/* API scaffolding routes */
 						
 			if( $moduleInfo[ 'api' ] )
 			{
-				$models = Modules::models( $module );
+				$models = Modules::controller( $module )->models();
 				
 				$defaultModel = false;
 						
@@ -242,7 +275,7 @@ while( !$routed )
 				}
 					
 				// this comes from /:module/:model
-				$secondPath = val( $req->paths(), 1 );
+				$secondPath = Util::array_value( $req->paths(), 1 );
 				$possibleModel = Inflector::singularize( Inflector::camelize( $secondPath ) );
 				
 				// default model?
@@ -286,7 +319,7 @@ while( !$routed )
 			
 			/* Redirect /4dm1n -> /4dm1n/:default */
 			
-			if( empty( $module ) && $default = Config::value( 'site', 'default-admin-module' ) )
+			if( empty( $module ) && $default = Config::get( 'site', 'default-admin-module' ) )
 				return $res->redirect( '/4dm1n/' . $default );
 			
 			if( Modules::exists( $module ) )
@@ -300,7 +333,7 @@ while( !$routed )
 				$req->setParams( array( 'controller' => $module ) );
 				
 				ViewEngine::engine()->assignData( array(
-					'modulesWithAdmin' => Modules::modulesWithAdmin(),
+					'modulesWithAdmin' => Modules::adminModules(),
 					'selectedModule' => $module,
 					'title' => $moduleInfo[ 'title' ] ) );				
 				
@@ -308,7 +341,7 @@ while( !$routed )
 				
 				/* automatic admin routes */
 				
-				if( !$routed && $req->method() == 'GET' && ( val( $moduleInfo, 'admin' ) ) )
+				if( !$routed && $req->method() == 'GET' && ( Util::array_value( $moduleInfo, 'admin' ) ) )
 				{					
 					Modules::controller( $module )->routeAdmin( $req, $res );
 					
