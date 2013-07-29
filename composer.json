@@ -1,6 +1,6 @@
 {
 	"name": "infuse/infuse",
-	"version": "0.1.14",
+	"version": "0.1.15",
 	"description": "MVC framework built on top of infuse/libs",
 	"type": "library",
 	"keywords": ["mvc","framework","infuse"],
@@ -19,7 +19,7 @@
 	},
 	"require": {
 		"php": ">=5.3.0",
-		"infuse/libs": "0.1.13",
+		"infuse/libs": "0.1.14.2",
 		"phpmailer/phpmailer": "5.2.6"
 	}
 }

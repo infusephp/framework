@@ -28,6 +28,9 @@ return  array (
     'host' => 'localhost',
     'name' => 'dbname',
   ),
+  'views' => array (
+  	'engine' => 'smarty'
+  ),
   'memcache' => array (
     'enabled' => false,
     'host' => '127.0.0.1',

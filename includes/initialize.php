@@ -43,70 +43,21 @@ Config::load( $config );
 // setup logging
 Logger::setConfig( Config::get( 'logging' ) );
 
-// error handling
-function handleError( $errno, $errstr, $errfile, $errline, $errcontext )
-{
-	$formattedErrorString = Logger::formatPhpError( $errno, $errstr, $errfile, $errline, $errcontext );
-	
-	if( !Config::get( 'site', 'production-level' ) )
-		echo "<pre>$formattedErrorString</pre>";
+// setup error reporting
+ini_set( 'display_errors', !Config::get( 'site', 'production-level' ) );
+ini_set( 'log_errors', 1 );
+error_reporting( E_ALL | E_STRICT );
 
-	switch( $errno )
-	{
-	case E_CORE_ERROR:
-	case E_COMPILE_ERROR:
-	case E_ERROR:
-	case E_PARSE:
-		Logger::error( $formattedErrorString );
-		die();
-	break;
-	case E_USER_ERROR:
-	case E_RECOVERABLE_ERROR:
-		Logger::error( $formattedErrorString );
-	break;
-	case E_WARNING:
-	case E_CORE_WARNING:
-	case E_COMPILE_WARNING:
-	case E_USER_WARNING:
-	case E_NOTICE:
-	case E_USER_NOTICE:
-	case E_DEPRECATED:
-	case E_USER_DEPRECATED:
-	case E_STRICT:
-		Logger::warning( $formattedErrorString );
-	break;
-	}
-	
-	return true;
-}
-
-set_error_handler( '\infuse\handleError' );
-
-// exception handling
-set_exception_handler( function( $exception )
-{
-	$formattedExceptionString = Logger::formatException( $exception );
-		
-	if( !Config::get( 'site', 'production-level' ) )
-		echo $formattedExceptionString;
-
-	Logger::error( $formattedExceptionString );
-	
-	die();
-} );
+// error and exception handlers
+set_error_handler( '\infuse\Logger::phpErrorHandler' );
+set_exception_handler( '\infuse\Logger::exceptionHandler' );
 
 // show errors on shutdown
 register_shutdown_function( function()
 {
 	if( $error = error_get_last() )
-	{
-		handleError( $error[ 'type' ], $error[ 'message' ], $error[ 'file' ], $error[ 'line' ], null );
-    }
+		Logger::phpErrorHandler( $error[ 'type' ], $error[ 'message' ], $error[ 'file' ], $error[ 'line' ], null );
 } );
-
-ini_set( 'display_errors', !Config::get( 'site', 'production-level' ) );
-ini_set( 'log_errors', 1 );
-error_reporting( E_ALL | E_STRICT );
 
 // time zone
 if( Config::get( 'site', 'time-zone' ) )
@@ -136,7 +87,7 @@ if( !Config::get( 'site', 'installed' ) && !$req->isCli() )
 	exit;
 }
 
-// only use sessions if this is not an api call
+// setup sessions if this request is not an api call
 if( !$req->isApi() )
 {
 	// initialize sessions
@@ -182,13 +133,15 @@ if( !$req->isApi() )
 	$req->setSession( $_SESSION );
 }
 
-// enable modules autoloader
+Modules::$moduleDirectory = INFUSE_MODULES_DIR;
+
+// autoload modules
 spl_autoload_register( 'infuse\\Modules::autoloader' );
 
 // load required modules
 Modules::load( Config::get( 'site', 'required-modules' ) );
 
-// handle cli requests
+// make exception for cli requests
 if( $req->isCli() )
 {
 	if( $argc >= 2 ) {
@@ -199,23 +152,46 @@ if( $req->isCli() )
 	User::elevateToSuperUser();
 }
 
-// middleware
+// execute middleware
 Modules::middleware( $req, $res );
 
 if( $req->isHtml() )
 {
+	// setup the view engine
+	ViewEngine::configure( array(
+		'engine' => Config::get( 'views', 'engine' ),
+		'viewsDir' => INFUSE_VIEWS_DIR,
+		'compileDir' => INFUSE_TEMP_DIR . '/smarty',
+		'cacheDir' => INFUSE_TEMP_DIR . '/smarty/cache'
+	) );
+	
 	$engine = ViewEngine::engine();
+
+    // create temp and output dirs
+    if( !file_exists( INFUSE_TEMP_DIR . '/css' ) )
+	   	@mkdir( INFUSE_TEMP_DIR . '/css' );
+	if( !file_exists( INFUSE_APP_DIR . '/css' ) )
+	   	@mkdir( INFUSE_APP_DIR . '/css' );
+	if( !file_exists( INFUSE_TEMP_DIR . '/js' ) )
+		@mkdir( INFUSE_TEMP_DIR . '/js' );
+	if( !file_exists( INFUSE_APP_DIR . '/js' ) )
+		@mkdir( INFUSE_APP_DIR . '/js' );
 	
 	// CSS asset compilation
 	$cssFile = INFUSE_BASE_DIR . '/assets/css/styles.less';
 	if( file_exists( $cssFile ) )
-		$engine->compileLess( $cssFile, 'styles.css');
+		$engine->compileLess( $cssFile, INFUSE_TEMP_DIR . '/css/styles.css.cache', INFUSE_APP_DIR . '/css/styles.css' );
 	
 	// JS asset compilation
 	$jsFile = INFUSE_BASE_DIR . '/assets/js';
 	if( file_exists( $jsFile ) )
-		$engine->compileJs( $jsFile, 'header.js' );
+		$engine->compileJs( $jsFile, INFUSE_TEMP_DIR . '/js/header.js.cache', INFUSE_APP_DIR . '/css/header.js' );
 }
+
+// setup the router
+Router::configure( array(
+	'use_modules' => true
+) );
 
 /*
 	Routing Steps:
@@ -366,13 +342,12 @@ while( !$routed )
 	else
 	{
 		/* not found */
-		
 		$res->setCode( 404 );
 		
 		$routed = true;
 	}
 	
-	// move onto the next step
+	// move on to the next step
 	$routeStep++;
 }
 
