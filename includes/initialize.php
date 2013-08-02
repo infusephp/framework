@@ -119,14 +119,16 @@ if( !$req->isApi() )
 	// default: built-in sessions
 	else
 		session_start();
-	
+
 	// set the cookie by sending it in a header.
 	Util::set_cookie_fix_domain(
 		session_name(),
 		session_id(),
 		time() + Config::get( 'session', 'lifetime' ),
 		'/',
-		$req->host()
+		$req->host(),
+		$req->isSecure(),
+		true
 	);
 	
 	// update the session in our request
