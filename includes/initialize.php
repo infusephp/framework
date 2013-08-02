@@ -183,9 +183,9 @@ if( $req->isHtml() )
 		$engine->compileLess( $cssFile, INFUSE_TEMP_DIR . '/css/styles.css.cache', INFUSE_APP_DIR . '/css/styles.css' );
 	
 	// JS asset compilation
-	$jsFile = INFUSE_BASE_DIR . '/assets/js';
-	if( file_exists( $jsFile ) )
-		$engine->compileJs( $jsFile, INFUSE_TEMP_DIR . '/js/header.js.cache', INFUSE_APP_DIR . '/css/header.js' );
+	$jsDir = INFUSE_BASE_DIR . '/assets/js';
+	if( is_dir( $jsDir ) )
+		$engine->compileJs( $jsDir, INFUSE_TEMP_DIR . '/js/header.js.cache', INFUSE_APP_DIR . '/js/header.js' );
 }
 
 // setup the router

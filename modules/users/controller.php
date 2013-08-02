@@ -44,7 +44,8 @@ class Users extends \infuse\Controller
 		'api' => true,
 		'models' => array(
 			'User',
-			'UserLink'
+			'UserLink',
+			'UserLoginHistory'
 		),
 		'routes' => array(
 			'get /users/login' => 'loginForm',

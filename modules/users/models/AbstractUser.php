@@ -799,7 +799,7 @@ abstract class AbstractUser extends \infuse\Model
 		
 		// create an entry in the login history table
 		Database::insert(
-			'User_Login_History',
+			'UserLoginHistories',
 			array(
 				'uid' => $uid,
 				'timestamp' => time(),
@@ -1071,7 +1071,7 @@ abstract class AbstractUser extends \infuse\Model
 	
 							// create an entry in the login history table
 							Database::insert(
-								'User_Login_History',
+								'UserLoginHistories',
 								array(
 									'uid' => $this->id,
 									'timestamp' => time(),
