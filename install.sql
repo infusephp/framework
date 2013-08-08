@@ -1,5 +1,3 @@
-DROP TABLE IF EXISTS `Permissions`;
-CREATE TABLE `Permissions` (`id` int(11) NOT NULL auto_increment, PRIMARY KEY (`id`), `model` varchar(255) NOT NULL, `model_id` int(11) NULL, `uid` int(11) NOT NULL, `gid` int(11) NOT NULL, `permission` varchar(255) NOT NULL);
 DROP TABLE IF EXISTS `Bans`;
 CREATE TABLE `Bans` (`id` int(11) NOT NULL auto_increment, PRIMARY KEY (`id`), `type` int(1) NOT NULL, `value` varchar(40) NULL, `reason` varchar(255) NULL);
 DROP TABLE IF EXISTS `CronJobs`;
