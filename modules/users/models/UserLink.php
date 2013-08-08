@@ -1,11 +1,10 @@
 <?php
 
 /**
- * Represents a link for a user account (temporary, verify, forgot)
- * 
+ * @package infuse\framework
  * @author Jared King <j@jaredtking.com>
  * @link http://jaredtking.com
- * @version 1.0
+ * @version 0.1.15.2
  * @copyright 2013 Jared King
  * @license MIT
 	Permission is hereby granted, free of charge, to any person obtaining a copy of this software and

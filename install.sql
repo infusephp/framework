@@ -11,8 +11,6 @@ CREATE TABLE `Groups` (`id` int(11) NOT NULL auto_increment, PRIMARY KEY (`id`),
 INSERT INTO Groups VALUES('1', 'Administrators');
 DROP TABLE IF EXISTS `Persistent_Sessions`;
 CREATE TABLE `Persistent_Sessions` (`user_email` varchar(255) NOT NULL, `created` int(11) NOT NULL, `series` char(128) NOT NULL, `token` char(128) NOT NULL, PRIMARY KEY (`token`));
-DROP TABLE IF EXISTS `Sessions`;
-CREATE TABLE `Sessions` (`id` varchar(32) NOT NULL, PRIMARY KEY (`id`), `session_data` longtext NULL, `access` int(10) NULL, `logged_in` int(11) NULL);
 DROP TABLE IF EXISTS `Site_Stats_History`;
 CREATE TABLE `Site_Stats_History` (`id` int(11) NOT NULL auto_increment, PRIMARY KEY (`id`), `timestamp` int(11) NOT NULL, `stats` text NOT NULL);
 DROP TABLE IF EXISTS `UserLinks`;

@@ -7,3 +7,5 @@ Desktop.ini
 composer.lock
 /app/css/styles.css
 /app/js/header.js
+header.sh
+HEADER
