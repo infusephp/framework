@@ -823,7 +823,7 @@ abstract class AbstractUser extends \infuse\Model
 		{
 			// delete all persistent sessions
 			Database::delete(
-				'Persistent_Sessions',
+				'PersistentSessions',
 				array(
 					'user_email' => $this->get( 'user_email' ) ) );
 			
@@ -1031,7 +1031,7 @@ abstract class AbstractUser extends \infuse\Model
 					// which means an older session is being used, and then we run away					
 					
 					$tokenDB = Database::select(
-						'Persistent_Sessions',
+						'PersistentSessions',
 						'token',
 						array(
 							'where' => array(
@@ -1046,7 +1046,7 @@ abstract class AbstractUser extends \infuse\Model
 						{
 							// remove the token
 							Database::delete(
-								'Persistent_Sessions',
+								'PersistentSessions',
 								array(
 									'user_email' => $cookieParams->user_email,
 									'series' => $seriesEnc,
@@ -1076,7 +1076,7 @@ abstract class AbstractUser extends \infuse\Model
 							// same series, but different token.
 							// the user is trying to use an older token
 							// most likely an attack, so flush all sessions
-							Database::delete( 'Persistent_Sessions', array( 'user_email' => $email ) );
+							Database::delete( 'PersistentSessions', array( 'user_email' => $email ) );
 						}
 					}
 				}
@@ -1130,12 +1130,16 @@ abstract class AbstractUser extends \infuse\Model
 			$req->isSecure(),
 			true );
 		
-		Database::insert(
-			'Persistent_Sessions',
-			array(
-				'user_email' => $email,
-				'series' => Util::encryptPassword( $series ),
-				'token' => Util::encryptPassword( $token ),
-				'created' => time() ) );	
+		$currentUser = self::currentUser();
+		
+		$currentUser->elevateToSuperUser();
+		
+		PersistentSession::create( array(
+			'user_email' => $email,
+			'series' => Util::encryptPassword( $series ),
+			'token' => Util::encryptPassword( $token ),
+			'created' => time() ) );
+			
+		$currentUser->returnFromSuperUser();
 	}
 }

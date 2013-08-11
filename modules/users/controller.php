@@ -68,7 +68,8 @@ class Users extends \infuse\Controller
 		'models' => array(
 			'User',
 			'UserLink',
-			'UserLoginHistory'
+			'UserLoginHistory',
+			'PersistentSession'
 		),
 		'routes' => array(
 			'get /users/login' => 'loginForm',
@@ -169,7 +170,7 @@ class Users extends \infuse\Controller
 			$res->redirect( '/' );
 		
 		$success = User::forgotStep1( $req->request( 'email' ) );
-
+		
 		$req->setParams( array(
 			'success' => $success ) );
 		
@@ -322,7 +323,7 @@ class Users extends \infuse\Controller
 	{
 		if( !$req->isHtml() )
 		{
-			if( in_array( $req->params( 'slug' ), array( 'users', 'user_links' ) ) )
+			if( in_array( $req->params( 'slug' ), array( 'users', 'user_links', 'user_login_histories', 'persistent_sessions' ) ) )
 			{
 				$req->setParams( array( 'model' => $req->params( 'slug' ) ) );
 
