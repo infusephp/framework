@@ -895,7 +895,7 @@ abstract class AbstractUser extends \infuse\Model
 	 */
 	function sendEmail( $message, $details = array() )
 	{
-		$email = $this->getProperty( 'user_email' );
+		$email = $this->get( 'user_email' );
 	
 		$template = '';
 	
@@ -932,37 +932,29 @@ abstract class AbstractUser extends \infuse\Model
 		{
 			ob_start();
 			
-			// setup the mailer
-			$mail = new \PHPMailer;
-			$mail->SMTPAuth = true;
-			$mail->SMTPSecure = 'tls';
-			$mail->Host = Config::value( 'smtp', 'host' );
-			$mail->Username = Config::value( 'smtp', 'username' );
-			$mail->Password = Config::value( 'smtp', 'password' );
-			$mail->Port = Config::value( 'smtp', 'port' );
-			
-			// basic e-mail info
-			$mail->From = SMTP_FROM_ADDRESS;
-			$mail->FromName = Config::value( 'site', 'title' );
-			$mail->Subject = $subject;
-			
 			// generate the body
 			$engine = \infuse\ViewEngine::engine();
 			$engine->assignData( $details );
-			$body = $engine->fetch( 'emails/' . $template . '.tpl' );
-		
-			// text body
-			$mail->AltBody = $body;
+			$body = nl2br( $engine->render( 'emails/' . $template ) );
 			
-			// html body
-			$mail->MsgHTML( nl2br($body) );
+			// Create the Transport
+			$transport = \Swift_SmtpTransport::newInstance( Config::get( 'smtp', 'host' ), Config::get( 'smtp', 'port' ) )
+			  ->setUsername( Config::get( 'smtp', 'username' ) )
+			  ->setPassword( Config::get( 'smtp', 'password' ) );
 			
-			// send it to the user
-			$mail->AddAddress( $email );
+			// Create the Mailer using your created Transport
+			$mailer = \Swift_Mailer::newInstance( $transport );
+			
+			// Create a message
+			$message = \Swift_Message::newInstance( $subject )
+			  ->setFrom( array( SMTP_FROM_ADDRESS => Config::get( 'site', 'title' ) ) )
+			  ->setTo( array( $email => $this->name( true ) ) )
+			  ->setBody( $body, 'text/html' )
+			  ->addPart( strip_tags( $body ), 'text/plain' );
 			
 			// send the e-mail
-			$success = $mail->Send();
-			
+			$success = $mailer->send( $message );
+						
 			$errors = ob_get_contents();
 			ob_end_clean();
 			
