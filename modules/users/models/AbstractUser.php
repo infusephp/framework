@@ -101,12 +101,6 @@ abstract class AbstractUser extends \infuse\Model
 	
 	protected static $currentUser;
 	
-	protected static $verifyTimeWindow = 86400; // one day
-	
-	protected static $forgotLinkTimeframe = 1800; // 30 minutes
-	
-	protected static $persistentSessionLength = 7776000; // 3 months
-	
 	protected static $usernameProperties = array( 'user_email' );
 	
 	/**
@@ -186,7 +180,7 @@ abstract class AbstractUser extends \infuse\Model
 	*/
 	function isVerified( $withinTimeWindow = true )
 	{
-		$timeWindow = ( $withinTimeWindow ) ? time() - static::$verifyTimeWindow : time() + 100;
+		$timeWindow = ( $withinTimeWindow ) ? time() - UserLink::$verifyTimeWindow : time() + 100;
 		
 		return UserLink::totalRecords( array(
 			'uid' => $this->id,
@@ -570,7 +564,7 @@ abstract class AbstractUser extends \infuse\Model
 				// make sure there are no other forgot links
 				$oldLinks = UserLink::totalRecords( array(
 					'link_type' => 0,
-					'link_timestamp > ' . (time() - static::$forgotLinkTimeframe) ) );
+					'link_timestamp > ' . (time() - UserLink::$forgotLinkTimeframe) ) );
 				
 				if( $oldLinks > 0 )
 					return true;
@@ -619,7 +613,7 @@ abstract class AbstractUser extends \infuse\Model
 			'where' => array(
 				'link' => $token,
 				'link_type' => 0,
-				'link_timestamp > ' . (time() - static::$forgotLinkTimeframe) ) ) );
+				'link_timestamp > ' . (time() - UserLink::$forgotLinkTimeframe) ) ) );
 		
 		if( $link )
 		{
@@ -1036,7 +1030,7 @@ abstract class AbstractUser extends \infuse\Model
 						array(
 							'where' => array(
 								'user_email' => $cookieParams->user_email,
-								'created > ' . (time() - static::$persistentSessionLength),
+								'created > ' . (time() - PersistentSession::$sessionLength),
 								'series' => $seriesEnc ),
 								'single' => true ) );
 					
@@ -1124,7 +1118,7 @@ abstract class AbstractUser extends \infuse\Model
 				'series' => $series,
 				'token' => $token,
 				'agent' => $req->agent() ) ),
-			time() + static::$persistentSessionLength,
+			time() + PersistentSession::$sessionLength,
 			'/',
 			$req->host(),
 			$req->isSecure(),

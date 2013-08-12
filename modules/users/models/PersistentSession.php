@@ -25,6 +25,8 @@
  
 namespace infuse\models;
 
+use \infuse\Database;
+
 class PersistentSession extends \infuse\Model
 {
 	public static $idProperty = 'token';
@@ -56,4 +58,17 @@ class PersistentSession extends \infuse\Model
 			'default' => 'today'
 		)
 	);
+	
+	public static $sessionLength = 7776000; // 3 months
+	
+	/**
+	 * Clears out expired user links
+	 */
+	static function garbageCollect()
+	{
+		return Database::delete(
+			'PersistentSessions',
+			array(
+				'created < ' . (time() - self::$sessionLength) ) );
+	}
 }

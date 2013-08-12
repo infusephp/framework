@@ -25,6 +25,7 @@
  
 namespace infuse\models;
 
+use \infuse\Database;
 use \infuse\Util;
 
 class UserLink extends \infuse\Model
@@ -67,6 +68,10 @@ class UserLink extends \infuse\Model
 		)
 	);
 	
+	public static $verifyTimeWindow = 86400; // one day
+	
+	public static $forgotLinkTimeframe = 1800; // 30 minutes	
+	
 	function can( $permission, $requestor = null )
 	{
 		if( !$requestor )
@@ -89,5 +94,25 @@ class UserLink extends \infuse\Model
 			$data[ 'link_timestamp' ] = time();
 	
 		return true;
+	}
+	
+	/**
+	 * Clears out expired user links
+	 */
+	static function garbageCollect()
+	{
+		return
+			// verify links
+			Database::delete(
+				'UserLinks',
+				array(
+					'link_timestamp < ' . (time() - self::$verifyTimeWindow),
+					'link_type' => 1 ) ) &&
+			// forgot password links
+			Database::delete(
+				'UserLinks',
+				array(
+					'link_timestamp < ' . (time() - self::$forgotLinkTimeframe),
+					'link_type' => 0 ) );
 	}
 }
