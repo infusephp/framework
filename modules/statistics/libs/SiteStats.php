@@ -27,6 +27,8 @@ namespace infuse\libs;
 
 use \infuse\Config;
 use \infuse\Database;
+use \infuse\Util;
+use \infuse\models\StatisticSnapshot;
 
 class SiteStats
 {
@@ -140,14 +142,9 @@ class SiteStats
 	 */
 	static function getLatestSnapshot()
 	{
-		return json_decode( Database::select(
-			'Site_Stats_History',
-			'stats',
-			array(
-				'orderBy' => 'timestamp DESC',
-				'single' => true,
-				'limit' => '0,1'
-		)), true);
+		$lastSnapshot = StatisticSnapshot::findOne( array( 'sort' => 'timestamp DESC' ) );
+		
+		return json_decode( $lastSnapshot->get( 'stats' ) );
 	}
 	
 	/**
@@ -163,23 +160,20 @@ class SiteStats
 	{
 		if( !in_array( $metric, self::$historyMetrics ) )
 			return false;
-			
-		$stats = Database::select(
-			'Site_Stats_History',
-			'stats,timestamp',
-			array(
-				'where' => array(
-					"`timestamp` >= '$start'",
-					"`timestamp` <= '$end'" ),
-				'orderBy' => 'timestamp ASC' ) );
+		
+		$snapshots = StatisticSnapshot::find( array(
+			'where' => array(
+				"`timestamp` >= '$start'",
+				"`timestamp` <= '$end'" ),
+			'sort' => 'timestamp ASC' ) );
 		
 		$series = array();
 		
-		foreach( $stats as $day )
+		foreach( $snapshots[ 'models' ] as $snapshot )
 		{
-			$decoded = json_decode( $day[ 'stats' ], true );
+			$decoded = json_decode( $snapshot->get( 'stats' ), true );
 			
-			$series[ date( 'm/d/Y', $day[ 'timestamp' ] ) ] = Util::array_value( $decoded, $metric );
+			$series[ date( 'm/d/Y', $snapshot->get( 'timestamp' ) ) ] = Util::array_value( $decoded, $metric );
 		}
 		
 		return $series;
@@ -202,12 +196,7 @@ class SiteStats
 			Util::array_set( $stats, $metric, Util::array_value( $snapshot, $metric ) );
 		
 		// save it in the DB
-		return Database::insert(
-			'Site_Stats_History',
-			array(
-				'timestamp' => time(),
-				'stats' => json_encode( $stats )
-			)
-		);
+		$success = StatisticSnapshot::create( array(
+			'stats' => json_encode( $stats ) ) );
 	}
 }

@@ -25,35 +25,19 @@
  
 namespace infuse\models;
 
-class PersistentSession extends \infuse\Model
+class StatisticSnapshot extends \infuse\Model
 {
-	public static $idProperty = 'token';
-
 	public static $properties = array(
-		'token' => array(
-			'type' => 'id',
-			'mutable' => true,
-			'required' => true,
-			'auto_increment' => false,
-			'db_type' => 'char',
-			'length' => 128
+		'id' => array(
+			'type' => 'id'
 		),
-		'user_email' => array(
-			'type' => 'text',
-			'validate' => 'email'
-		),
-		'series' => array(
-			'type' => 'text',
-			'db_type' => 'char',
-			'length' => 128,
-			'required' => true,
-			'validate' => 'string:128'
-		),		
-		'created' => array(
+		'timestamp' => array(
 			'type' => 'date',
-			'required' => true,
 			'validate' => 'timestamp',
 			'default' => 'today'
+		),
+		'stats' => array(
+			'type' => 'longtext'
 		)
 	);
 }
