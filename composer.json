@@ -1,6 +1,6 @@
 {
 	"name": "infuse/infuse",
-	"version": "0.1.15.3",
+	"version": "0.1.15.4",
 	"description": "MVC framework built on top of infuse/libs",
 	"type": "library",
 	"keywords": ["mvc","framework","infuse"],
