@@ -1,4 +1,4 @@
-infuse v0.1.15.3
+infuse v0.1.15.4
 =====
 
 PHP MVC framework built with infuse/libs
@@ -20,7 +20,7 @@ Infuse Framework is an incredibly powerful tool for building a modern web applic
 - Dashboard to view, create, edit, and delete models
 - Schema generation
 - Templating with [Smarty](http://smarty.net)
-- CSS asset minification with LESS
+- CSS asset minification with [LESS](http://lesscss.org/)
 - Javascript minification
 - Logging with [monolog](https://github.com/Seldaek/monolog)
 
