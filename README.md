@@ -54,32 +54,24 @@ Infuse Framework is served through the `/app` directory to prevent the framework
 
 Here is a sample configuration:
 
-```
+```nginx
 server {
 	listen 80;
- 	server_name example.com;
-	root /var/www/example.com/app;
-	access_log /var/www/log/example.com-access.log;
-	error_log /var/www/log/example.com-error.log;
-	
-	location ~ \.php$ {
-		fastcgi_pass   127.0.0.1:9000;
-		fastcgi_index  index.php;
-		fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
-		include        fastcgi_params;
-	}
 
+ 	server_name example.com;
+
+	root /var/www/example.com/app;
+
+	access_log /var/log/nginx/example.com-access.log;
+	error_log /var/log/nginx/example.com-error.log;
+	
 	location / {
-	   	index  index.html index.htm index.php;
 		try_files $uri $uri/ /index.php?q=$uri&$args;
 	}
 
-	location ~ ^/index.php
-	{
-	  	fastcgi_pass   127.0.0.1:9000;
-	 	fastcgi_index  index.php;
-	 	fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
-		fastcgi_param  PATH_INFO $fastcgi_script_name;	
+	location ~ \.php$ {
+		fastcgi_pass   127.0.0.1:9000;
+		fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
 		include        fastcgi_params;
 	}
 }
