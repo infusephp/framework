@@ -87,7 +87,7 @@ Fire up the url where the framework is installed and you will be redirected to a
 
 ## Why another MVC framework?
 
-Infuse is the culmination of best practices that I learned through developing PHP web applications. My aim is to pass on what I learned for other's benefit. This framework has been built to my own taste. If something does not look right or feels wrong, I would love to hear about it in the issues.
+Infuse has served me well on many projects in the past, which makes this a highly opinionated framework. My aim is to make this available for the benefit of others. If something does not look right, I would love to hear about it in the issues.
 
 ## Documentation
 
