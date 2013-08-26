@@ -19,7 +19,7 @@
 	},
 	"require": {
 		"php": ">=5.3.0",
-		"infuse/libs": "0.1.14.7",
+		"infuse/libs": "0.1.14.8",
 		"swiftmailer/swiftmailer": "v5.0.1"
 	}
 }
