@@ -85,6 +85,14 @@ A .htaccess file is already included in the `/app` directory for url rewrites. Y
 
 Fire up the url where the framework is installed and you will be redirected to an installer to setup the database and `config.yml`.
 
+### 4. Cron Jobs (optional)
+
+If you wish to use the built-in `cron` module then you must setup a cron job for Infuse Framework.
+
+```bash
+*	*	*	*	*	cd /var/www/example.com/app;php index.php /cron/scheduleCheck
+```
+
 ## Why another MVC framework?
 
 Infuse has served me well on many projects in the past, which makes this a highly opinionated framework. My aim is to make this available for the benefit of others. If something does not look right, I would love to hear about it in the issues.
