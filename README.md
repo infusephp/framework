@@ -83,7 +83,7 @@ A .htaccess file is already included in the `/app` directory for url rewrites. Y
 
 ### 3. Installer
 
-Fire up the url where the framework is installed and you will be redirected to an installer to setup the database and `config.yml`.
+Fire up the url where the framework is installed and you will be redirected to an installer to setup the database and `config.php`.
 
 ### 4. Cron Jobs (optional)
 
