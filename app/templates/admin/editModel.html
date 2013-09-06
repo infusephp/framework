@@ -39,7 +39,7 @@
 						<select class="form-control" name="{{property.name}}" ng-options="key as value for (key,value) in property.enum" ng-model="model[property.name]"></select>
 					</div>
 					<div ng-switch-when="password">
-						<input class="input-large" type="password" name="{{property.name}}" ng-model="model[property.name]" autocomplete="off" />
+						<input class="form-control" type="password" name="{{property.name}}" ng-model="model[property.name]" autocomplete="off" />
 					</div>
 					<div ng-switch-when="number">
 						<input class="form-control" type="text" name="{{property.name}}" ng-model="model[property.name]" />
@@ -57,10 +57,10 @@
 			</div>
 		</div>
 		<div ng-show="newModel">
-			<input type="submit" class="btn btn-success btn-large" value="Create" ng-disabled="saving" />
+			<input type="submit" class="btn btn-success btn-lg" value="Create" ng-disabled="saving" />
 		</div>
 		<div ng-hide="newModel">
-			<input type="submit" class="btn btn-success btn-large" value="Save" ng-disabled="saving" />
+			<input type="submit" class="btn btn-success btn-lg" value="Save" ng-disabled="saving" />
 		</div>
 	</div>
 </form>

@@ -4,8 +4,8 @@
 
 <div class="filter-bar">
 	<div class="row">
-		<div class="col-md-1">
-			<a href="#/new" ng-show="modelInfo.permissions.create" class="btn btn-success">
+		<div class="col-md-2" ng-show="modelInfo.permissions.create">
+			<a href="#/new" class="btn btn-success btn-block">
 				<span class="glyphicon glyphicon-plus glyphicon-white"></span> {{modelInfo.proper_name}}
 			</a>
 		</div>
@@ -42,12 +42,12 @@
 							<span class="glyphicon glyphicon-filter glyphicon-white"></i>
 						</button>
 						<div class="input-group" ng-show="hasFilter[property.name]">
-							<input class="form-control" type="text" placeholder="Filter..." ng-model="filter[property.name]" />
+							<input class="form-control input-sm" type="text" placeholder="Filter..." ng-model="filter[property.name]" />
 							<span class="input-group-btn">
-								<button class="btn btn-success" type="button" ng-click="loadModels()">
+								<button class="btn btn-success btn-sm" type="button" ng-click="loadModels()">
 									<i class="glyphicon glyphicon-ok glyphicon-white"></i>
 								</button>
-								<button class="btn btn-danger" type="button" ng-click="hideFilter(property)">
+								<button class="btn btn-danger btn-sm" type="button" ng-click="hideFilter(property)">
 									<i class="glyphicon glyphicon-remove glyphicon-white"></i>
 								</button>								
 							</span>

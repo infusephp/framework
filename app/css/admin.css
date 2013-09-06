@@ -6,7 +6,7 @@ body {
 	background: #fff fixed;
 	width: 100%;
 	padding: 19px;
-	margin: -27px 0 0;
+	margin: 40px 0 0;
 }
 
 .navbar .secondary-nav img {
@@ -108,10 +108,18 @@ footer {
 
 /* Models */
 
+.filter-bar > div > div {
+	margin: 0 0 9px;
+}
+
 .models-holder {
 	overflow-x: auto;
 	overflow-y: visible !important;
 	padding-bottom: 50px;
+}
+
+#models-table th {
+	border-bottom: 0;
 }
 
 #models-table th, #models-table .nowrap {
@@ -120,6 +128,7 @@ footer {
 
 #models-table td {
 	border: none;
+	min-width: 100px;
 }
 
 .models .value {
@@ -163,9 +172,19 @@ footer {
 	border: 1px solid #08c;
 }
 
-@media (min-width: 992px) {
+@media (max-width: 767px) {
+	.subnavbar {
+		margin: 50px 0 0;
+	}
+
+	#main {
+		margin: 0;
+	}
+}
+
+@media (min-width: 768px) {
 	body {
-		padding-top: 80px;
+		padding-top: 50px;
 	}
 
 	.subnavbar {
@@ -173,6 +192,6 @@ footer {
 		margin: 0;
 		top: 53px;
 		left: 0;
-		right: 0;
+		right: 0;		
 	}
 }
