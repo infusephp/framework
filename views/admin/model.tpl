@@ -42,8 +42,8 @@
 		
 			<div class="title-bar">{$info.proper_name}</div>
 	
-			<div class="row-fluid">
-				<div class="span6">
+			<div class="row">
+				<div class="col-md-6">
 					<h3>Current Schema</h3>
 	
 					{if !$schema[$model].currentSql}
@@ -53,7 +53,7 @@
 					{/if}
 	
 				</div>
-				<div class="span6">
+				<div class="col-md-6">
 					<h3>Suggested Schema</h3>
 					
 					{if !$schema[$model].suggestedSql}

@@ -5,6 +5,8 @@ body {
 #main {
 	background: #fff fixed;
 	width: 100%;
+	padding: 19px;
+	margin: -27px 0 0;
 }
 
 .navbar .secondary-nav img {
@@ -21,8 +23,9 @@ body {
 	background: linear-gradient(to bottom,  #45484d 0%,#333333 100%); /* W3C */
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#45484d', endColorstr='#333333',GradientType=0 ); /* IE6-9 */
 	border-bottom: 1px solid #000;
-	margin: -19px -19px 19px -19px;
+	margin: 0;
 	z-index: 5;
+	width: 100%;
 }
 
 .subnavbar ul {
@@ -68,10 +71,6 @@ footer {
 
 .nav-pills > li {
 	margin-right: 10px;
-}
-
-.filter-bar select, .filter-bar .input-prepend {
-	margin-top: 10px;
 }
 
 .title-bar {
@@ -144,51 +143,11 @@ footer {
 	padding-left: 5px;
 }
 
-#models-table th button .caret {
-	border-top-color: #fff;
-	border-bottom-color: #fff;
+#models-table th button {
+	color: #fff;
 }
 
-#models-table th .sort-none .caret-1 {
-	border-top: none;
-	border-bottom: 4px solid #fff;
-	border-left: 4px solid transparent;
-	border-right: 4px solid transparent;
-	float: left;
-	margin: -2px 0 0;
-}
-
-#models-table th .sort-none .caret-2 {
-	border-bottom: none;
-	border-top: 4px solid #fff;
-	border-left: 4px solid transparent;
-	border-right: 4px solid transparent;
-	float: left;
-	clear: both;
-	margin: 3px 0 0 -1px;
-}
-
-#models-table th .sort-asc .caret-2, #models-table th .sort-desc .caret-2 {
-	display: none;
-}
-
-#models-table th .sort-asc .caret-1 {
-	margin: 8px 0 0;
-	border-top: none;
-	border-bottom: 4px solid #fff;
-	border-left: 4px solid transparent;
-	border-right: 4px solid transparent;
-}
-
-#models-table th .sort-desc .caret-1 {
-	margin: 8px 0 0;
-	border-bottom: none;
-	border-top: 4px solid #fff;
-	border-left: 4px solid transparent;
-	border-right: 4px solid transparent;
-}
-
-#models-table th > button .caret, #models-table th > button i {
+#models-table th > button {
 	opacity: .75;
 }
 
@@ -196,50 +155,23 @@ footer {
 	text-decoration: none;
 }
 
-#models-table th button:hover .caret, #models-table th button:hover i {
+#models-table th button:hover {
 	opacity: 1;
-}
-
-#models-table th .input-append {
-	margin: 0;
 }
 
 #models-table th input {
 	border: 1px solid #08c;
 }
 
-@media (max-width: 767px) {
-	#main {
-	    margin: -19px -19px 0;
-	    padding: 19px;	
-	}
-}
-
-@media (min-width: 768px) {
-	.subnavbar {
-		margin: -19px 0 19px;
-	}
-	
-	#main {
-	    margin: -19px -19px 0;
-	    padding: 19px;	
-	}
-}
-
-@media (min-width: 980px) {
+@media (min-width: 992px) {
 	body {
 		padding-top: 80px;
 	}
-	
-	#main {
-		margin: 0 -19px;
-		padding: 19px;
-	}
-	
+
 	.subnavbar {
 		position: fixed;
 		margin: 0;
-		top: 40px;
+		top: 53px;
 		left: 0;
 		right: 0;
 	}

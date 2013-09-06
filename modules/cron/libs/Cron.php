@@ -19,26 +19,27 @@ use \infuse\Config;
 class Cron
 {
 	/**
-	 * Runs a specific cron task
+	 * Runs a specific cron job
 	 *
-	 * @param int $id task id
+	 * @param CronJob job
+	 * @param boolean $echoOutput
 	 *
 	 * @return boolean result
 	 */
-	static function runTask( $id, $echoOutput = false )
+	static function runJob( $job, $echoOutput = false )
 	{
-		if( !isset( $id ) || !is_numeric( $id ) )
-			return false;
-		
+		$job->load();
+		// only run a job if we can get the lock, otherwise skip
+		if( !$job->getLock() )
+			return true;
+
 		$success = false;
 		$output = '';
-		
-		$task = new CronJob( $id );
-		$task->loadProperties();
-		$info = $task->toArray();
 
 		try
 		{
+			$info = $job->toArray();
+
 			if( Modules::exists( $info[ 'module' ] ) )
 			{
 				if( $echoOutput )
@@ -63,10 +64,12 @@ class Cron
 			$output .= "\n" . $e->getMessage();
 		}
 		
-		$task->saveRun( $success, $output );
+		$job->saveRun( $success, $output );
 		
 		if( $echoOutput )
 			echo $output . (( $success ) ? "\tFinished Successfully\n" : "\tFailed\n");
+
+		$job->releaseLock();
 		
 		return $success;
 	}
@@ -83,19 +86,13 @@ class Cron
 		if( $echoOutput )
 			echo "-- Starting Cron on " . Config::value('site', 'title') . "\n";
 		
-		$tasks =  Database::select(
-			'CronJobs',
-			'id',
-			array(
-				'where' => array(
-					'next_run <= ' . time() ),
-				'fetchStyle' => 'singleColumn' ) );
-
 		$success = true;
 		
-		foreach( $tasks as $id )
+		$jobs =  CronJob::overdueJobs();
+
+		foreach( $jobs as $job )
 		{
-			$taskSuccess = self::runTask( $id, $echoOutput );
+			$taskSuccess = self::runJob( $job, $echoOutput );
 			
 			$success = $success & $taskSuccess;
 		}

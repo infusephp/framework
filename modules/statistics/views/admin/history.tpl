@@ -76,8 +76,8 @@
 
 <div class="btn-toolbar stat-toolbar pull-right">
 	<div class="btn-group">
-		<a href="/4dm1n/statistics" class="btn">Overview</a>
-		<a href="/4dm1n/statistics/history" class="btn active">History</a>
+		<a href="/4dm1n/statistics" class="btn btn-default">Overview</a>
+		<a href="/4dm1n/statistics/history" class="btn btn-default active">History</a>
 	</div>
 </div>
 
@@ -85,31 +85,38 @@
 <hr/>
 
 <form>
- 	<select name="metric" id="metric">
-		{foreach from=$metrics item=m}
-		<option value="{$m}" {if $m==$metric}selected="selected"{/if}>{$m}</option>
-		{/foreach}
-	</select>
-	
-	<div class="input-prepend">
-		<span class="add-on">
-			<i class="icon-calendar"></i>
-		</span>
-		<input id="start" class="input-small datepicker" type="text" value="{$start}" />
+	<div class="row">
+		<div class="col-md-2">
+		 	<select name="metric" id="metric" class="form-control">
+				{foreach from=$metrics item=m}
+				<option value="{$m}" {if $m==$metric}selected="selected"{/if}>{$m}</option>
+				{/foreach}
+			</select>
+		</div>
+		<div class="col-md-2">
+			<div class="input-group">
+				<span class="input-group-addon">
+					<span class="glyphicon glyphicon-calendar"></span>
+				</span>
+				<input id="start" class="form-control datepicker" type="text" value="{$start}" />
+			</div>
+		</div>
+		<div class="col-md-2">
+			<div class="input-group">
+				<span class="input-group-addon">
+					<span class="glyphicon glyphicon-calendar"></span>
+				</span>
+				<input id="end" class="form-control datepicker" type="text" value="{$end}" />
+			</div>
+		</div>
 	</div>
-	to
-	<div class="input-prepend">
-		<span class="add-on">
-			<i class="icon-calendar"></i>
-		</span>
-		<input id="end" class="input-small datepicker" type="text" value="{$end}" />
-	</div>	
 </form>
 
 {if $history}
 	<div id="theChart"></div>
 {else}
-	<div class="alert alert-error">No history exists for the metric <strong>{$metric}</strong>.</div>
+	<br/>
+	<div class="alert alert-danger">No history exists for the metric <strong>{$metric}</strong>.</div>
 {/if}
 
 {/block}

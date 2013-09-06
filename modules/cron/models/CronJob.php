@@ -36,6 +36,7 @@ namespace infuse\models;
 
 use \infuse\libs\Cron;
 use \infuse\libs\CronDate;
+use \infuse\Database;
 use \infuse\ErrorStack;
 
 class CronJob extends \infuse\Model
@@ -94,8 +95,14 @@ class CronJob extends \infuse\Model
 			'type' => 'longtext',
 			'filter' => '<pre>{last_run_output}</pre>',
 			'truncate' => false
-		)		
+		),
+		'locked' => array(
+			'type' => 'date'
+		)
 	);
+
+	public static $lockInterval = 60; // 1 minute
+	private $hasLock = false;
 	
 	static function validateMinute( &$minute )
 	{
@@ -139,6 +146,75 @@ class CronJob extends \infuse\Model
 		if( isset( $data[ 'minute' ] ) && isset( $data[ 'hour' ] ) && isset( $data[ 'day' ] ) && isset( $data[ 'month' ] ) && isset( $data[ 'week' ] ) )
 			$data[ 'next_run' ] = self::calcNextRun( $data[ 'minute' ], $data[ 'hour' ], $data[ 'day' ], $data[ 'month' ], $data[ 'week' ] );
 
+		return true;
+	}
+
+	/**
+	 * Gets jobs that are due to be ran
+	 *
+	 * @return array(CronJob)
+	 */
+	static function overdueJobs()
+	{
+		$jobs = self::find( array(
+			'where' => array(
+				'next_run <= ' . time(),
+				'locked < ' . (time() - self::$lockInterval) ) ) );
+				
+		return $jobs[ 'models' ];
+	}
+
+	/** 
+	 * Checks if the job is locked by anyone
+	 *
+	 * @return boolean
+	 */
+	function isLocked()
+	{
+		return $this->get( 'locked' ) > (time() - self::$lockInterval);
+	}
+
+	/**
+	 * Attempts to get the global lock for this job
+	 *
+	 * @return boolean
+	 */
+	function getLock()
+	{
+		if( $this->hasLock )
+			return true;
+
+		$t = time();
+
+		if( $this->isLocked() )
+			return false;
+
+		$this->set( 'locked', $t );
+
+		if( Database::select(
+			'CronJobs',
+			'locked',
+			array(
+				'where' => array(
+					'id' => $this->id ),
+				'single' => true ) ) == $t )
+			$this->hasLock = true;
+		else
+			$this->hasLock = false;
+
+		return $this->hasLock;
+	}
+
+	/**
+	 * Releases the lock on this job, if the current model has it
+	 *
+	 * @return boolean
+	 */
+	function releaseLock()
+	{
+		if( $this->getLock() && $this->set( 'locked', 0 ) )
+			$this->hasLock = false;
+		
 		return true;
 	}
 	

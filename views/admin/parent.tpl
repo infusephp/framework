@@ -6,7 +6,7 @@
 	<meta name="robots" content="noindex, nofollow" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-	<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet" type="text/css" />
+	<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
 	<link href="//code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" rel="stylesheet" type="text/css" />
 	<link rel="stylesheet" href="/css/admin.css" type="text/css" />
 	
@@ -14,41 +14,42 @@
 	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js"></script>
 	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.6/angular.min.js"></script>
 	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/angularjs/1.1.4/angular-resource.min.js"></script>
-	<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
+	<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
 	<script type="text/javascript" src="//www.google.com/jsapi"></script>
 	<script type="text/javascript" src="/js/header.js"></script>
 
 	{block name=header}{/block}
 </head>
 <body>
-	<div class="navbar navbar-fixed-top">
-		<div class="navbar-inner">
-			<div class="container-fluid">
-				<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-					<span class="icon-bar"></span>
-					<span class="icon-bar"></span>
-					<span class="icon-bar"></span>
-				</a>
-	    	   <a class="brand" href="/4dm1n">{$smarty.const.SITE_TITLE}</a>
-		       <div class="nav-collapse collapse">
-					<ul class="nav pull-right">
-						<li><a href="/"><i class="icon-home"></i> Site Home</a></li>
-						<li class="dropdown">
-							<a class="dropdown-toggle" data-toggle="dropdown" href="#">
-								<img src="{$currentUser->profilePicture(20)}" alt="{$currentUser->name()}" height="20" width="20" />
-								{$currentUser->name()}
-								<b class="caret"></b>
-							</a>
-							<ul class="dropdown-menu">
-								<li><a href="/users/account"><i class="icon-user"></i> Account</a></li>
-								<li><a href="/users/logout"><i class="icon-remove"></i> Logout</a></li>
-							</ul>
-						</li>
+	<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+				<span class="sr-only">Toggle navigation</span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+	    	<a class="navbar-brand" href="/4dm1n">{$smarty.const.SITE_TITLE}</a>
+	    </div>
+
+	    <div class="collapse navbar-collapse navbar-ex1-collapse">
+			<ul class="nav navbar-nav navbar-right">
+				<li><a href="/"><i class="icon-home"></i> Site Home</a></li>
+				<li class="dropdown">
+					<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+						<img src="{$currentUser->profilePicture(20)}" alt="{$currentUser->name()}" height="20" width="20" />
+						{$currentUser->name()}
+						<b class="caret"></b>
+					</a>
+					<ul class="dropdown-menu">
+						<li><a href="/users/account"><i class="icon-user"></i> Account</a></li>
+						<li><a href="/users/logout"><i class="icon-remove"></i> Logout</a></li>
 					</ul>
-				</div>
-			</div>
+				</li>
+			</ul>
 		</div>
-	</div>
+	</nav>
+
 	<div class="subnavbar clearfix">
 		<ul>
 			{foreach from=$modulesWithAdmin item=module}
@@ -56,13 +57,13 @@
 			{/foreach}
 		</ul>
 	</div>
-	<div class="container-fluid">
-		<div id="main">
-			{block name=main}{/block}
-		</div>
-		<footer>
-			<p>Powered by <a href="https://github.com/jaredtking/infuse" target="_blank">infuse framework</a></p>
-		</footer>
+
+	<div id="main">
+		{block name=main}{/block}
 	</div>
+	
+	<footer>
+		<p>Powered by <a href="https://github.com/jaredtking/infuse" target="_blank">infuse framework</a></p>
+	</footer>
 </body>
 </html>
