@@ -13,6 +13,7 @@ namespace infuse\models;
 
 class Module extends \infuse\Model
 {
+	protected static $hasSchema = false;
 	public static $properties = array(
 		'title' => array(
 			'type' => 'text'

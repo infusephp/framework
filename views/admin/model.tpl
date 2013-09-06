@@ -13,9 +13,11 @@
 				<a href="/4dm1n/{$moduleName}/{$model.model}#/">{$model.proper_name_plural}</a>
 			</li>
 		{/foreach}
-		<li class="{if isset($schema)}active{/if}">
-			<a href="/4dm1n/{$moduleName}/schema">Database Schema</a>
-		</li>
+		{if $hasSchema}
+			<li class="{if isset($schema)}active{/if}">
+				<a href="/4dm1n/{$moduleName}/schema">Database Schema</a>
+			</li>
+		{/if}
 	</ul>
 	<hr/>
 

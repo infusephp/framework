@@ -21,11 +21,13 @@ class GroupMember extends \infuse\Model
 	public static $properties = array(
 		'gid' => array(
 			'type' => 'id',
-			'mutable' => true
+			'mutable' => true,
+			'auto_increment' => false
 		),
 		'uid' => array(
 			'type' => 'id',
-			'mutable' => true
+			'mutable' => true,
+			'auto_increment' => false
 		)
 	);
 }

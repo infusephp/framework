@@ -99,7 +99,7 @@ class Users extends \infuse\Controller
 				if( !empty( $redir ) )
 					$res->redirect( $redir );
 				else
-					$res->redirect( "/" );
+					$res->redirect( '/' );
 			}
 			else
 				$this->loginForm( $req, $res );
@@ -338,5 +338,5 @@ class Users extends \infuse\Controller
 			
 			return $persistentSessionSuccess && $userLinkSuccess;
 		}
-	}	
+	}
 }

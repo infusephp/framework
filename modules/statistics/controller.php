@@ -27,6 +27,7 @@ class Statistics extends \infuse\Controller
 			'website' => 'http://jaredtking.com'
 		),
 		'admin' => true,
+		'model' => 'StatisticSnapshot',
 		'defaultHistoryMetric' => 'users.numUsers',
 		'routes' => array(
 			'get /4dm1n/statistics' => 'adminHome',

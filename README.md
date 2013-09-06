@@ -48,7 +48,7 @@ A demo has been setup at [infuse.jaredtking.com](http://infuse.jaredtking.com).
 composer create-project infuse/infuse ./path/to/dir
 ```
 
-Infuse Framework is served through the `/app` directory to prevent the framework files from being publicly accessible. This requires a small amount of configuration for the web server to work properly.
+Infuse Framework is served through the `app` directory to prevent the framework files from being publicly accessible. This requires a small amount of configuration for the web server to work properly.
 
 ### 2. nginx
 
@@ -90,7 +90,7 @@ Fire up the url where the framework is installed and you will be redirected to a
 If you wish to use the built-in `cron` module then you must setup a cron job for Infuse Framework.
 
 ```bash
-*	*	*	*	*	cd /var/www/example.com/app;php index.php /cron/scheduleCheck
+*	*	*	*	*	php /var/www/example.com/app/index.php /cron/scheduleCheck
 ```
 
 ## Why another MVC framework?
