@@ -83,19 +83,17 @@
 		</table>
 	</div>
 		
-	<div class="pagination pull-right" ng-show="page_count>1">
-	    <ul>
-		    <li ng-class="{disabled:page==1}">
-		    	<a href="#" ng-click="prevPage()" eat-click>&larr;</a>
-		    </li>
-		    <li ng-repeat="p in currentPages(5)" ng-class="{active:page==p}">
-		    	<a href="#" ng-click="goToPage(p)" eat-click>{{p}}</a>
-		    </li>
-		    <li ng-class="{disabled:page>=page_count}">
-		    	<a href="#" ng-click="nextPage()" eat-click>&rarr;</a>
-		    </li>
-	    </ul>
-	</div>
+	<ul class="pagination pull-right" ng-show="page_count>1">
+	    <li ng-class="{disabled:page==1}">
+	    	<a href="#" ng-click="prevPage()" eat-click>&larr;</a>
+	    </li>
+	    <li ng-repeat="p in currentPages(5)" ng-class="{active:page==p}">
+	    	<a href="#" ng-click="goToPage(p)" eat-click>{{p}}</a>
+	    </li>
+	    <li ng-class="{disabled:page>=page_count}">
+	    	<a href="#" ng-click="nextPage()" eat-click>&rarr;</a>
+	    </li>
+	</ul>
 	
 	<p ng-show="models.length>0">
 		<br/>
