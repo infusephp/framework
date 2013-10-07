@@ -272,7 +272,7 @@ while( !$routed )
 			
 			/* Redirect /4dm1n -> /4dm1n/:default */
 			
-			if( empty( $module ) && $default = Config::get( 'site', 'default-admin-module' ) )
+			if( empty( $module ) && $default = Config::get( 'modules', 'default-admin' ) )
 				return $res->redirect( '/4dm1n/' . $default );
 			
 			if( Modules::exists( $module ) )
