@@ -172,6 +172,16 @@ footer {
 	border: 1px solid #08c;
 }
 
+/* Temporary styles until ui-bootstrap supports bootstrap 3.0 */
+
+body > .modal {
+	display: block;
+}
+
+.modal-backdrop {
+	opacity: .5;
+}
+
 @media (max-width: 767px) {
 	.subnavbar {
 		margin: 50px 0 0;

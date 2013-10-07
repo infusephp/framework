@@ -294,7 +294,7 @@ abstract class AbstractUser extends \infuse\Model
 	function url()
 	{
 		if( $this->id > 0 )
-			return 'http://' . Config::value( 'site', 'host-name' ) . '/users/' . Util::seoUrl( $this->name(true), $this->id );
+			return 'http://' . Config::get( 'site', 'host-name' ) . '/users/' . Util::seoUrl( $this->name(true), $this->id );
 		
 		return false;
 	}
@@ -477,7 +477,7 @@ abstract class AbstractUser extends \infuse\Model
 		
 		$success = false;
 		
-		User::currentUser()->elevateToSuperUser();
+		User::currentUser()->su();
 		
 		if( $this->set( $updateArray ) )
 		{
@@ -494,7 +494,7 @@ abstract class AbstractUser extends \infuse\Model
 			$success = true;
 		}
 		
-		User::currentUser()->returnFromSuperUser();
+		User::currentUser()->quitSu();
 
 		return $success;
 	}
@@ -514,12 +514,12 @@ abstract class AbstractUser extends \infuse\Model
 		{
 			$user = new User( $link->get( 'uid' ) );
 		
-			User::currentUser()->elevateToSuperUser();
+			User::currentUser()->su();
 			
 			// enable the user and delete the verify link
 			$success = $user->set( 'enabled', 1 ) && $link->delete();
 			
-			User::currentUser()->returnFromSuperUser();
+			User::currentUser()->quitSu();
 			
 			// send a welcome e-mail
 			$user->sendEmail( 'registration-welcome' );
@@ -605,7 +605,7 @@ abstract class AbstractUser extends \infuse\Model
 		{
 			$user = new User( $link->get( 'uid' ) );
 			
-			User::currentUser()->elevateToSuperUser();
+			User::currentUser()->su();
 			
 			// Update the password
 			$success = $user->set( 'user_password', $password );
@@ -613,7 +613,7 @@ abstract class AbstractUser extends \infuse\Model
 			if( $success )
 				$link->delete();
 
-			User::currentUser()->returnFromSuperUser();
+			User::currentUser()->quitSu();
 				
 			return $success;
 		}
@@ -633,26 +633,38 @@ abstract class AbstractUser extends \infuse\Model
 	 * to everything. BE CAREFUL. Typically, this is reserved for cron jobs that need
 	 * to work with models belonging to other users.
 	 *
-	 * WARNING: do not forget to remove super user permissions when done with returnFromSuperUser()
+	 * WARNING: do not forget to remove super user permissions when done with quitSu()
 	 * or else the user will have free reign to do anything
 	 */
-	static function elevateToSuperUser()
+	static function su()
 	{
 		static::currentUser();
 		static::$currentUser->oldUid = static::$currentUser->id;
 		static::$currentUser->id = SUPER_USER;
 	}
+
+	/**
+	 * @deprecated
+	 */
+	static function elevateToSuperUser()
+	{ return static::su(); }
 	
 	/**
 	 * Removes super user permission.
 	 *
 	 */
-	static function returnFromSuperUser()
+	static function quitSu()
 	{
 		static::currentUser();
 		if( isset( static::$currentUser->oldUid ) )
 			static::$currentUser->id = static::$currentUser->oldUid;
 	}
+
+	/**
+	 * @deprecated
+	 */
+	static function returnFromSuperUser()
+	{ return static::quiteSu(); }
 	
 	/**
 	 * Checks if the a given username and password are valid
@@ -776,18 +788,20 @@ abstract class AbstractUser extends \infuse\Model
 			}
 		}
 		
+		$currentUser = static::currentUser();
+		$currentUser->su();
+
 		// create an entry in the login history table
-		Database::insert(
-			'UserLoginHistories',
-			array(
-				'uid' => $uid,
-				'timestamp' => time(),
-				'type' => $type,
-				'ip' => ($req) ? $req->ip() : $_SERVER[ 'REMOTE_ADDR' ] ) );
+		UserLoginHistory::create( array(
+			'uid' => $uid,
+			'timestamp' => time(),
+			'type' => $type,
+			'ip' => ($req) ? $req->ip() : $_SERVER[ 'REMOTE_ADDR' ] ) );
+		$currentUser->quitSu();
 
 		$this->logged_in = true;
 		
-		return true;		
+		return true;
 	}
 	
 	/**
@@ -801,18 +815,22 @@ abstract class AbstractUser extends \infuse\Model
 	{
 		if( $this->isLoggedIn() )
 		{
-			// delete all persistent sessions
-			Database::delete(
-				'PersistentSessions',
-				array(
-					'user_email' => $this->get( 'user_email' ) ) );
+			// delete persistent session cookie
+			$req->setCookie(
+				'persistent',
+				'',
+				time() - 86400,
+				'/',
+				$req->host(),
+				$req->isSecure(),
+				true );
 			
 			// empty the session cookie
 		    $sessionCookie = session_get_cookie_params();
 			$req->setCookie(
 				session_name(),
 				'',
-				time() - 42000,
+				time() - 86400,
 				$sessionCookie[ 'path' ],
 				$sessionCookie[ 'domain' ],
 				$sessionCookie[ 'secure' ],
@@ -879,18 +897,18 @@ abstract class AbstractUser extends \infuse\Model
 	
 		$template = '';
 	
-		$subject = 'Message from ' . Config::value( 'site', 'title' );
+		$subject = 'Message from ' . Config::get( 'site', 'title' );
 		
 		$details[ 'message' ] = $message;
 		$details[ 'user' ] = $this;
-		$details[ 'baseUrl' ] = ((Config::value( 'site', 'ssl-enabled' )) ? 'https://' : 'http://') . Config::value( 'site', 'host-name' ) . '/';
-		$details[ 'siteEmail' ] = Config::value( 'site', 'email' );
+		$details[ 'baseUrl' ] = ((Config::get( 'site', 'ssl-enabled' )) ? 'https://' : 'http://') . Config::get( 'site', 'host-name' ) . '/';
+		$details[ 'siteEmail' ] = Config::get( 'site', 'email' );
 		$details[ 'email' ] = $email;
 
 		switch ($message)
 		{
 		case 'registration-welcome':
-			$subject = 'Welcome to ' . Config::value( 'site', 'title' );
+			$subject = 'Welcome to ' . Config::get( 'site', 'title' );
 			$template = 'welcome';
 		break;
 		case 'email-verification':
@@ -899,7 +917,7 @@ abstract class AbstractUser extends \infuse\Model
 			$template = 'email-verification';
 		break;
 		case 'forgot-password':
-			$subject = 'Password change request on ' . Config::value( 'site', 'title' );
+			$subject = 'Password change request on ' . Config::get( 'site', 'title' );
 			$details[ 'forgotLink' ] = "{$details['baseUrl']}users/forgot/{$details['forgot']}";
 			$template = 'forgot-password';
 		break;
@@ -907,7 +925,7 @@ abstract class AbstractUser extends \infuse\Model
 			return false;
 		break;
 		}
-				
+		
 		try
 		{
 			ob_start();
@@ -973,26 +991,18 @@ abstract class AbstractUser extends \infuse\Model
 	protected function authenticate( $req )
 	{
 		// check if the user's session is already logged in and valid
-		if( $req->session( 'user_agent' ) == $req->agent() && $req->session( 'user_id' ) > 0 )
+		if( $req->session( 'user_agent' ) == $req->agent() )
 		{
 			$this->id = $req->session( 'user_id' );
 
-			if( !$this->exists() )
-			{
-				// back to guest
-				$this->id = -1;
-				$this->changeSessionUserID( $req );
-				
-				return false;
-			}
-			
-			return true;
+			if( $this->id > 0 && $this->exists() )
+				return true;
 		}
 		// check for persistent sessions
 		else if( $cookie = $req->cookies( 'persistent' ) )
 		{
 			// decode the cookie
-			$cookieParams = json_decode( $cookie );
+			$cookieParams = json_decode( base64_decode( $cookie ) );
 			
 			if( $cookieParams )
 			{
@@ -1000,8 +1010,6 @@ abstract class AbstractUser extends \infuse\Model
 				
 				if( $user )
 				{
-					$user->load();
-					
 					// encrypt series and token for matching with the db
 					$seriesEnc = Util::encryptPassword( $cookieParams->series );
 					$tokenEnc = Util::encryptPassword( $cookieParams->token );
@@ -1031,41 +1039,47 @@ abstract class AbstractUser extends \infuse\Model
 									'user_email' => $cookieParams->user_email,
 									'series' => $seriesEnc,
 									'token' => $tokenEnc ) );
-							
-							// generate a new cookie for the next time
-							static::createPersistentCookie( $req, $cookieParams->user_email, $cookieParams->series );
-							
+
 							// log the user in
-							$this->id = $user->id();
-							$this->changeSessionUserID( $req );
-							$req->setSession( 'persistent', true );
-	
-							// create an entry in the login history table
-							Database::insert(
-								'UserLoginHistories',
-								array(
-									'uid' => $this->id,
-									'timestamp' => time(),
-									'type' => 0, // regular = 0
-									'ip' => $req->ip() ) );
-							
-							return true;
+							if( $this->loginForUid( $user->id(), 4, $req, false ) )
+							{
+								// generate a new cookie for the next time
+								static::createPersistentCookie( $req, $cookieParams->user_email, $cookieParams->series );
+								
+								// mark this session as persistent (useful for security checks)
+								$req->setSession( 'persistent', true );
+								
+								return true;
+							}
 						}
 						else
 						{
 							// same series, but different token.
 							// the user is trying to use an older token
 							// most likely an attack, so flush all sessions
-							Database::delete( 'PersistentSessions', array( 'user_email' => $email ) );
+							Database::delete( 'PersistentSessions', array( 'user_email' => $cookieParams->user_email ) );
 						}
 					}
 				}
 			}
+
+			// delete persistent session cookie
+			$req->setCookie(
+				'persistent',
+				'',
+				time() - 86400,
+				'/',
+				$req->host(),
+				$req->isSecure(),
+				true );
 		}
 
-		// back to guest
+		// just a guest...
+		$changed = $this->id != -1;
 		$this->id = -1;
-		$this->changeSessionUserID( $req );
+		// change session user id back to guest if we thought user was someone else
+		if( $changed )
+			$this->changeSessionUserID( $req );	
 		
 		return false;
 	}
@@ -1073,7 +1087,17 @@ abstract class AbstractUser extends \infuse\Model
 	protected function changeSessionUserID( $req )
 	{
 		// regenerate session id to prevent session hijacking
-		session_regenerate_id();
+		session_regenerate_id( true );
+
+		// hang on to the new session id
+		$sid = session_id();
+
+		// close the old and new sessions
+		session_write_close();
+
+		// re-open the new session
+		session_id( $sid );
+		session_start();
 		
 		// set the user id
 		$req->setSession( array(
@@ -1099,20 +1123,20 @@ abstract class AbstractUser extends \infuse\Model
 	
 		$req->setCookie(
 			'persistent',
-			json_encode( array(
+			base64_encode( json_encode( array(
 				'user_email' => $email,
 				'series' => $series,
 				'token' => $token,
-				'agent' => $req->agent() ) ),
+				'agent' => $req->agent() ) ) ),
 			time() + PersistentSession::$sessionLength,
 			'/',
 			$req->host(),
 			$req->isSecure(),
 			true );
 		
-		$currentUser = self::currentUser();
+		$currentUser = static::currentUser();
 		
-		$currentUser->elevateToSuperUser();
+		$currentUser->su();
 		
 		PersistentSession::create( array(
 			'user_email' => $email,
@@ -1120,6 +1144,6 @@ abstract class AbstractUser extends \infuse\Model
 			'token' => Util::encryptPassword( $token ),
 			'created' => time() ) );
 			
-		$currentUser->returnFromSuperUser();
+		$currentUser->quitSu();
 	}
 }

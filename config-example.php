@@ -16,11 +16,6 @@ return  array (
     'production-level' => false,
     'host-name' => 'example.com',
     'ssl-enabled' => false,
-    'required-modules' => array(
-    	'users',
-    	'bans'
-    ),
-    'default-admin-module' => 'statistics',
     'salt' => 'replacewithrandomstring',
     'time-zone' => 'America/Chicago',
     'disabled' => false,
@@ -28,7 +23,17 @@ return  array (
     'installed' => false,
     'language' => 'en',
   ),
-  'logger' => array(
+  'modules' => array (
+    'required' => array (
+      'users',
+    ),
+    'middleware' => array (
+      'users',
+      'bans'
+    ),
+    'default-admin' => 'statistics',
+  ),  
+  'logger' => array (
   ),
   'database' => array (
     'type' => 'mysql',

@@ -37,7 +37,7 @@ if( !is_array( $config ) )
 Config::load( $config );
 
 // setup logging
-Logger::setConfig( Config::get( 'logging' ) );
+Logger::setConfig( Config::get( 'logger' ) );
 
 // setup error reporting
 ini_set( 'display_errors', !Config::get( 'site', 'production-level' ) );
@@ -101,7 +101,7 @@ if( !$req->isApi() )
 	session_set_cookie_params(
 	    Config::get( 'session', 'lifetime' ), // lifetime
 	    '/', // path
-	    $req->host(), // domain
+	    '.' . $req->host(), // domain
 	    $req->isSecure(), // secure
 	    true // http only
 	);
@@ -137,7 +137,7 @@ Modules::$moduleDirectory = INFUSE_MODULES_DIR;
 spl_autoload_register( 'infuse\\Modules::autoloader' );
 
 // load required modules
-Modules::load( Config::get( 'site', 'required-modules' ) );
+Modules::load( Config::get( 'modules', 'required' ) );
 
 // make exception for cli requests
 if( $req->isCli() )
@@ -147,11 +147,8 @@ if( $req->isCli() )
 	}
 	
 	// super user permissions
-	User::elevateToSuperUser();
+	User::su();
 }
-
-// execute middleware
-Modules::middleware( $req, $res );
 
 if( $req->isHtml() )
 {
@@ -162,29 +159,11 @@ if( $req->isHtml() )
 		'compileDir' => INFUSE_TEMP_DIR . '/smarty',
 		'cacheDir' => INFUSE_TEMP_DIR . '/smarty/cache'
 	) );
-	
-	$engine = ViewEngine::engine();
-
-    // create temp and output dirs
-    if( !file_exists( INFUSE_TEMP_DIR . '/css' ) )
-	   	@mkdir( INFUSE_TEMP_DIR . '/css' );
-	if( !file_exists( INFUSE_APP_DIR . '/css' ) )
-	   	@mkdir( INFUSE_APP_DIR . '/css' );
-	if( !file_exists( INFUSE_TEMP_DIR . '/js' ) )
-		@mkdir( INFUSE_TEMP_DIR . '/js' );
-	if( !file_exists( INFUSE_APP_DIR . '/js' ) )
-		@mkdir( INFUSE_APP_DIR . '/js' );
-	
-	// CSS asset compilation
-	$cssFile = INFUSE_BASE_DIR . '/assets/css/styles.less';
-	if( file_exists( $cssFile ) )
-		$engine->compileLess( $cssFile, INFUSE_TEMP_DIR . '/css/styles.css.cache', INFUSE_APP_DIR . '/css/styles.css' );
-	
-	// JS asset compilation
-	$jsDir = INFUSE_BASE_DIR . '/assets/js';
-	if( is_dir( $jsDir ) )
-		$engine->compileJs( $jsDir, INFUSE_TEMP_DIR . '/js/header.js.cache', INFUSE_APP_DIR . '/js/header.js' );
 }
+
+// execute middleware
+foreach( Config::get( 'modules', 'middleware' ) as $module )
+	Modules::controller( $module )->middleware( $req, $res );
 
 // setup the router
 Router::configure( array(

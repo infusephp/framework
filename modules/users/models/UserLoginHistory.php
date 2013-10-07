@@ -29,7 +29,8 @@ class UserLoginHistory extends \infuse\Model
 				0 => 'Regular',
 				1 => 'Facebook',
 				2 => 'Twitter',
-				3 => 'OAuth'
+				3 => 'OAuth',
+				4 => 'Persistent'
 			),
 			'db_type' => 'tinyint',
 			'length' => 1

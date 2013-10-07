@@ -184,5 +184,7 @@ class SiteStats
 		// save it in the DB
 		$success = StatisticSnapshot::create( array(
 			'stats' => json_encode( $stats ) ) );
+
+		return !!$success;
 	}
 }

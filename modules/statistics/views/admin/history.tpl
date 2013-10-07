@@ -35,15 +35,15 @@
 		var raw = [['Date', '{$metric}']];
 
 		// parse time series data
-		var start = moment('{$start}');
-		var end = moment('{$end}');
+		var start = moment('{$start}').startOf('day');
+		var end = moment('{$end}').endOf('day');
 		var d = start.clone();
 		
 		for (var i = 0; i <= end.diff(start, 'days'); i++) {
 			
 			// look up numbers
 			var key = d.format('MM/DD/YYYY');
-			var value = (typeof history[key] != 'undefined') ? history[key] : 0;
+			var value = (typeof history[key] != 'undefined') ? parseFloat(''+history[key]) : 0;
 			
 			raw.push([d.format('M/D'), value]);
 			
