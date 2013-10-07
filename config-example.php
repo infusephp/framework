@@ -29,7 +29,8 @@ return  array (
     ),
     'middleware' => array (
       'users',
-      'bans'
+      'bans',
+      'infuse'
     ),
     'default-admin' => 'statistics',
   ),  
