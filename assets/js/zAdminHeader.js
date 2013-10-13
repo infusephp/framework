@@ -28,7 +28,7 @@ if (typeof angular != 'undefined') {
 	
 	app.factory('Model', ['$resource', function ($resource) {
 		var Model = $resource(
-			'/' + module + '/' + modelInfo.plural_key + '/:modelId',
+			'/api/' + module + '/' + modelInfo.plural_key + '/:modelId',
 			{ modelId : '@modelId' },
 			{
 				findAll: { method: 'GET', headers: { Accept: 'application/json'} },

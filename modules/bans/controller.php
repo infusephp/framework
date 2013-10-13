@@ -23,7 +23,6 @@ class Bans extends \infuse\Controller
 			'website' => 'http://jaredtking.com'
 		),
 		'admin' => true,
-		'api' => true,
 		'model' => 'Ban'
 	);
 

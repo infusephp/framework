@@ -13,6 +13,8 @@ namespace infuse\models;
 
 class Group extends \infuse\Model
 {
+	public static $scaffoldApi = true;
+
 	public static $properties = array(
 		'id' => array(
 			'type' => 'id'

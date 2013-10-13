@@ -19,6 +19,8 @@ define( 'BAN_TYPE_EMAIL', 3 );
 
 class Ban extends \infuse\Model
 {
+	public static $scaffoldApi = true;
+
 	public static $properties = array(
 		'id' => array(
 			'type' => 'id'

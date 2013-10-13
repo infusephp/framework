@@ -13,7 +13,10 @@ namespace infuse\models;
 
 class Module extends \infuse\Model
 {
+	public static $scaffoldApi = true;
+
 	protected static $hasSchema = false;
+
 	public static $properties = array(
 		'title' => array(
 			'type' => 'text'

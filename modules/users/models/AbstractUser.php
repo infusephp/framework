@@ -26,6 +26,8 @@ abstract class AbstractUser extends \infuse\Model
 	// Model Properties
 	/////////////////////////////////////
 		
+	public static $scaffoldApi = true;
+
 	public static $idProperty = 'uid';
 	
 	protected static $escapedFields = array();

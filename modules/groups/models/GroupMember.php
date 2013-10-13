@@ -13,6 +13,8 @@ namespace infuse\models;
 
 class GroupMember extends \infuse\Model
 {
+	public static $scaffoldApi = true;
+
 	public static $idProperty = array(
 		'gid',
 		'uid'

@@ -15,6 +15,8 @@ use \infuse\Database;
 
 class PersistentSession extends \infuse\Model
 {
+	public static $scaffoldApi = true;
+
 	public static $idProperty = 'token';
 
 	public static $properties = array(

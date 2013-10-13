@@ -16,6 +16,8 @@ use \infuse\Util;
 
 class UserLink extends \infuse\Model
 {
+	public static $scaffoldApi = true;
+
 	public static $idProperty = array( 'uid', 'link' );
 
 	public static $properties = array(

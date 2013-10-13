@@ -23,7 +23,6 @@ class Groups extends \infuse\Controller
 			'website' => 'http://jaredtking.com'
 		),
 		'admin' => true,
-		'api' => true,
 		'models' => array(
 			'Group',
 			'GroupMember'

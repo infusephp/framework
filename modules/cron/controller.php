@@ -23,7 +23,6 @@ class Cron extends \infuse\Controller
 			'website' => 'http://jaredtking.com'
 		),
 		'admin' => true,
-		'api' => true,
 		'model' => 'CronJob',
 		'routes' => array(
 			'get /cron/scheduleCheck' => 'checkSchedule'

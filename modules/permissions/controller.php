@@ -23,7 +23,6 @@ class Permissions extends \infuse\Controller
 			'website' => 'http://jaredtking.com'
 		),
 		'admin' => true,
-		'api' => true,
 		'model' => 'Permission'
 	);
 }

@@ -288,7 +288,7 @@ while( !$routed )
 				ViewEngine::engine()->assignData( array(
 					'modulesWithAdmin' => Modules::adminModules(),
 					'selectedModule' => $module,
-					'title' => $moduleInfo[ 'title' ] ) );				
+					'title' => $moduleInfo[ 'title' ] ) );
 				
 				$routed = Router::route( $moduleRoutes, $req, $res );
 				
