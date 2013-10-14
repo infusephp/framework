@@ -479,7 +479,7 @@ abstract class AbstractUser extends \infuse\Model
 		
 		$success = false;
 		
-		User::currentUser()->su();
+		User::su();
 		
 		if( $this->set( $updateArray ) )
 		{
@@ -496,7 +496,7 @@ abstract class AbstractUser extends \infuse\Model
 			$success = true;
 		}
 		
-		User::currentUser()->quitSu();
+		User::quitSu();
 
 		return $success;
 	}
@@ -516,12 +516,12 @@ abstract class AbstractUser extends \infuse\Model
 		{
 			$user = new User( $link->get( 'uid' ) );
 		
-			User::currentUser()->su();
+			User::su();
 			
 			// enable the user and delete the verify link
 			$success = $user->set( 'enabled', 1 ) && $link->delete();
 			
-			User::currentUser()->quitSu();
+			User::quitSu();
 			
 			// send a welcome e-mail
 			$user->sendEmail( 'registration-welcome' );
@@ -607,7 +607,7 @@ abstract class AbstractUser extends \infuse\Model
 		{
 			$user = new User( $link->get( 'uid' ) );
 			
-			User::currentUser()->su();
+			User::su();
 			
 			// Update the password
 			$success = $user->set( 'user_password', $password );
@@ -615,7 +615,7 @@ abstract class AbstractUser extends \infuse\Model
 			if( $success )
 				$link->delete();
 
-			User::currentUser()->quitSu();
+			User::quitSu();
 				
 			return $success;
 		}

@@ -244,11 +244,11 @@ while( !$routed )
 		/* view without a controller */
 		$basePath = $req->basePath();
 		
-		// make sure the route does not peek into admin directory or touch special files
-		if( strpos( $basePath, '/admin/' ) !== 0 && strpos( $basePath, '/emails/' ) !== 0 && !in_array( $basePath, array( '/error', '/parent' ) ) )
+		// make sure the route does not touch any special files
+		if( strpos( $basePath, '/emails/' ) !== 0 && !in_array( $basePath, array( '/error', '/parent' ) ) )
 		{
-			$view = INFUSE_VIEWS_DIR . $basePath . '.tpl';
-			if( file_exists( $view ) )
+			$view = substr_replace( $basePath, '', 0, 1 );
+			if( file_exists( INFUSE_VIEWS_DIR . '/' . $view . '.tpl' ) )
 				$routed = $res->render( $view );
 		}
 	}

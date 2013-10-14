@@ -33,7 +33,7 @@ class Admin extends \infuse\Controller
 			// these go first so the dynamic segments are not mistaken as models
 			'get /admin/:module/schema' => 'schema',
 			'get /admin/:module/schema/update/:model' => 'updateSchema',
-			'get /admin/:module/schema/cleanup/:model' => 'cleanupSchema',
+			'get /admin/:module/schema/cleanup/:model' => 'updateSchema',
 			'get /admin/:module/:model' => 'model',
 			'get /admin/:module/:model/:id' => 'model', // not implemented
 		),
