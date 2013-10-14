@@ -22,7 +22,7 @@ class Permissions extends \infuse\Controller
 			'email' => 'j@jaredtking.com',
 			'website' => 'http://jaredtking.com'
 		),
-		'admin' => true,
+		'scaffoldAdmin' => true,
 		'model' => 'Permission'
 	);
 }

@@ -28,7 +28,7 @@ class Users extends \infuse\Controller
 			'email' => 'j@jaredtking.com',
 			'website' => 'http://jaredtking.com'
 		),
-		'admin' => true,
+		'scaffoldAdmin' => true,
 		'models' => array(
 			'User',
 			'UserLink',

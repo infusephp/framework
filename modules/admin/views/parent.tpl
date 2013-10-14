@@ -29,7 +29,7 @@
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 			</button>
-	    	<a class="navbar-brand" href="/4dm1n">{$smarty.const.SITE_TITLE}</a>
+	    	<a class="navbar-brand" href="/admin">{$smarty.const.SITE_TITLE}</a>
 	    </div>
 
 	    <div class="collapse navbar-collapse navbar-ex1-collapse">
@@ -53,7 +53,7 @@
 	<div class="subnavbar clearfix">
 		<ul>
 			{foreach from=$modulesWithAdmin item=module}
-				<li class="{if $module.name == $selectedModule}active{/if}"><a href="/4dm1n/{$module.name}">{$module.title}</a></li>
+				<li class="{if $module.name == $selectedModule}active{/if}"><a href="/admin/{$module.name}">{$module.title}</a></li>
 			{/foreach}
 		</ul>
 	</div>

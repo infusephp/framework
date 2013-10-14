@@ -30,9 +30,9 @@ class Statistics extends \infuse\Controller
 		'model' => 'StatisticSnapshot',
 		'defaultHistoryMetric' => 'users.numUsers',
 		'routes' => array(
-			'get /4dm1n/statistics' => 'adminHome',
-			'get /4dm1n/statistics/history' => 'adminHistoryDefault',
-			'get /4dm1n/statistics/history/:metric' => 'adminHistory'
+			'get /admin/statistics' => 'adminHome',
+			'get /admin/statistics/history' => 'adminHistoryDefault',
+			'get /admin/statistics/history/:metric' => 'adminHistory'
 		)
 	);
 
@@ -56,7 +56,7 @@ class Statistics extends \infuse\Controller
 	{
 		$mInfo = Modules::info( 'statistics' );
 		
-		$res->redirect( '/4dm1n/statistics/history/' . $mInfo[ 'defaultHistoryMetric' ] );
+		$res->redirect( '/admin/statistics/history/' . $mInfo[ 'defaultHistoryMetric' ] );
 	}
 	
 	function adminHistory( $req, $res )

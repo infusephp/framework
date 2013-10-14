@@ -1,4 +1,4 @@
-{extends file='admin/parent.tpl'}
+{extends file="$adminViewsDir/parent.tpl"}
 {block name=header}
 <style type="text/css">
 .stat-toolbar {
@@ -19,8 +19,8 @@
 
 <div class="btn-toolbar stat-toolbar pull-right">
 	<div class="btn-group">
-		<a href="/4dm1n/statistics" class="btn btn-default active">Overview</a>
-		<a href="/4dm1n/statistics/history" class="btn btn-default">History</a>
+		<a href="/admin/statistics" class="btn btn-default active">Overview</a>
+		<a href="/admin/statistics/history" class="btn btn-default">History</a>
 	</div>
 </div>
 
@@ -75,7 +75,7 @@
 	</div>
 	<div class="col-md-2 stat">
 		<strong>
-			<a target="_blank" href="/4dm1n/users/User#/{$stats.users.newestUser->id()}">{$stats.users.newestUser->name(true)}</a>		
+			<a target="_blank" href="/admin/users/User#/{$stats.users.newestUser->id()}">{$stats.users.newestUser->name(true)}</a>		
 		</strong><br/>
 		Newest User
 	</div>

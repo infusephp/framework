@@ -1,4 +1,4 @@
-{extends file='admin/parent.tpl'}
+{extends file="$adminViewsDir/parent.tpl"}
 {block name=header}
 <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/themes/base/jquery-ui.css" type="text/css" media="all" />
 <style type="text/css">
@@ -18,7 +18,7 @@
 	
 	function refreshView()
 	{
-		window.location = '/4dm1n/statistics/history/' + $('#metric').val() + '?start=' + $('#start').val() + '&end=' + $('#end').val();
+		window.location = '/admin/statistics/history/' + $('#metric').val() + '?start=' + $('#start').val() + '&end=' + $('#end').val();
 	}
 	
 	$(function() {
@@ -76,8 +76,8 @@
 
 <div class="btn-toolbar stat-toolbar pull-right">
 	<div class="btn-group">
-		<a href="/4dm1n/statistics" class="btn btn-default">Overview</a>
-		<a href="/4dm1n/statistics/history" class="btn btn-default active">History</a>
+		<a href="/admin/statistics" class="btn btn-default">Overview</a>
+		<a href="/admin/statistics/history" class="btn btn-default active">History</a>
 	</div>
 </div>
 

@@ -56,6 +56,9 @@ define( 'VALIDATION_FAILED', 'validation_failed' );
 define( 'VALIDATION_REQUIRED_FIELD_MISSING', 'required_field_missing' );
 define( 'VALIDATION_NOT_UNIQUE', 'not_unique' );
 
+/* useful constants */
+define( 'SKIP_ROUTE', -1 );
+
 /* some useful functions */
 function val( $a = array(), $k = '' )
 {

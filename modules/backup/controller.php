@@ -22,12 +22,12 @@ class Backup extends \infuse\Controller
 			'email' => 'j@jaredtking.com',
 			'website' => 'http://jaredtking.com'
 		),
-		'admin' => true,
+		'hasAdminView' => true,
 		'routes' => array(
-			'get /4dm1n/backup' => 'adminHome',
-			'get /4dm1n/backup/optimize' => 'optimizeDb',
-			'post /4dm1n/backup/restore' => 'restoreDb',
-			'get /4dm1n/backup/download' => 'backupDb'
+			'get /admin/backup' => 'adminHome',
+			'get /admin/backup/optimize' => 'optimizeDb',
+			'post /admin/backup/restore' => 'restoreDb',
+			'get /admin/backup/download' => 'backupDb'
 		)
 	);
 	

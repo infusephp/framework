@@ -15,7 +15,7 @@
 			<li><a href="/users/logout">Logout</a></li>
 			<li><a href="/users/account">Account</a></li>
 			{if $currentUser->isAdmin()}
-				<li><a href="/4dm1n">Administration Panel</a></li>			
+				<li><a href="/admin">Administration Panel</a></li>			
 			{/if}
 		{else}
 			<li><a href="/users/login">Login</a></li>

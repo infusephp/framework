@@ -70,7 +70,7 @@ $req = new Request();
 $res = new Response();
 
 // check if site disabled, still allow access to admin panel
-if( Config::get( 'site', 'disabled' ) && $req->paths( 0 ) != '4dm1n' )
+if( Config::get( 'site', 'disabled' ) && $req->paths( 0 ) != 'admin' )
 {
 	$res->setBody( Config::get( 'site', 'disabled-message' ) );
 	$res->send();
@@ -176,7 +176,6 @@ Router::configure( array(
 	2) module routes (i.e. /users/:id/friends)
 	   i) static routes
 	   ii) dynamic routes
-	   iii) api scaffolding
 	3) module admin routes
 	4) view without a controller (i.e. /contact-us displays views/contact-us.tpl)
 	5) not found
@@ -209,72 +208,18 @@ while( !$routed )
 			$moduleRoutes = $moduleInfo[ 'routes' ];
 			
 			$req->setParams( array( 'controller' => $module ) );
-
-			/* API scaffolding routes */
-						
-			if( $moduleInfo[ 'api' ] )
-			{
-				$models = Modules::controller( $module )->models();
-				
-				$defaultModel = false;
-						
-				if( isset( $moduleInfo[ 'default-model' ] ) )
-					$defaultModel = $moduleInfo[ 'default-model' ];
-				
-				if( count( $models ) == 1 )
-				{
-					$modelKeys = array_keys( $models );
-					$defaultModel = $modelKeys[ 0 ];
-				}
-					
-				// this comes from /:module/:model
-				$secondPath = Util::array_value( $req->paths(), 1 );
-				$possibleModel = Inflector::singularize( Inflector::camelize( $secondPath ) );
-				
-				// default model?
-				if( $defaultModel && !isset( $models[ $possibleModel ] ) )
-				{
-					$req->setParams( array( 'model' => $defaultModel ) );
-					
-					$moduleRoutes = array_merge( $moduleRoutes, array(
-						'get /:controller' => 'findAll',
-						'get /:controller/:id' => 'find',
-						'post /:controller' => 'create',
-						'put /:controller/:id' => 'edit',
-						'delete /:controller/:id' => 'delete'
-					) );
-				}
-				// no default model
-				else
-				{
-					$req->setParams( array( 'model' => $secondPath ) );
-					
-					$moduleRoutes = array_merge( $moduleRoutes, array(
-						'get /:controller/:model' => 'findAll',
-						'get /:controller/:model/:id' => 'find',
-						'post /:controller/:model' => 'create',
-						'put /:controller/:model/:id' => 'edit',
-						'delete /:controller/:model/:id' => 'delete'
-					) );
-				}
-			}
 			
 			$routed = Router::route( $moduleRoutes, $req, $res );
 		}
 	}
 	else if( $routeStep == 3 )
 	{
-		/* admin panel routes */	
-			
-		if( $req->paths( 0 ) == '4dm1n' )
+		/* module admin routes */
+		
+		if( $req->paths( 0 ) == 'admin' )
 		{
 			$module = $req->paths( 1 );
-			
-			/* Redirect /4dm1n -> /4dm1n/:default */
-			
-			if( empty( $module ) && $default = Config::get( 'modules', 'default-admin' ) )
-				return $res->redirect( '/4dm1n/' . $default );
-			
+						
 			if( Modules::exists( $module ) )
 			{
 				Modules::load( $module );
@@ -291,15 +236,6 @@ while( !$routed )
 					'title' => $moduleInfo[ 'title' ] ) );
 				
 				$routed = Router::route( $moduleRoutes, $req, $res );
-				
-				/* automatic admin routes */
-				
-				if( !$routed && $req->method() == 'GET' && ( Util::array_value( $moduleInfo, 'admin' ) ) )
-				{					
-					Modules::controller( $module )->routeAdmin( $req, $res );
-					
-					$routed = true;
-				}
 			}
 		}
 	}

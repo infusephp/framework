@@ -1,4 +1,4 @@
-{extends file='admin/parent.tpl'}
+{extends file="$moduleViewsDir/parent.tpl"}
 {block name=header}
 <script type="text/javascript">
 	{if isset($modelJSON)}var modelInfo = {$modelJSON};{/if}
@@ -10,12 +10,12 @@
 	<ul class="nav nav-pills">
 		{foreach from=$models item=model}
 			<li class="{if !isset($schema) && $model.model == $modelInfo.model}active{/if}">
-				<a href="/4dm1n/{$moduleName}/{$model.model}#/">{$model.proper_name_plural}</a>
+				<a href="/admin/{$moduleName}/{$model.model}#/">{$model.proper_name_plural}</a>
 			</li>
 		{/foreach}
 		{if $hasSchema}
 			<li class="{if isset($schema)}active{/if}">
-				<a href="/4dm1n/{$moduleName}/schema">Database Schema</a>
+				<a href="/admin/{$moduleName}/schema">Database Schema</a>
 			</li>
 		{/if}
 	</ul>
@@ -64,10 +64,10 @@
 	
 					<p>
 						{if count($schema[$model].extraFields) > 0}
-							<a href="/4dm1n/{$moduleName}/schema/cleanup/{$model}" class="btn btn-large btn-danger pull-right">Delete Old Fields</a>
+							<a href="/admin/{$moduleName}/schema/cleanup/{$model}" class="btn btn-large btn-danger pull-right">Delete Old Fields</a>
 						{/if}
 						{if $schema[$model].different}
-							<a href="/4dm1n/{$moduleName}/schema/update/{$model}" class="btn btn-large btn-success">&larr; Update</a>
+							<a href="/admin/{$moduleName}/schema/update/{$model}" class="btn btn-large btn-success">&larr; Update</a>
 						{/if}
 					</p>
 				
