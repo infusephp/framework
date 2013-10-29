@@ -583,7 +583,7 @@ abstract class AbstractUser extends \infuse\Model
 		}
 		
 		return false;
-	}	
+	}
 	
 	/**
 	 * Step 2 in the forgot password process. Resets the password with a valid token.
@@ -624,6 +624,27 @@ abstract class AbstractUser extends \infuse\Model
 			ErrorStack::add( 'user_forgot_expired_invalid' );
 			return false;
 		}
+	}
+
+	/**
+	 * Looks up a user from a given forgot token
+	 *
+	 * @param string $token
+	 *
+	 * @return User|false
+	 */
+	static function userFromForgotToken( $token )
+	{
+		$link = UserLink::findOne( array(
+			'where' => array(
+				'link' => $token,
+				'link_type' => 0,
+				'link_timestamp > ' . (time() - UserLink::$forgotLinkTimeframe) ) ) );
+		
+		if( $link )
+			return new User( $link->get( 'uid' ) );
+
+		return false;
 	}
 	
 	///////////////////////////////////

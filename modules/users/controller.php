@@ -120,18 +120,29 @@ class Users extends \infuse\Controller
 		if( $currentUser->isLoggedIn() )
 			$currentUser->logout( $req );
 
+		$user = false;
+
+		if( !$req->params( 'success' ) && $token = $req->params( 'id' ) )
+		{
+			$user = User::userFromForgotToken( $token );
+
+			if( !$user )
+				return $res->setCode( 404 );
+		}
+
 		$res->render( 'forgot', array(
 			'success' => $req->params( 'success' ),
 			'title' => 'Forgot Password',
 			'id' => $req->params( 'id' ),
-			'email' => $req->request( 'email' )
+			'email' => $req->request( 'email' ),
+			'user' => $user
 		) );
 	}
 	
 	function forgotStep1( $req, $res )
 	{
 		if( User::currentUser()->isLoggedIn() )
-			$res->redirect( '/' );
+			$res->redirect( '/profile' );
 		
 		$success = User::forgotStep1( $req->request( 'email' ) );
 		
