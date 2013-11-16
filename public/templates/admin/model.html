@@ -1,0 +1,37 @@
+<h2>{{modelInfo.proper_name}} #{{model.id}}</h2>
+
+<div class="errors">
+	<p class="alert alert-error" ng-repeat="error in errors">{{error}}</p>
+</div>
+
+<a href="#/{{model.id}}/edit" class="btn btn-success" ng-show="modelInfo.permissions.edit">
+	<i class="glyphicon glyphicon-pencil"></i> Edit
+</a>
+<button class="btn btn-danger" ng-click="deleteModelAsk(model)">
+	<i class="glyphicon glyphicon-remove"></i> Delete
+</button>
+
+<div class="models">
+	<div ng-repeat="property in modelInfo.properties" class="model">
+		<h4>{{property.title}}</h4>
+		
+		<div class="value" ng-bind-html-unsafe="model|modelValue:modelInfo.properties:property:false"></div>
+	</div>
+</div>
+
+<div class="modal fade in" modal="deleteModel" close="closeDeleteModal()" opts="dialogOptions">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">Are you sure?</h4>
+			</div>
+			<div class="modal-body">
+				<p>Are you sure you want to delete this {{modelInfo.proper_name}}?</p>
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-default cancel" ng-click="closeDeleteModal()">No</button>
+				<button class="btn btn-danger" ng-click="deleteModelConfirm()">Yes</button>
+			</div>
+		</div>
+	</div>
+</div>

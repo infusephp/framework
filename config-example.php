@@ -4,17 +4,19 @@
  * @package infuse\framework
  * @author Jared King <j@jaredtking.com>
  * @link http://jaredtking.com
- * @version 0.1.15.3
+ * @version 0.1.16
  * @copyright 2013 Jared King
  * @license MIT
  */
 
-return  array (
+$routes = include 'routes.php';
+
+return array (
   'site' => array (
     'title' => 'Infuse Framework',
-    'email' => 'contact@example.com',
+    'email' => 'contact@infuse.com',
     'production-level' => false,
-    'host-name' => 'example.com',
+    'host-name' => 'infuse.com',
     'ssl-enabled' => false,
     'salt' => 'replacewithrandomstring',
     'time-zone' => 'America/Chicago',
@@ -28,93 +30,64 @@ return  array (
       'users',
     ),
     'middleware' => array (
+      'infuse',
       'users',
       'bans',
-      'infuse'
     ),
     'default-admin' => 'statistics',
-  ),  
+  ),
   'logger' => array (
+    'ErrorLogHandler' => array (
+      'level' => 'debug',
+    ),
   ),
   'database' => array (
     'type' => 'mysql',
-    'user' => 'username',
-    'password' => 'password',
+    'user' => 'myuser',
+    'password' => 'mypass',
     'host' => 'localhost',
-    'name' => 'dbname',
+    'name' => 'mydb',
   ),
   'views' => array (
-  	'engine' => 'smarty'
+    'engine' => 'smarty'
   ),
   'memcache' => array (
-    'enabled' => false,
+    'enabled' => true,
     'host' => '127.0.0.1',
     'port' => 11211,
-    'prefix' => 'example',
+    'prefix' => 'infuse',
   ),
   'smtp' => array (
-    'from' => 'no-reply@example.com',
+    'from' => 'no-reply@infuse.com',
     'username' => 'username',
     'password' => 'password',
     'port' => 587,
-    'host' => 'smtp.example.com',
+    'host' => 'smtp.infuse.com',
   ),
   'session' => array (
-    'adapter' => 'database',
+    'adapter' => 'php',
     'lifetime' => 86400,
-    'prefix' => 'example'
+    'prefix' => 'infuse'
   ),
   'redis' => array (
     'scheme' => 'tcp',
     'host' => '127.0.0.1',
+    'password' => 'notused',
     'port' => 6379,
   ),
-  'routes' => array (
-    '/' => array (
-      'controller' => 'home'
+  'queue' => array (
+    'type' => 'synchronous',
+    'queues' => array (
+      'points'
     ),
-    'get /install/finish' => array (
-      'controller' => 'home',
+    'listeners' => array (
     ),
-    'get /login' => array (
-      'controller' => 'users',
-      'action' => 'loginForm',
-    ),
-    'post /login' => array (
-      'controller' => 'users',
-      'action' => 'login',
-    ),
-    'get /logout' => array (
-      'controller' => 'users',
-      'action' => 'logout',
-    ),
-    'get /signup' => array (
-      'controller' => 'users',
-      'action' => 'signupForm',
-    ),
-    'post /signup' => array (
-      'controller' => 'users',
-      'action' => 'signup',
-    ),
-    'get /forgot' => array (
-      'controller' => 'users',
-      'action' => 'forgotForm',
-    ),
-    'post /forgot' => array (
-      'controller' => 'users',
-      'action' => 'forgotStep1',
-    ),
-    'get /users/forgot/:id' => array (
-      'controller' => 'users',
-      'action' => 'forgotForm',
-    ),
-    'post /users/forgot/:id' => array (
-      'controller' => 'users',
-      'action' => 'forgotStep2',
-    ),
-    'get /account' => array (
-      'controller' => 'users',
-      'action' => 'accountSettings',
+    // only used for iron.io
+    'project' => '',
+    'token' => '',
+    'auth_token' => '', // generate something random here, used to verify messages coming from iron.io
+    'push_subscribers' => array ( 
     ),
   ),
-) ;
+  'routes' => $routes
+);

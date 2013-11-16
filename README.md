@@ -1,4 +1,4 @@
-infuse v0.1.15.4
+infuse framework
 =====
 
 PHP MVC framework built with infuse/libs
@@ -48,7 +48,7 @@ A demo has been setup at [infuse.jaredtking.com](http://infuse.jaredtking.com).
 composer create-project infuse/infuse ./path/to/dir
 ```
 
-Infuse Framework is served through the `app` directory to prevent the framework files from being publicly accessible. This requires a small amount of configuration for the web server to work properly.
+Infuse Framework is served through the `public` directory to prevent the framework files from being served. This requires a small amount of configuration for the web server to work properly.
 
 ### 2. nginx
 
@@ -60,7 +60,7 @@ server {
 
  	server_name example.com;
 
-	root /var/www/example.com/app;
+	root /var/www/example.com/public;
 
 	access_log /var/log/nginx/example.com-access.log;
 	error_log /var/log/nginx/example.com-error.log;
@@ -79,7 +79,7 @@ server {
 
 ### 2. apache
 
-A .htaccess file is already included in the `/app` directory for url rewrites. You must also make sure that `DocumentRoot` points to `{FRAMEWORK_PATH}/app`.
+A .htaccess file is already included in the `/public` directory for url rewrites. You must also make sure that `DocumentRoot` points to `{FRAMEWORK_PATH}/public`.
 
 ### 3. Installer
 
@@ -90,7 +90,7 @@ Fire up the url where the framework is installed and you will be redirected to a
 If you wish to use the built-in `cron` module then you must setup a cron job for Infuse Framework.
 
 ```bash
-*	*	*	*	*	php /var/www/example.com/app/index.php /cron/scheduleCheck
+*	*	*	*	*	php /var/www/example.com/public/index.php /cron/scheduleCheck
 ```
 
 ## Why another MVC framework?
