@@ -44,6 +44,13 @@ class Controller extends \infuse\Acl
 		// which model are we talking about?
 		$model = $this->fetchModelInfo( $req->params( 'module' ), $req->params( 'model' ) );
 
+		// try model as a model id
+		if( !$model && $req->params( 'model' ) )
+		{
+			$req->setParams( array( 'id' => $req->params( 'model' ), 'model' => false ) );
+			return $this->find( $req, $res );
+		}
+
 		$modelClass = $model[ 'class_name' ];
 		
 		// check if automatic api generation enabled
@@ -266,7 +273,7 @@ class Controller extends \infuse\Acl
 		$controllerObj = new $controller();
 
 		// get info about the controller
-		$properties = $controllerObj::$properties;
+		$properties = $controller::$properties;
 		
 		// fetch all available models from the controller
 		$modelsInfo = $this->models( $controllerObj );

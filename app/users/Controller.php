@@ -37,58 +37,19 @@ class Controller extends \infuse\Acl
 		),
 		'defaultModel' => 'User',
 		'routes' => array(
-			'get /users/login' => array (
-				'users\\Controller',
-				'loginForm'
-			),
-			'post /users/login' => array (
-				'users\\Controller',
-				'login'
-			),
-			'get /users/logout' => array (
-				'users\\Controller',
-				'logout'
-			),
-			'get /users/signup' => array (
-				'users\\Controller',
-				'signupForm'
-			),
-			'post /users/signup' => array (
-				'users\\Controller',
-				'signup'
-			),
-			'get /users/verifyEmail/:id' => array (
-				'users\\Controller',
-				'verifiyEmail'
-			),
-			'get /users/forgot' => array (
-				'users\\Controller',
-				'forgotForm'
-			),
-			'post /users/forgot' => array (
-				'users',
-				'forgotStep1'
-			),
-			'get /users/forgot/:id' => array (
-				'users\\Controller',
-				'forgotForm'
-			),
-			'post /users/forgot/:id' => array (
-				'users\\Controller',
-				'forgotStep2'
-			),
-			'get /users/account' => array (
-				'users\\Controller',
-				'accountSettings'
-			),
-			'post /users/account' => array (
-				'users\\Controller',
-				'editAccountSettings'
-			),
-			'get /users/:slug' => array (
-				'users\\Controller',
-				'userProfile'
-			)
+			'get /users/login' => 'loginForm',
+			'post /users/login' => 'login',
+			'get /users/logout' => 'logout',
+			'get /users/signup' => 'signupForm',
+			'post /users/signup' => 'signup',
+			'get /users/verifyEmail/:id' => 'verifiyEmail',
+			'get /users/forgot' => 'forgotForm',
+			'post /users/forgot' => 'forgotStep1',
+			'get /users/forgot/:id' => 'forgotForm',
+			'post /users/forgot/:id' => 'forgotStep2',
+			'get /users/account' => 'accountSettings',
+			'post /users/account' => 'editAccountSettings',
+			'get /users/:slug' => 'userProfile',
 		)
 	);
 
