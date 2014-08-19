@@ -1,0 +1,45 @@
+#!/usr/bin/php
+
+<?php
+
+use infuse\Util;
+
+require_once 'vendor/autoload.php';
+
+define( 'INFUSE_BASE_DIR', dirname( __DIR__ ) );
+
+function app()
+{
+	$config = @include 'config.php';
+	$config[ 'modules' ][ 'middleware' ] = [];
+	$config[ 'sessions' ][ 'enabled' ] = false;
+	$config[ 'logger' ][ 'enabled' ] = false;
+	return new App( $config );
+}
+
+$args = $argv;
+unset( $args[ 0 ] );
+
+$command = Util::array_value( $args, 1 );
+if( $command == "schema" )
+{
+	$subCommand = Util::array_value( $args, 2 );
+	$install = $subCommand == 'update' || $subCommand == 'install' || $subCommand == 'cleanup';
+	$cleanup = $subCommand == 'cleanup';
+	if( $install )
+		app()->installSchema( true, $cleanup );
+}
+else if( $command == "test" )
+{
+	unset( $args[ 1 ] );
+	if( isset( $args[ 2 ] ) )
+		$args[ 2 ] = 'app/' . $args[ 2 ] . '/tests/';
+	system( 'phpunit ' . implode( ' ', $args ) );
+}
+else
+{
+	$args = $argv;
+	unset( $args[ 0 ] );
+
+	system( "php public/index.php " . implode( ' ', $args ) );
+}

@@ -4,11 +4,11 @@
 <h1>Account</h1>
 
 <p class="lead">
-        <img src="{$currentUser->profilePicture()}" alt="{$currentUser->name()}" class="pull-left img-circle" height="30" width="30" />&nbsp;
-        Welcome, {$currentUser->name()}!
+        <img src="{$app.user->profilePicture()}" alt="{$app.user->name()}" class="img-circle" height="80" width="80" />
+        Welcome, {$app.user->name()}!
 </p>
 
-{foreach from=$errorStack->messages() item=error}
+{foreach from=$app.errors->messages() item=error}
         <div class="alert alert-danger">
                 {$error}
         </div>
@@ -34,7 +34,7 @@
                         <input type="text" name="user_email" class="form-control" />
                 </div>
                 <div class="col-md-6 help-block">
-                        <strong>Current: </strong> {$currentUser->get('user_email')}
+                        <strong>Current: </strong> {$app.user->user_email}
                 </div>
         </div>
         <div class="form-group">
@@ -62,13 +62,13 @@
         <div class="form-group">
                 <label class="control-label col-md-2">First Name</label>
                 <div class="col-md-4">
-                        <input type="text" name="first_name" value="{$currentUser->get('first_name')}" class="form-control" />
+                        <input type="text" name="first_name" value="{$app.user->first_name}" class="form-control" />
                 </div>
         </div>
         <div class="form-group">
                 <label class="control-label col-md-2">Last Name</label>
                 <div class="col-md-4">
-                        <input type="text" name="last_name" value="{$currentUser->get('last_name')}" class="form-control" />
+                        <input type="text" name="last_name" value="{$app.user->last_name}" class="form-control" />
                 </div>
         </div>
         <div class="form-group">

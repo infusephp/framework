@@ -1,8 +1,8 @@
-Welcome to {$smarty.const.SITE_TITLE}, {$user->name()}!
+<p>Welcome to {$smarty.const.SITE_TITLE}, {$username}!</p>
 
-Thank you for joining. As you become familiar with {$smarty.const.SITE_TITLE}, we would love to hear what you think about it.
+<p>Thank you for joining. As you become familiar with {$smarty.const.SITE_TITLE}, we would love to hear what you think about it.</p>
 
-Feel free to message us any time at <a href="mailto:{$siteEmail}">{$siteEmail}</a> with any issues, comments, or suggestions.
+<p>Feel free to message us any time at <a href="mailto:{$siteEmail}">{$siteEmail}</a> with any issues, comments, or suggestions.</p>
 
-Sincerely,
-The team at {$smarty.const.SITE_TITLE}
+<p>Sincerely,<br>
+The team at {$smarty.const.SITE_TITLE}</p>

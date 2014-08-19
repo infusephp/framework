@@ -1,93 +1,110 @@
 <?php
 
-/**
- * @package infuse\framework
- * @author Jared King <j@jaredtking.com>
- * @link http://jaredtking.com
- * @version 0.1.16
- * @copyright 2013 Jared King
- * @license MIT
- */
+$routes = include 'config/routes.php';
+$cron = include 'config/cron.php';
+$modules = include 'config/modules.php';
+$statistics = include 'config/statistics.php';
 
-$routes = include 'routes.php';
-
-return array (
-  'site' => array (
-    'title' => 'Infuse Framework',
-    'email' => 'contact@infuse.com',
+return  [
+  'site' => [
+    'title' => 'Idealist Framework',
+    'email' => 'site@example.com',
     'production-level' => false,
-    'host-name' => 'infuse.com',
+    'host-name' => 'example.com',
     'ssl-enabled' => false,
     'salt' => 'replacewithrandomstring',
     'time-zone' => 'America/Chicago',
-    'disabled' => false,
-    'disabled-message' => 'The site is currently unavailable.',
-    'installed' => false,
     'language' => 'en',
-  ),
-  'modules' => array (
-    'required' => array (
-      'users',
-    ),
-    'middleware' => array (
-      'infuse',
-      'users',
-      'bans',
-    ),
-    'default-admin' => 'statistics',
-  ),
-  'logger' => array (
-    'ErrorLogHandler' => array (
-      'level' => 'debug',
-    ),
-  ),
-  'database' => array (
+  ],
+  'modules' => [
+    'middleware' => [
+      'auth',
+      'admin',
+      'email'
+    ],
+    'all' => $modules
+  ],
+  'logger' => [
+    'enabled' => true
+  ],
+  'admin' => [
+    'index' => 'statistics'
+  ],
+  'database' => [
     'type' => 'mysql',
     'user' => 'myuser',
     'password' => 'mypass',
     'host' => 'localhost',
     'name' => 'mydb',
-  ),
-  'views' => array (
+  ],
+  'views' => [
     'engine' => 'smarty'
-  ),
-  'memcache' => array (
+  ],
+  'models' => [
+    'cache' => [
+      'strategies' => [
+        // 'redis',
+        // 'memcache',
+        'local'
+      ],
+      'prefix' => 'idealist:'
+    ],
+  ],
+  'email' => [
+    'from_email' => 'no-reply@example.com',
+    'from_name' => 'Idealist Framework',
+    'type' => 'nop'
+    // For SMTP use:
+    // 'type' => 'smtp'
+    // 'username' => 'username',
+    // 'password' => 'password',
+    // 'port' => 25,
+    // 'host' => 'smtp.example.com',
+  ],
+  // For redis sessions use:
+  /*
+  'sessions' => [
     'enabled' => true,
-    'host' => '127.0.0.1',
-    'port' => 11211,
-    'prefix' => 'infuse',
-  ),
-  'smtp' => array (
-    'from' => 'no-reply@infuse.com',
-    'username' => 'username',
-    'password' => 'password',
-    'port' => 587,
-    'host' => 'smtp.infuse.com',
-  ),
-  'session' => array (
-    'adapter' => 'php',
+    'adapter' => 'redis',
     'lifetime' => 86400,
-    'prefix' => 'infuse'
-  ),
-  'redis' => array (
+    'prefix' => 'idealist:'
+  ],
+  */
+  'sessions' => [
+    'enabled' => true,
+    'adapter' => 'database',
+    'lifetime' => 86400
+  ],
+  'queue' => [
+    'type' => 'synchronous',
+    'queues' => [
+      'emails'
+    ],
+    'listeners' => [
+      'emails' => [
+        [ 'email\\Controller', 'processEmail' ] ],
+    ],
+  ],
+  'assets' => [
+    'base_url' => ''
+  ],
+  /*
+  'redis' => [
     'scheme' => 'tcp',
     'host' => '127.0.0.1',
     'password' => 'notused',
-    'port' => 6379,
-  ),
-  'queue' => array (
-    'type' => 'synchronous',
-    'queues' => array (
-      'points'
-    ),
-    'listeners' => array (
-    ),
-    // only used for iron.io
-    'project' => '',
-    'token' => '',
-    'auth_token' => '', // generate something random here, used to verify messages coming from iron.io
-    'push_subscribers' => array ( 
-    ),
-  ),
-  'routes' => $routes
-);
+    'port' => 6379
+  ],
+  */
+  /*
+  'memcache' => [
+    'enabled' => true,
+    'host' => '127.0.0.1',
+    'port' => 11211,
+    'prefix' => 'idealist:',
+  ],
+  */
+  'routes' => $routes,
+  'cron' => $cron,
+  'statistics' => $statistics
+];

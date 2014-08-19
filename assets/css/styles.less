@@ -1,4 +1,124 @@
 /*
-	All styles should go into this file for compilation/minification
-	- large stylesheets can be broken up using @import
+	---
+	Minimal Forms
+	---
 */
+
+@minimalBodyBg: #fff;
+@gridUnit: 15px;
+
+h1.logo {
+	padding: (@gridUnit * 7) 0 0;
+	margin: 0;
+	text-align: center;
+
+	img {
+		margin: 0 auto;
+	}
+
+	a {
+		color: #777;
+	}
+}
+
+.body.minimal {
+	background: @minimalBodyBg;
+	margin: (@gridUnit * 2) auto;
+	border-radius: 4px;
+	padding: 0 @gridUnit;
+	position: relative;
+	text-align: left;
+	box-shadow: 1px 1px 10px #999;
+
+	h2 {
+		margin: 0 0 (@gridUnit * 2);
+		text-align: center;
+		font-size: 24px;
+
+		small {
+			a {
+				color: #999;				
+			}
+		}
+	}
+	
+	h3, h4, h5, h6 {
+		margin: 0;
+	}
+
+	.title {
+		text-align: center;
+		margin: @gridUnit 0 (@gridUnit * 2);
+	}
+
+	label {
+		font-weight: bold;
+		color: #999;
+	}
+
+	p {
+		margin: @gridUnit 0;
+	}
+
+	.alert {
+		margin: @gridUnit 0;
+	}
+	
+	input[type=radio],input[type=checkbox] {
+		width: auto;
+		height: auto;
+		margin: 0 9px 0 0;
+	}
+
+	hr {
+		margin: (@gridUnit * 2) 0 @gridUnit;
+		border-color: #ccc;
+	}
+}
+
+.body.minimal.skinny {
+	max-width: @gridUnit * 20;
+
+	.btn-action {
+		margin-bottom: (@gridUnit / 2.0);
+	}
+}
+
+.body.minimal.fat {
+	max-width: @gridUnit * 40;
+}
+
+.body.secondary {
+	padding: @gridUnit @gridUnit;
+	text-align: center;
+	background: rgba(255,255,255,.25);
+	color: #999;
+	font-size: 1.1em;
+	margin: (@gridUnit * 2) auto @gridUnit;
+	box-shadow: none;
+	border: 1px solid #ccc;
+
+	a {
+		color: #777;
+		text-decoration: underline;
+	}
+
+	a:hover {
+		color: #000;
+	}
+}
+
+@media (max-width: 991px) {
+	h1.logo {
+		padding: (@gridUnit * 2) 0 @gridUnit;
+	}
+
+	.body.minimal {
+		margin: @gridUnit auto;
+		width: 100%;
+
+		h2 {
+			margin: 0 0 @gridUnit;
+		}
+	}
+}

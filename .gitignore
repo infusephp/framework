@@ -11,3 +11,4 @@ header.sh
 config.php
 .vagrant
 HEADER
+composer.lock

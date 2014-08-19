@@ -1,9 +1,9 @@
-Dear {$user->name(true)},
+<p>Dear {$username},</p>
 
-A request was made to reset your password on {$smarty.const.SITE_TITLE} from {$ip}. If you did not make this request, please ignore this message and nothing will be changed.
+<p>A request was made to reset your password on {$smarty.const.SITE_TITLE} from {$ip}. If you did not make this request, please ignore this message and nothing will be changed.</p>
 
-If you do wish to reset your password please visit the following page to do so:
+<p>If you do wish to reset your password please visit the following page to do so:</p>
 
-<a href="{$forgotLink}">{$forgotLink}</a>
+<p><a href="{$forgot_link}">{$forgot_link}</a></p>
 
-- {$smarty.const.SITE_TITLE}
+<p>- {$smarty.const.SITE_TITLE}</p>
