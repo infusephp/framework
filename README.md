@@ -41,6 +41,7 @@ Idealist Framework is a tool for building modern web applications. It is built o
 - [Facebook](https://github.com/jaredtking/infuse-facebook): Adds Facebook as an authentication method
 - [OAuth](https://github.com/jaredtking/infuse-oauth): Adds OAuth as an authentication method
 - [Twitter](https://github.com/jaredtking/infuse-twitter): Adds Twitter as an authentication method
+- [IronMQ](https://github.com/idealistsoft/framework-iron-mq): Use iron.io push queues
 
 ## Demo
 
