@@ -10,6 +10,9 @@
       <arguments>
         <boolean>false</boolean>
       </arguments>
+      <arguments>
+        <boolean>true</boolean>
+      </arguments>
     </listener>
     <listener class="\Mockery\Adapter\Phpunit\TestListener"></listener>
   </listeners>
