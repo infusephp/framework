@@ -4,11 +4,10 @@ Desktop.ini
 /composer.phar
 /vendor
 ._.DS_Store
-/public/css/styles.css
-/public/js/header.js
-header.sh
 /temp
 config.php
 .vagrant
-HEADER
-composer.lock
+/build
+/node_modules
+/public/static
+/assets/static.assets.json
