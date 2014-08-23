@@ -5,7 +5,6 @@
 use infuse\Util;
 
 require_once 'vendor/autoload.php';
-require_once 'assets/constants.php';
 
 define( 'INFUSE_BASE_DIR', dirname( __DIR__ ) );
 
