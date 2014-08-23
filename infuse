@@ -22,7 +22,7 @@ unset( $args[ 0 ] );
 
 $command = Util::array_value( $args, 1 );
 if( $command == "migrate" )
-	return (int)!app()->installSchema( Util::array_value( $args, 2 ), true );
+	return (int)!app()->migrate( Util::array_value( $args, 2 ), true );
 else if( $command == "test" )
 {
 	unset( $args[ 1 ] );
