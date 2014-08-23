@@ -32,10 +32,12 @@ return  [
   ],
   'database' => [
     'type' => 'mysql',
-    'user' => 'myuser',
-    'password' => 'mypass',
     'host' => 'localhost',
     'name' => 'mydb',
+    'user' => 'root',
+    'password' => '',
+    'port' => 3306,
+    'charset' => 'utf8'
   ],
   'views' => [
     'engine' => 'smarty'
