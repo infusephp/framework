@@ -16,7 +16,6 @@ before_script:
     - mv config-example.php config.php
     - mysql -e 'create database mydb;'
     - ./infuse migrate
-    - mysql -e 'use mydb;show tables;'
 
 script:
     - mkdir -p build/logs
