@@ -12,7 +12,7 @@ Idealist Framework is a tool for building modern web applications. It is built o
 - Modular
 - MVC style
 - Dependency Injection
-- Database agnostic and schema management
+- Database agnostic and migrations with [phinx](http://phinx.org)
 - Flexible URL routing
 - Templating with [Smarty](http://smarty.net) or pure PHP
 - Logging with [monolog](https://github.com/Seldaek/monolog)
