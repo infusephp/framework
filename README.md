@@ -1,4 +1,4 @@
-Idealist Framework
+Idealist Framework [![Build Status](https://travis-ci.org/idealistsoft/framework.png?branch=master)](https://travis-ci.org/idealistsoft/framework)
 =====
 
 Modular PHP framework built with infuse/libs
