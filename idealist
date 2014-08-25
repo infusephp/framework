@@ -1,9 +1,10 @@
 <?php
 
-require_once 'vendor/autoload.php';
 define( 'INFUSE_BASE_DIR', dirname( __DIR__ ) );
+set_include_path( get_include_path() . PATH_SEPARATOR . INFUSE_BASE_DIR );
 
-require_once 'assets/constants.php';
+require_once 'vendor/autoload.php';
+include 'assets/constants.php';
 
 use App\Console\Application;
 
