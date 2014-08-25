@@ -30,5 +30,8 @@
 		"idealistsoft/framework-email": "dev-master",
 		"idealistsoft/framework-statistics": "dev-master"
 	},
+	"require-dev": {
+		"robmorgan/phinx": "*"
+	},
 	"minimum-stability": "dev"
 }
