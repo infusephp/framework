@@ -31,7 +31,8 @@
 		"idealistsoft/framework-statistics": "dev-master"
 	},
 	"require-dev": {
-		"robmorgan/phinx": "*"
+		"robmorgan/phinx": "*",
+		"satooshi/php-coveralls": "dev-master"
 	},
 	"minimum-stability": "dev"
 }
