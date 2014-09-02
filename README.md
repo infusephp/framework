@@ -32,16 +32,25 @@ Idealist Framework is a tool for building modern web applications. It is built o
 
 ### Available Modules
 
+#### Authentication
+
 - [Auth](https://github.com/idealistsoft/framework-auth): Adds user authentication to the framework
-- [API](https://github.com/idealistsoft/framework-api): RESTful API scaffolding for models
-- [Admin](https://github.com/idealistsoft/framework-admin): Generates an admin panel CRUD operations on models
-- [Cron](https://github.com/idealistsoft/framework-cron): Processes scheduled tasks in the background
-- [Email](https://github.com/idealistsoft/framework-email): Provides a mailer dependency for queueing and sending email templates
-- [Statistics](https://github.com/idealistsoft/framework-statistics): Statistics collection with admin dashboard
 - [Facebook](https://github.com/jaredtking/infuse-facebook): Adds Facebook as an authentication method
 - [OAuth](https://github.com/jaredtking/infuse-oauth): Adds OAuth as an authentication method
 - [Twitter](https://github.com/jaredtking/infuse-twitter): Adds Twitter as an authentication method
+
+#### Services
+
+- [API](https://github.com/idealistsoft/framework-api): RESTful API scaffolding for models
+- [Cron](https://github.com/idealistsoft/framework-cron): Processes scheduled tasks in the background
+- [Email](https://github.com/idealistsoft/framework-email): Provides a mailer dependency for queueing and sending email templates
 - [IronMQ](https://github.com/idealistsoft/framework-iron-mq): Use iron.io push queues
+
+#### Admin
+
+- [Admin](https://github.com/idealistsoft/framework-admin): Generates an admin panel CRUD operations on models
+- [Statistics](https://github.com/idealistsoft/framework-statistics): Statistics collection with admin dashboard
+
 
 ## Demo
 
