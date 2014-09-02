@@ -92,12 +92,12 @@ A .htaccess file is already included in the `/public` directory for url rewrites
 
 Copy the contents of `config-example.php` into `config.php` and update the settings to match your app's configuration.
 
-### 4. Database Schema
+### 4. Database Migrations
 
 Once you have setup the config and have a working connection to the database you are ready to install the schema. Run:
 
 ```
-./infuse schema install
+php idealist migrate
 ```
 
 ### 5. Compile Static Assets
