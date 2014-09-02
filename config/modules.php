@@ -1,12 +1,19 @@
 <?php
 
 return [
-	'auth',
-	'admin',
-	'api',
-	'cron',
-	'email',
-	'home',
-	'statistics',
-	'users'
+    'middleware' => [
+      'auth',
+      'admin',
+      'email'
+    ],
+    'all' => [
+		'auth',
+		'admin',
+		'api',
+		'cron',
+		'email',
+		'home',
+		'statistics',
+		'users'
+	]
 ];

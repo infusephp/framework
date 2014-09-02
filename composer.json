@@ -1,6 +1,5 @@
 {
 	"name": "idealistsoft/framework",
-	"version": "1.0",
 	"description": "Modular PHP framework built with infuse/libs",
 	"type": "library",
 	"keywords": ["modular","mvc","framework","idealist","infuse"],
@@ -14,7 +13,7 @@
 		}
 	],
     "autoload": {
-        "psr-0": {"app\\": ""}
+        "psr-4": {"app\\": "app/"}
     },
 	"support": {
 		"issues": "https://github.com/idealistsoft/framework/issues",

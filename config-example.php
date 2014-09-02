@@ -1,10 +1,5 @@
 <?php
 
-$routes = include 'config/routes.php';
-$cron = include 'config/cron.php';
-$modules = include 'config/modules.php';
-$statistics = include 'config/statistics.php';
-
 return  [
   'site' => [
     'title' => 'Idealist Framework',
@@ -15,14 +10,6 @@ return  [
     'salt' => 'replacewithrandomstring',
     'time-zone' => 'America/Chicago',
     'language' => 'en',
-  ],
-  'modules' => [
-    'middleware' => [
-      'auth',
-      'admin',
-      'email'
-    ],
-    'all' => $modules
   ],
   'logger' => [
     'enabled' => true
@@ -106,7 +93,8 @@ return  [
     'prefix' => 'idealist:',
   ],
   */
-  'routes' => $routes,
-  'cron' => $cron,
-  'statistics' => $statistics
+  'modules' => include 'config/modules.php',
+  'routes' => include 'config/routes.php',
+  'cron' => include 'config/cron.php',
+  'statistics' => include 'config/statistics.php'
 ];
