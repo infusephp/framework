@@ -11,22 +11,15 @@
 
 namespace app\home;
 
-use \App;
+use infuse\View;
 
 class Controller
 {
-	private $app;
-
-	function __construct( App $app )
-	{
-		$this->app = $app;
-	}
-
-	function index( $req, $res )
-	{
-		$res->render( 'home', array(
-			'title' => 'Welcome to Idealist Framework',
-			'metaDescription' => 'Idealist Framework allows rapid creation of web applications and APIs.'
-		) );
-	}
+    public function index($req, $res)
+    {
+        return new View('landing', [
+            'title' => 'Welcome to Idealist Framework',
+            'metaDescription' => 'Idealist Framework allows rapid creation of web applications and APIs.'
+        ]);
+    }
 }

@@ -20,10 +20,10 @@ return  [
   'database' => [
     'type' => 'mysql',
     'host' => 'localhost',
-    'name' => 'mydb',
-    'user' => 'root',
-    'password' => '',
     'port' => 3306,
+    'name' => 'mydb',
+    'user' => 'myuser',
+    'password' => 'mypass',
     'charset' => 'utf8'
   ],
   'views' => [
@@ -93,8 +93,4 @@ return  [
     'prefix' => 'idealist:',
   ],
   */
-  'modules' => include 'config/modules.php',
-  'routes' => include 'config/routes.php',
-  'cron' => include 'config/cron.php',
-  'statistics' => include 'config/statistics.php'
-];
+  'modules' => include 'config/modules.php', 'routes' => include 'config/routes.php', 'cron' => include 'config/cron.php', 'statistics' => include 'config/statistics.php' ];

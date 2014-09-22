@@ -11,11 +11,14 @@
 
 namespace app\users;
 
-use App;
+use infuse\View;
+
 use app\users\models\User;
 
 class Controller
 {
+	use \InjectApp;
+
 	public static $properties = [
 		'models' => [
 			'User'
@@ -39,69 +42,60 @@ class Controller
 
 	public static $scaffoldAdmin;
 
-	private $app;
+	public static $viewsDir;
 
-	function __construct( App $app )
+	public function __construct()
 	{
-		$this->app = $app;
+		self::$viewsDir = __DIR__ . '/views';
 	}
 
-	function loginForm( $req, $res )
+	public function loginForm($req, $res)
 	{
 		$this->ensureHttps( $req, $res );
 
 		if( $this->app[ 'user' ]->isLoggedIn() )
-			$res->redirect( '/' );
-		
-		$res->render( 'login', [
-			'redir' => $req->session( 'redir' ),
+			return $res->redirect( '/' );
+
+		return new View('login', [
+			'redir' => $req->session('redir'),
 			'title' => 'Login',
-			'loginUsername' => $req->request( 'user_email' ),
-			'loginForm' => true,
-		] );
+			'loginUsername' => $req->request('user_email'),
+			'loginForm' => true
+		]);
 	}
-	
-	function login( $req, $res )
+
+	public function login($req, $res)
 	{
 		$password = $req->request( 'password' );
-		
-		if( is_array( $req->request( 'user_password' ) ) )
-		{
+
+		if ( is_array( $req->request( 'user_password' ) ) ) {
 			$password = $req->request( 'user_password' );
 			$password = reset( $password );
 		}
 
 		$success = $this->app[ 'auth' ]->login( $req->request( 'user_email' ), $password, $req, true );
-		
-		if( $req->isHtml() )
-		{
-			if( $success )
-			{
+
+		if ( $req->isHtml() ) {
+			if ($success) {
 				$redir = ( $req->request( 'redir' ) ) ? $req->request( 'redir' ) : $req->cookies( 'redirect' );
 
-				if( !empty( $redir ) )
-				{
+				if ( !empty( $redir ) ) {
 					$req->setCookie( 'redirect', '', time() - 86400, '/' );
 					$res->redirect( $redir );
-				}
-				else
+				} else
 					$res->redirect( '/' );
-			}
-			else
-				$this->loginForm( $req, $res );
-		}
-		else if( $req->isJson() )
-		{
+			} else
+				return $this->loginForm( $req, $res );
+		} elseif ( $req->isJson() ) {
 			if( $success )
-				$res->setBodyJson([ 'success' => true ]);
+				$res->json([ 'success' => true ]);
 			else
-				$res->setBodyJson([ 'error' => true ]);
-		}
-		else
+				$res->json([ 'error' => true ]);
+		} else
 			$res->setCode( 404 );
 	}
-	
-	function forgotForm( $req, $res )
+
+	public function forgotForm($req, $res)
 	{
 		$this->ensureHttps( $req, $res );
 
@@ -110,210 +104,193 @@ class Controller
 
 		$user = false;
 
-		if( !$req->params( 'success' ) && $token = $req->params( 'id' ) )
-		{
+		if ( !$req->params( 'success' ) && $token = $req->params( 'id' ) ) {
 			$user = $this->app[ 'auth' ]->getUserFromForgotToken( $token );
 
 			if( !$user )
 				return $res->setCode( 404 );
 		}
-		
-		$res->render( 'forgot', [
-			'success' => $req->params( 'success' ),
+
+		return new View('forgot', [
+			'success' => $req->params('success'),
 			'title' => 'Forgot Password',
-			'id' => $req->params( 'id' ),
-			'email' => $req->request( 'email' ),
+			'id' => $req->params('id'),
+			'email' => $req->request('email'),
 			'user' => $user
-		] );
+		]);
 	}
-	
-	function forgotStep1( $req, $res )
+
+	public function forgotStep1($req, $res)
 	{
 		if( $this->app[ 'user' ]->isLoggedIn() )
-			$res->redirect( '/' );
-		
+			return $res->redirect( '/' );
+
 		$success = $this->app[ 'auth' ]->forgotStep1( $req->request( 'email' ), $req->ip() );
-		
+
 		$req->setParams( [
 			'success' => $success ] );
-		
-		$this->forgotForm( $req, $res );
+
+		return $this->forgotForm( $req, $res );
 	}
-	
-	function forgotStep2( $req, $res ) {
+
+	public function forgotStep2($req, $res)
+	{
 		$success = $this->app[ 'auth' ]->forgotStep2( $req->params( 'id' ), $req->request( 'user_password' ) );
-		
+
 		$req->setParams( [
 			'success' => $success ] );
-	
-		$this->forgotForm( $req, $res );
+
+		return $this->forgotForm( $req, $res );
 	}
-	
-	function logout( $req, $res )
+
+	public function logout($req, $res)
 	{
 		$this->app[ 'auth' ]->logout();
 
 		$req->setCookie( 'redirect', '', time() - 86400, '/' );
-		
+
 		if( $req->isHtml() )
 			$res->redirect( '/' );
-		else if( $req->isJson() )
-			$res->setBodyJson( [ 'success' => true ] );
+		elseif( $req->isJson() )
+			$res->json( [ 'success' => true ] );
 	}
-	
-	function signupForm( $req, $res )
+
+	public function signupForm($req, $res)
 	{
 		$this->ensureHttps( $req, $res );
 
 		if( $this->app[ 'user' ]->isLoggedIn() )
 			$this->app[ 'auth' ]->logout();
 
-		$res->render( 'signup', [
+		return new View('signup', [
 			'title' => 'Sign Up',
 			'name' => $req->request( 'name' ),
 			'signupEmail' => ($req->request( 'user_email' )) ? $req->request( 'user_email' ) : $req->query( 'user_email' ),
 			'signupForm' => true
 		] );
 	}
-	
-	function signup( $req, $res )
+
+	public function signup($req, $res)
 	{
 		if( $this->app[ 'user' ]->isLoggedIn() )
-			$res->redirect( '/' );
-		
+			return $res->redirect( '/' );
+
 		// break the name up into first and last
-		$name = explode( ' ', $req->request( 'name' ) );
-		
+        $name = explode( ' ', $req->request( 'name' ) );
+
 		$lastName = (count($name) <= 1) ? '' : array_pop( $name );
 		$firstName = implode( ' ', $name );
-		
+
 		$info = [
 			'first_name' => $firstName,
 			'last_name' => $lastName,
 			'user_email' => $req->request( 'user_email' ),
 			'user_password' => $req->request( 'user_password' ),
 			'ip' => $req->ip() ];
-		
+
 		$user = User::registerUser( $info );
 
-		if( $user )
-		{
+		if ($user) {
 			if( $req->isHtml() )
 				$this->login( $req, $res );
-			else if( $req->isJson() )
-				$req->setBodyJson( [
+			elseif( $req->isJson() )
+				$req->json( [
 					'user' => $user->toArray(),
 					'success' => true ] );
 			else
 				$res->setCode( 404 );
-		}
-		else
-			$this->signupForm( $req, $res );
+		} else
+			return $this->signupForm( $req, $res );
 	}
-	
-	function verifiyEmail( $req, $res )
+
+	public function verifiyEmail($req, $res)
 	{
 		$user = $this->app[ 'auth' ]->verifyEmailWithLink( $req->params( 'id' ) );
-		
+
 		// log the user in
-		if( $user )
+        if( $user )
 			$this->app[ 'auth' ]->signInUser( $user->id() );
 
-		$res->render( 'verifyEmail', [
+		return new View('verifyEmail', [
 			'title' => 'Verify E-mail',
-			'success' => $user ] );
+			'success' => $user ]);
 	}
 
-	function sendVerifyEmail( $req, $res )
+	public function sendVerifyEmail($req, $res)
 	{
 		// look up user
-		$user = new User( $req->params( 'id' ) );
+        $user = new User( $req->params( 'id' ) );
 
 		// check that the user is not verified
-		if( $user->isVerified( false ) )
-		{
+        if ( $user->isVerified( false ) ) {
 			// TODO error
-		}
+        }
 
 		// send the e-mail
-		$this->app[ 'auth' ]->sendVerifyEmail( $user );
+        $this->app[ 'auth' ]->sendVerifyEmail( $user );
 
-		$res->render( 'verifyEmailSent', [
-			'title' => 'E-mail Verification Sent' ] );
+		return new View('verifyEmailSent', [
+			'title' => 'E-mail Verification Sent' ]);
 	}
-	
-	function accountSettings( $req, $res )
+
+	public function accountSettings($req, $res)
 	{
 		$user = $this->app[ 'user' ];
-		if( !$user->isLoggedIn() ) {
+		if ( !$user->isLoggedIn() ) {
 			if( $req->isHtml() )
-				$res->redirect( '/' );
+				return $res->redirect( '/' );
 			else
 				return $res->setCode( 401 );
 		}
-		
-		$res->render( 'account', [
+
+		return new View('account', [
 			'success' => $req->params( 'success' ),
 			'deleteError' => $req->params( 'deleteError' ),
-			'title' => 'Account Settings' ] );
+			'title' => 'Account Settings' ]);
 	}
-	
-	function editAccountSettings( $req, $res )
+
+	public function editAccountSettings($req, $res)
 	{
 		$user = $this->app[ 'user' ];
-		if( !$user->isLoggedIn() ) {
+		if ( !$user->isLoggedIn() ) {
 			return $res->setCode( 401 );
 		}
-		
-		if( $req->request( 'delete' ) ) {
+
+		if ( $req->request( 'delete' ) ) {
 			$success = $user->deleteConfirm( $req->request( 'password' ), $req );
-			
-			if( $success ) {
+
+			if ($success) {
 				$this->app[ 'auth' ]->logout();
-				$res->redirect( '/' );
+				return $res->redirect( '/' );
 			} else {
 				$req->setParams( [ 'deleteError' => true ] );
-				$this->accountSettings( $req, $res );
+				return $this->accountSettings( $req, $res );
 			}
 		} else {
 			$success = $user->set( $req->request() );
-			
-			if( $success ) {
-				if( $req->isHtml() ) {
+
+			if ($success) {
+				if ( $req->isHtml() ) {
 					$req->setParams( [ 'success' => true ] );
-					$this->accountSettings( $req, $res );
-				} else if( $req->isJson() ) {
-					$res->setBodyJson( [ 'success' => true ] );
+					return $this->accountSettings( $req, $res );
+				} elseif ( $req->isJson() ) {
+					$res->json( [ 'success' => true ] );
 				}
 			} else {
 				if( $req->isHtml() )
-					$this->accountSettings( $req, $res );
-				else if( $req->isJson() ) {
-					$res->setBodyJson( [ 'error' => true ] );
+					return $this->accountSettings( $req, $res );
+				elseif ( $req->isJson() ) {
+					$res->json( [ 'error' => true ] );
 				}
 			}
 		}
 	}
 
-	private function ensureHttp( $req, $res )
+	private function ensureHttps($req, $res)
 	{
-		if( $req->isSecure() )
-		{
-			$url = str_replace( 'https://', 'http://', $req->url() );
-			header( 'HTTP/1.1 301 Moved Permanently' );
-			header( "Location: $url" );
-			exit;
-		}
-	}
-
-	private function ensureHttps( $req, $res )
-	{
-		if( !$req->isSecure() && $this->app[ 'config' ]->get( 'site.ssl-enabled' ) )
-		{
+		if ( !$req->isSecure() && $this->app[ 'config' ]->get( 'site.ssl-enabled' ) ) {
 			$url = str_replace( 'http://', 'https://', $req->url() );
-			header( 'HTTP/1.1 301 Moved Permanently' );
-			header( "Location: $url" );
-			exit;
+			$res->redirect($url, 301);
 		}
 	}
 }
