@@ -22,8 +22,8 @@ return  [
     'host' => 'localhost',
     'port' => 3306,
     'name' => 'mydb',
-    'user' => 'myuser',
-    'password' => 'mypass',
+    'user' => 'root',
+    'password' => '',
     'charset' => 'utf8'
   ],
   'views' => [
