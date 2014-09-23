@@ -24,7 +24,7 @@
 		"idealistsoft/framework-bootstrap": "dev-master",
 		"idealistsoft/framework-auth": "dev-master",
 		"idealistsoft/framework-admin": "dev-master",
-		"idealistsoft/framework-api": "dev-master",
+		"idealistsoft/framework-rest-api": "dev-master",
 		"idealistsoft/framework-cron": "dev-master",
 		"idealistsoft/framework-email": "dev-master",
 		"idealistsoft/framework-statistics": "dev-master"
