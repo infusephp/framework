@@ -21,17 +21,17 @@
 	},
 	"require": {
 		"php": ">=5.4.0",
-		"idealistsoft/framework-bootstrap": "dev-master",
+		"idealistsoft/framework-bootstrap": "~1.0",
 		"idealistsoft/framework-auth": "dev-master",
-		"idealistsoft/framework-admin": "dev-master",
-		"idealistsoft/framework-rest-api": "dev-master",
+		"idealistsoft/framework-admin": "~1.0",
+		"idealistsoft/framework-rest-api": "~1.0",
 		"idealistsoft/framework-cron": "dev-master",
-		"idealistsoft/framework-email": "dev-master",
-		"idealistsoft/framework-statistics": "dev-master"
+		"idealistsoft/framework-email": "~1.0",
+		"idealistsoft/framework-statistics": "dev-master",
+		"robmorgan/phinx": "~0.3"
 	},
 	"require-dev": {
-		"robmorgan/phinx": "*",
-		"satooshi/php-coveralls": "dev-master"
+		"mockery/mockery": "0.9.1"
 	},
 	"minimum-stability": "dev"
 }
