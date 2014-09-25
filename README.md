@@ -38,7 +38,7 @@ Idealist Framework is a tool for building modern web applications. It is built o
 - [OAuth2](https://github.com/idealistsoft/framework-oauth2): Adds support for OAuth2 and JWT access tokens
 - [Facebook](https://github.com/idealistsoft/framework-facebook): Adds Facebook as an authentication method
 - [Twitter](https://github.com/idealistsoft/framework-twitter): Adds Twitter as an authentication method
-- [Instagram](https://github.com/idealistsfot/framework-instagram): Adds Instagram as an authentication method
+- [Instagram](https://github.com/idealistsoft/framework-instagram): Adds Instagram as an authentication method
 
 #### Services
 
