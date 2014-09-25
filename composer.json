@@ -22,7 +22,7 @@
 	"require": {
 		"php": ">=5.4.0",
 		"idealistsoft/framework-bootstrap": "~1.0",
-		"idealistsoft/framework-auth": "dev-master",
+		"idealistsoft/framework-auth": "~1.0",
 		"idealistsoft/framework-admin": "~1.0",
 		"idealistsoft/framework-rest-api": "~1.0",
 		"idealistsoft/framework-cron": "dev-master",
