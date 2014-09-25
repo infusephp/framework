@@ -11,3 +11,4 @@ config.php
 /node_modules
 /public/static
 /assets/static.assets.json
+HEADER

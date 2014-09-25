@@ -1,11 +1,11 @@
 <?php
 
 /**
- * @package infuse\framework
+ * @package Idealist Framework
  * @author Jared King <j@jaredtking.com>
  * @link http://jaredtking.com
- * @version 0.1.16
- * @copyright 2013 Jared King
+ * @version 1.0.0
+ * @copyright 2014 Jared King
  * @license MIT
  */
 

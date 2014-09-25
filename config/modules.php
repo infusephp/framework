@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * @package Idealist Framework
+ * @author Jared King <j@jaredtking.com>
+ * @link http://jaredtking.com
+ * @version 1.0.0
+ * @copyright 2014 Jared King
+ * @license MIT
+ */
+
 return [
     'middleware' => [
       'auth',
@@ -7,13 +16,13 @@ return [
       'email'
     ],
     'all' => [
-		'auth',
-		'admin',
-		'api',
-		'cron',
-		'email',
-		'home',
-		'statistics',
-		'users'
-	]
+        'auth',
+        'admin',
+        'api',
+        'cron',
+        'email',
+        'home',
+        'statistics',
+        'users'
+    ]
 ];
