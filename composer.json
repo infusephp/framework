@@ -27,7 +27,7 @@
 		"idealistsoft/framework-rest-api": "~1.0",
 		"idealistsoft/framework-cron": "~1.0",
 		"idealistsoft/framework-email": "~1.0",
-		"idealistsoft/framework-statistics": "~1.0",
+		"idealistsoft/framework-statistics": "dev-master",
 		"robmorgan/phinx": "~0.3"
 	},
 	"require-dev": {

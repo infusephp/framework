@@ -19,19 +19,17 @@ return [
         'SiteMode',
         'SiteSession',
         'SiteStatus',
-        'SiteVersion',
+        'FrameworkVersion',
         'Users'
     ],
     'dashboard' => [
-        'Signup Funnel' => [
-            'SignupsToday'
-        ],
         'Usage' => [
-            'TotalUsers'
+            'TotalUsers',
+            'SignupsToday'
         ],
         'Site' => [
             'SiteStatus',
-            'SiteVersion',
+            'FrameworkVersion',
             'PhpVersion',
             'SiteMode',
             'SessionAdapter',

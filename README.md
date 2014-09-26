@@ -55,7 +55,7 @@ Idealist Framework is a tool for building modern web applications. It is built o
 
 ## Demo
 
-A demo has been setup at [infuse.jaredtking.com](http://infuse.jaredtking.com).
+A demo has been setup at [framework-demo.idealistsoftware.com](http://framework-demo.idealistsoftware.com).
 
 ## Getting Started
 
