@@ -8,4 +8,5 @@
 
 <p><a href="{$verify_link}">{$verify_link}</a></p>
 
-<p>- {$smarty.const.SITE_TITLE}</p>
+<p>Best,<br>
+The team at {$smarty.const.SITE_TITLE}</p>

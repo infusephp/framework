@@ -131,26 +131,25 @@ class Controller
 
     public function forgotStep1($req, $res)
     {
-        if( $this->app[ 'user' ]->isLoggedIn() )
+        if ($this->app['user']->isLoggedIn())
+            return $res->redirect('/');
 
-            return $res->redirect( '/' );
+        $success = $this->app['auth']->forgotStep1($req->request('email'), $req->ip());
 
-        $success = $this->app[ 'auth' ]->forgotStep1( $req->request( 'email' ), $req->ip() );
+        $req->setParams([
+            'success' => $success ]);
 
-        $req->setParams( [
-            'success' => $success ] );
-
-        return $this->forgotForm( $req, $res );
+        return $this->forgotForm($req, $res);
     }
 
     public function forgotStep2($req, $res)
     {
-        $success = $this->app[ 'auth' ]->forgotStep2( $req->params( 'id' ), $req->request( 'user_password' ) );
+        $success = $this->app['auth']->forgotStep2($req->params('id'), $req->request('user_password'), $req->ip());
 
-        $req->setParams( [
-            'success' => $success ] );
+        $req->setParams([
+            'success' => $success ]);
 
-        return $this->forgotForm( $req, $res );
+        return $this->forgotForm($req, $res);
     }
 
     public function logout($req, $res)
