@@ -30,7 +30,7 @@ class Controller
             'get /users/signup' => 'signupForm',
             'post /users/signup' => 'signup',
             'get /users/verifyEmail/:id' => 'verifiyEmail',
-            'post /users/verifyEmail/:id' => 'verifiyEmail',
+            'get /users/verify/:id' => 'sendVerifyEmail',
             'get /users/forgot' => 'forgotForm',
             'post /users/forgot' => 'forgotStep1',
             'get /users/forgot/:id' => 'forgotForm',
@@ -57,8 +57,16 @@ class Controller
 
             return $res->redirect( '/' );
 
+        $redir = urldecode($req->query('redir'));
+
+        if (!$redir)
+            $redir = $req->request('redir');
+
+        if (!$redir)
+            $redir = $req->session('redir');
+
         return new View('login', [
-            'redir' => $req->session('redir'),
+            'redir' => $redir,
             'title' => 'Login',
             'loginUsername' => $req->request('user_email'),
             'loginForm' => true
@@ -80,9 +88,9 @@ class Controller
             if ($success) {
                 $redir = ( $req->request( 'redir' ) ) ? $req->request( 'redir' ) : $req->cookies( 'redirect' );
 
-                if ( !empty( $redir ) ) {
+                if (!empty($redir)) {
                     $req->setCookie( 'redirect', '', time() - 86400, '/' );
-                    $res->redirect( $redir );
+                    $res->redirect($redir);
                 } else
                     $res->redirect( '/' );
             } else
@@ -166,9 +174,18 @@ class Controller
         if( $this->app[ 'user' ]->isLoggedIn() )
             $this->app[ 'auth' ]->logout();
 
+        $redir = urldecode($req->query('redir'));
+
+        if( !$redir )
+            $redir = $req->request('redir');
+
+        if( !$redir )
+            $redir = $req->session('redir');
+
         return new View('signup', [
             'title' => 'Sign Up',
-            'name' => $req->request( 'name' ),
+            'redir' => $redir,
+            'name' => $req->request('name'),
             'signupEmail' => ($req->request( 'user_email' )) ? $req->request( 'user_email' ) : $req->query( 'user_email' ),
             'signupForm' => true
         ] );
