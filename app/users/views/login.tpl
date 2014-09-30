@@ -15,6 +15,9 @@
 			{if $error.error == 'user_login_no_match'}
 				We do not have a match for that username and password.<br/>
 				<a href="/forgot">Did you forget your password?</a>
+			{elseif $error.error == 'user_login_unverified'}
+				You must verify your email address before you can log in.<br/>
+				<a href="/users/verify/{$error.params.uid}">Resend verification email</a>
 			{else}
 				{$error.message}
 			{/if}

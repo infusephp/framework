@@ -69,8 +69,7 @@ class Controller
             'redir' => $redir,
             'title' => 'Login',
             'loginUsername' => $req->request('user_email'),
-            'loginForm' => true
-        ]);
+            'loginForm' => true ]);
     }
 
     public function login($req, $res)
@@ -127,8 +126,7 @@ class Controller
             'title' => 'Forgot Password',
             'id' => $req->params('id'),
             'email' => $req->request('email'),
-            'user' => $user
-        ]);
+            'user' => $user ]);
     }
 
     public function forgotStep1($req, $res)
@@ -187,8 +185,7 @@ class Controller
             'redir' => $redir,
             'name' => $req->request('name'),
             'signupEmail' => ($req->request( 'user_email' )) ? $req->request( 'user_email' ) : $req->query( 'user_email' ),
-            'signupForm' => true
-        ] );
+            'signupForm' => true ]);
     }
 
     public function signup($req, $res)
@@ -242,18 +239,17 @@ class Controller
     public function sendVerifyEmail($req, $res)
     {
         // look up user
-        $user = new User( $req->params( 'id' ) );
+        $user = new User($req->params('id'));
 
         // check that the user is not verified
-        if ( $user->isVerified( false ) ) {
-            // TODO error
-        }
+        if ($user->isVerified(false))
+            return $res->setCode(404);
 
         // send the e-mail
-        $this->app[ 'auth' ]->sendVerifyEmail( $user );
+        $this->app[ 'auth' ]->sendVerificationEmail($user);
 
         return new View('verifyEmailSent', [
-            'title' => 'E-mail Verification Sent' ]);
+            'title' => 'E-mail Verification Sent']);
     }
 
     public function accountSettings($req, $res)
@@ -264,7 +260,7 @@ class Controller
 
                 return $res->redirect( '/' );
             else
-                return $res->setCode( 401 );
+                return $res->setCode(403);
         }
 
         return new View('account', [
@@ -277,7 +273,7 @@ class Controller
     {
         $user = $this->app[ 'user' ];
         if ( !$user->isLoggedIn() ) {
-            return $res->setCode( 401 );
+            return $res->setCode(403);
         }
 
         if ( $req->request( 'delete' ) ) {

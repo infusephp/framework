@@ -64,6 +64,7 @@
    		{if $app.user->isLoggedIn() && !$app.user->isVerified(false)}
    			<p class="alert alert-danger">
    				Your account has not been verified yet. Please check your e-mail for instructions on verifying your account.
+   				<a href="/users/verify/{$app.user->id()}">Resend verification email</a>
    			</p>
    		{/if}
     	{block name=content}{/block}
