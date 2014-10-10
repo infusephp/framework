@@ -21,7 +21,7 @@
 	},
 	"require": {
 		"php": ">=5.4.0",
-		"idealistsoft/framework-bootstrap": "~1.0",
+		"idealistsoft/framework-bootstrap": "dev-master",
 		"idealistsoft/framework-auth": "dev-master",
 		"idealistsoft/framework-admin": "dev-master",
 		"idealistsoft/framework-rest-api": "dev-master",
