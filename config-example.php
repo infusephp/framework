@@ -45,7 +45,8 @@ return  [
         // 'memcache',
         'local'
       ],
-      'prefix' => 'idealist:'
+      'prefix' => 'idealist:',
+      'expires' => 86400 // 1 day
     ],
   ],
   'email' => [
