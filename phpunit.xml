@@ -4,9 +4,10 @@
   </php>
 
   <listeners>
+    <listener file="assets/constants.php"></listener>
     <listener file="vendor/autoload.php"></listener>
-    <listener class="\Test"></listener>
-    <listener class="\Mockery\Adapter\Phpunit\TestListener"></listener>
+    <listener class="Test"></listener>
+    <listener class="Mockery\Adapter\Phpunit\TestListener"></listener>
   </listeners>
 
   <testsuites>
