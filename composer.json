@@ -1,8 +1,8 @@
 {
-	"name": "idealistsoft/framework",
+	"name": "infuse/framework",
 	"description": "Modular PHP framework built with infuse/libs",
 	"type": "library",
-	"keywords": ["modular","mvc","framework","idealist","infuse"],
+	"keywords": ["modular","mvc","framework","infuse"],
 	"homepage": "http://infuse.jaredtking.com",
 	"license": "MIT",
 	"authors": [
@@ -16,18 +16,18 @@
         "psr-4": {"app\\": "app/"}
     },
 	"support": {
-		"issues": "https://github.com/idealistsoft/framework/issues",
-		"source": "https://github.com/idealistsoft/framework"
+		"issues": "https://github.com/infusephp/framework/issues",
+		"source": "https://github.com/infusephp/framework"
 	},
 	"require": {
 		"php": ">=5.4.0",
-		"idealistsoft/framework-bootstrap": "dev-master",
-		"idealistsoft/framework-auth": "dev-master",
-		"idealistsoft/framework-admin": "dev-master",
-		"idealistsoft/framework-rest-api": "dev-master",
-		"idealistsoft/framework-cron": "dev-master",
-		"idealistsoft/framework-email": "~1.0",
-		"idealistsoft/framework-statistics": "dev-master",
+		"infusephp/bootstrap": "dev-master",
+		"infusephp/auth": "dev-master",
+		"infusephp/admin": "dev-master",
+		"infusephp/rest-api": "dev-master",
+		"infusephp/cron": "dev-master",
+		"infusephp/email": "~1.0",
+		"infusephp/statistics": "dev-master",
 		"robmorgan/phinx": "~0.3"
 	},
 	"require-dev": {

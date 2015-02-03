@@ -1,11 +1,13 @@
-Idealist Framework [![Build Status](https://travis-ci.org/idealistsoft/framework.png?branch=master)](https://travis-ci.org/idealistsoft/framework)
+Infuse Framework
 =====
+
+[![Build Status](https://travis-ci.org/infusephp/framework.png?branch=master)](https://travis-ci.org/infuse/framework)
 
 Modular PHP framework built with infuse/libs
 
-## What is Idealist Framework?
+## What is Infuse Framework?
 
-Idealist Framework is a tool for building modern web applications. It is built on top of [infuse/libs](https://github.com/jaredtking/infuse-libs). The goal of this framework is scalability through a simple modular design.
+Infuse Framework is a tool for building modern web applications. It is built on top of [infuse/libs](https://github.com/infusephp/libs). The goal of this framework is scalability through a simple modular design.
 
 ## Features
 
@@ -34,38 +36,38 @@ Idealist Framework is a tool for building modern web applications. It is built o
 
 #### Authentication
 
-- [Auth](https://github.com/idealistsoft/framework-auth): Adds user authentication to the framework
-- [OAuth2](https://github.com/idealistsoft/framework-oauth2): Adds support for OAuth2 and JWT access tokens
-- [Facebook](https://github.com/idealistsoft/framework-facebook): Adds Facebook as an authentication method
-- [Twitter](https://github.com/idealistsoft/framework-twitter): Adds Twitter as an authentication method
-- [Instagram](https://github.com/idealistsoft/framework-instagram): Adds Instagram as an authentication method
+- [Auth](https://github.com/infusephp/auth): Adds user authentication to the framework
+- [OAuth2](https://github.com/infusephp/oauth2): Adds support for OAuth2 and JWT access tokens
+- [Facebook](https://github.com/infusephp/facebook): Adds Facebook as an authentication method
+- [Twitter](https://github.com/infusephp/twitter): Adds Twitter as an authentication method
+- [Instagram](https://github.com/infusephp/instagram): Adds Instagram as an authentication method
 
 #### Services
 
-- [API](https://github.com/idealistsoft/framework-api): RESTful API scaffolding for models
-- [Cron](https://github.com/idealistsoft/framework-cron): Processes scheduled tasks in the background
-- [Email](https://github.com/idealistsoft/framework-email): Provides a mailer dependency for queueing and sending email templates
-- [IronMQ](https://github.com/idealistsoft/framework-iron-mq): Use iron.io push queues
+- [API](https://github.com/infusephp/rest-api): RESTful API scaffolding for models
+- [Cron](https://github.com/infusephp/cron): Processes scheduled tasks in the background
+- [Email](https://github.com/infusephp/email): Provides a mailer dependency for queueing and sending email templates
+- [IronMQ](https://github.com/infusephp/iron-mq): Use iron.io push queues
 
 #### Admin
 
-- [Admin](https://github.com/idealistsoft/framework-admin): Generates an admin panel CRUD operations on models
-- [Statistics](https://github.com/idealistsoft/framework-statistics): Statistics collection with admin dashboard
+- [Admin](https://github.com/infusephp/admin): Generates an admin panel CRUD operations on models
+- [Statistics](https://github.com/infusephp/statistics): Statistics collection with admin dashboard
 
 
 ## Demo
 
-A demo has been setup at [framework-demo.idealistsoftware.com](http://framework-demo.idealistsoftware.com).
+A demo has been setup at [infuse.jaredtking.com](http://infuse.jaredtking.com).
 
 ## Getting Started
 
 ### 1. Install with composer
 
 ```
-composer create-project idealistsoft/framework ./path/to/dir
+composer create-project infuse/framework ./path/to/dir
 ```
 
-Idealist Framework is served through the `public` directory to prevent the framework files from being served. This requires a small amount of configuration for the web server to work properly.
+Infuse Framework is served through the `public` directory to prevent the framework files from being served. This requires a small amount of configuration for the web server to work properly.
 
 ### 2. Nginx
 
@@ -107,7 +109,7 @@ Copy the contents of `config-example.php` into `config.php` and update the setti
 Once you have setup the config and have a working connection to the database you are ready to install the schema. Run:
 
 ```
-php idealist migrate
+php infuse migrate
 ```
 
 ### 5. Compile Static Assets
@@ -123,11 +125,11 @@ You can use `grunt` to recompile all assets and `grunt watch` to watch for chang
 
 ## Why another PHP framework?
 
-Idealist Framework has served me well on many projects in the past. My hope by open sourcing it is that others may benefit. If something does not look right, I would love to hear about it in the issues.
+Infuse Framework has served me well on many projects in the past. My hope by open sourcing it is that others may benefit. If something does not look right, I would love to hear about it in the issues.
 
 ## Documentation
 
-Learn more about Idealist Framework in the [wiki](https://github.com/idealistsoft/framework/wiki).
+Learn more about Infuse Framework in the [wiki](https://github.com/infusephp/framework/wiki).
 
 ## Contributing
 
