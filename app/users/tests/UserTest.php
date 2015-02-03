@@ -17,7 +17,7 @@ class UserTest extends \PHPUnit_Framework_TestCase
 
     public static function setUpBeforeClass()
     {
-        $this->app['db']->delete('Users')->where('user_email', 'test@example.com')->execute();
+        Test::$app['db']->delete('Users')->where('user_email', 'test@example.com')->execute();
     }
 
     public static function tearDownAfterClass()
