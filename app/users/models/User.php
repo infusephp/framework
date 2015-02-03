@@ -1,11 +1,11 @@
 <?php
 
 /**
- * @package Idealist Framework
+ * @package infuse/framework
  * @author Jared King <j@jaredtking.com>
  * @link http://jaredtking.com
  * @version 1.0.0
- * @copyright 2014 Jared King
+ * @copyright 2015 Jared King
  * @license MIT
  */
 
@@ -18,15 +18,15 @@ class User extends AbstractUser
     public static $properties = [
         'uid' =>  [
             'type' => 'id',
-            'hidden_property' => true
+            'hidden_property' => true,
         ],
         'first_name' => [
             'type' => 'text',
             'validate' => 'string:1',
-            'required' => true
+            'required' => true,
         ],
         'last_name' => [
-            'type' => 'text'
+            'type' => 'text',
         ],
         'user_email' => [
             'type' => 'text',
@@ -43,7 +43,7 @@ class User extends AbstractUser
             'required' => true,
             'title' => 'Password',
             'admin_type' => 'password',
-            'admin_hidden_property' => true
+            'admin_hidden_property' => true,
         ],
         'ip' => [
             'type' => 'text',
@@ -51,7 +51,7 @@ class User extends AbstractUser
             'required' => true,
             'length' => 16,
             'adimn_html' => '<a href="http://www.infobyip.com/ip-{ip}.html" target="_blank">{ip}</a>',
-            'admin_hidden_property' => true
+            'admin_hidden_property' => true,
         ],
         'enabled' => [
             'type' => 'boolean',
@@ -59,33 +59,33 @@ class User extends AbstractUser
             'required' => true,
             'default' => true,
             'admin_type' => 'checkbox',
-            'admin_hidden_property' => true
-        ]
+            'admin_hidden_property' => true,
+        ],
     ];
 
     /**
-	 * Gets the user's name
-	 *
-	 * @param boolean $full when true gets full name
-	 *
-	 * @return string
-	 */
+     * Gets the user's name
+     *
+     * @param boolean $full when true gets full name
+     *
+     * @return string
+     */
     public function name($full = false)
     {
-        if( $this->_id == GUEST )
-
+        if ($this->_id == GUEST) {
             return 'Guest';
-        elseif( !$this->exists() )
+        } elseif (!$this->exists()) {
             return '(not registered)';
+        }
 
-        if ( !empty( $this->first_name ) ) {
-            if( $full )
-
-                return $this->first_name . ' ' . $this->last_name;
-            else
+        if (!empty($this->first_name)) {
+            if ($full) {
+                return $this->first_name.' '.$this->last_name;
+            } else {
                 return $this->first_name;
-        } else
-
+            }
+        } else {
             return $this->user_email;
+        }
     }
 }

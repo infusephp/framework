@@ -1,55 +1,55 @@
 <?php
 
 /**
- * @package Idealist Framework
+ * @package infuse/framework
  * @author Jared King <j@jaredtking.com>
  * @link http://jaredtking.com
  * @version 1.0.0
- * @copyright 2014 Jared King
+ * @copyright 2015 Jared King
  * @license MIT
  */
 
 return [
   'get /' => [
-    'home\\Controller'
+    'home\\Controller',
   ],
   'get /home' => [
-    'home\\Controller'
+    'home\\Controller',
   ],
   'get /install/finish' => [
-    'home\\Controller'
+    'home\\Controller',
   ],
   'get /login' => [
     'users\\Controller',
-    'loginForm'
+    'loginForm',
   ],
   'post /login' => [
     'users\\Controller',
-    'login'
+    'login',
   ],
   'get /logout' => [
     'users\\Controller',
-    'logout'
+    'logout',
   ],
   'get /signup' => [
     'users\\Controller',
-    'signupForm'
+    'signupForm',
   ],
   'post /signup' => [
     'users\\Controller',
-    'signup'
+    'signup',
   ],
   'get /signup/finish' => [
     'users\\Controller',
-    'finishSignup'
+    'finishSignup',
   ],
   'post /signup/finish' => [
     'users\\Controller',
-    'finishSignupPost'
+    'finishSignupPost',
   ],
   'get /forgot' => [
     'users\\Controller',
-    'forgotForm'
+    'forgotForm',
   ],
   'post /forgot' => [
     'users\\Controller',

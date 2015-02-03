@@ -1,15 +1,13 @@
 <?php
 
 /**
- * @package Idealist Framework
+ * @package infuse/framework
  * @author Jared King <j@jaredtking.com>
  * @link http://jaredtking.com
  * @version 1.0.0
- * @copyright 2014 Jared King
+ * @copyright 2015 Jared King
  * @license MIT
  */
-
-use infuse\Database;
 
 use app\users\models\User;
 
@@ -19,7 +17,7 @@ class UserTest extends \PHPUnit_Framework_TestCase
 
     public static function setUpBeforeClass()
     {
-        Database::delete( 'Users', [ 'user_email' => 'test@example.com' ] );
+        $this->app['db']->delete('Users')->where('user_email', 'test@example.com')->execute();
     }
 
     public static function tearDownAfterClass()
@@ -32,33 +30,33 @@ class UserTest extends \PHPUnit_Framework_TestCase
 
     public function testRegisterUser()
     {
-        self::$user = User::registerUser( [
+        self::$user = User::registerUser([
             'first_name' => 'Bob',
             'last_name' => 'Loblaw',
             'user_email' => 'test@example.com',
             'user_password' => [ 'testpassword', 'testpassword' ],
-            'ip' => '127.0.0.1'
-        ] );
+            'ip' => '127.0.0.1',
+        ]);
 
-        $this->assertInstanceOf( '\\app\\users\\models\\User', self::$user );
-        $this->assertGreaterThan( 0, self::$user->id() );
+        $this->assertInstanceOf('\\app\\users\\models\\User', self::$user);
+        $this->assertGreaterThan(0, self::$user->id());
     }
 
     /**
-	 * @depends testRegisterUser
-	 */
+     * @depends testRegisterUser
+     */
     public function testName()
     {
-        $this->assertEquals( 'Bob', self::$user->name() );
-        $this->assertEquals( 'Bob Loblaw', self::$user->name( true ) );
+        $this->assertEquals('Bob', self::$user->name());
+        $this->assertEquals('Bob Loblaw', self::$user->name(true));
 
-        $guest = new User( GUEST );
-        $this->assertEquals( 'Guest', $guest->name() );
+        $guest = new User(GUEST);
+        $this->assertEquals('Guest', $guest->name());
 
-        $notfound = new User( -100 );
-        $this->assertEquals( '(not registered)', $notfound->name() );
+        $notfound = new User(-100);
+        $this->assertEquals('(not registered)', $notfound->name());
 
         self::$user->first_name = '';
-        $this->assertEquals( 'test@example.com', self::$user->name() );
+        $this->assertEquals('test@example.com', self::$user->name());
     }
 }

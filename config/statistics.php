@@ -1,11 +1,11 @@
 <?php
 
 /**
- * @package Idealist Framework
+ * @package infuse/framework
  * @author Jared King <j@jaredtking.com>
  * @link http://jaredtking.com
  * @version 1.0.0
- * @copyright 2014 Jared King
+ * @copyright 2015 Jared King
  * @license MIT
  */
 
@@ -20,12 +20,12 @@ return [
         'SiteSession',
         'SiteStatus',
         'FrameworkVersion',
-        'Users'
+        'Users',
     ],
     'dashboard' => [
         'Usage' => [
             'TotalUsers',
-            'SignupsToday'
+            'SignupsToday',
         ],
         'Site' => [
             'SiteStatus',
@@ -37,7 +37,7 @@ return [
         'Database' => [
             'DatabaseSize',
             'DatabaseVersion',
-            'DatabaseTables'
-        ]
+            'DatabaseTables',
+        ],
     ]
 ];

@@ -1,11 +1,11 @@
 <?php
 
 /**
- * @package Idealist Framework
+ * @package infuse/framework
  * @author Jared King <j@jaredtking.com>
  * @link http://jaredtking.com
  * @version 1.0.0
- * @copyright 2014 Jared King
+ * @copyright 2015 Jared King
  * @license MIT
  */
 
@@ -21,10 +21,10 @@ return  [
     'language' => 'en',
   ],
   'logger' => [
-    'enabled' => true
+    'enabled' => true,
   ],
   'admin' => [
-    'index' => 'statistics'
+    'index' => 'statistics',
   ],
   'database' => [
     'type' => 'mysql',
@@ -33,26 +33,26 @@ return  [
     'name' => 'mydb',
     'user' => 'root',
     'password' => '',
-    'charset' => 'utf8'
+    'charset' => 'utf8',
   ],
   'views' => [
-    'engine' => 'smarty'
+    'engine' => 'smarty',
   ],
   'models' => [
     'cache' => [
       'strategies' => [
         // 'redis',
         // 'memcache',
-        'local'
+        'local',
       ],
       'prefix' => 'idealist:',
-      'expires' => 86400 // 1 day
+      'expires' => 86400, // 1 day
     ],
   ],
   'email' => [
     'from_email' => 'no-reply@example.com',
     'from_name' => 'Idealist Framework',
-    'type' => 'nop'
+    'type' => 'nop',
     // For SMTP use:
     // 'type' => 'smtp'
     // 'username' => 'username',
@@ -72,20 +72,20 @@ return  [
   'sessions' => [
     'enabled' => true,
     'adapter' => 'database',
-    'lifetime' => 86400
+    'lifetime' => 86400,
   ],
   'queue' => [
     'type' => 'synchronous',
     'queues' => [
-      'emails'
+      'emails',
     ],
     'listeners' => [
       'emails' => [
-        [ 'email\\Controller', 'processEmail' ] ],
+        [ 'email\\Controller', 'processEmail' ], ],
     ],
   ],
   'assets' => [
-    'base_url' => ''
+    'base_url' => '',
   ],
   /*
   'redis' => [

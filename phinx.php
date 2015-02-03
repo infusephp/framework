@@ -1,24 +1,25 @@
 <?php
 
 /**
- * @package Idealist Framework
+ * @package infuse/framework
  * @author Jared King <j@jaredtking.com>
  * @link http://jaredtking.com
  * @version 1.0.0
- * @copyright 2014 Jared King
+ * @copyright 2015 Jared King
  * @license MIT
  */
 
 $phinxConfig = [
     'environments' => [
         'default_migration_table' => 'Migrations',
-        'default_database' => 'app' ] ];
+        'default_database' => 'app', ], ];
 
 $appConfig = @include 'config.php';
 
 $migrationPath = getenv('PHINX_MIGRATION_PATH');
-if ($migrationPath)
+if ($migrationPath) {
     $phinxConfig['paths'] = ['migrations' => $migrationPath];
+}
 
 // generate database environment from config
 $environment = $appConfig['database'];
