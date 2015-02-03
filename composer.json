@@ -21,13 +21,13 @@
 	},
 	"require": {
 		"php": ">=5.4.0",
-		"infusephp/bootstrap": "dev-master",
-		"infusephp/auth": "dev-master",
-		"infusephp/admin": "dev-master",
-		"infusephp/rest-api": "dev-master",
-		"infusephp/cron": "dev-master",
-		"infusephp/email": "~1.0",
-		"infusephp/statistics": "dev-master",
+		"infuse/bootstrap": "dev-master",
+		"infuse/auth": "dev-master",
+		"infuse/admin": "dev-master",
+		"infuse/rest-api": "dev-master",
+		"infuse/cron": "dev-master",
+		"infuse/email": "~1.0",
+		"infuse/statistics": "dev-master",
 		"robmorgan/phinx": "~0.3"
 	},
 	"require-dev": {
