@@ -11,7 +11,7 @@
 
 return  [
   'site' => [
-    'title' => 'Idealist Framework',
+    'title' => 'Infuse Framework',
     'email' => 'site@example.com',
     'production-level' => false,
     'host-name' => 'example.com',
@@ -45,13 +45,13 @@ return  [
         // 'memcache',
         'local',
       ],
-      'prefix' => 'idealist:',
+      'prefix' => 'infuse:',
       'expires' => 86400, // 1 day
     ],
   ],
   'email' => [
     'from_email' => 'no-reply@example.com',
-    'from_name' => 'Idealist Framework',
+    'from_name' => 'Infuse Framework',
     'type' => 'nop',
     // For SMTP use:
     // 'type' => 'smtp'
@@ -66,7 +66,7 @@ return  [
     'enabled' => true,
     'adapter' => 'redis',
     'lifetime' => 86400,
-    'prefix' => 'idealist:'
+    'prefix' => 'infuse:'
   ],
   */
   'sessions' => [
@@ -100,7 +100,7 @@ return  [
     'enabled' => true,
     'host' => '127.0.0.1',
     'port' => 11211,
-    'prefix' => 'idealist:',
+    'prefix' => 'infuse:',
   ],
   */
   'modules' => include 'config/modules.php', 'routes' => include 'config/routes.php', 'cron' => include 'config/cron.php', 'statistics' => include 'config/statistics.php' ];
