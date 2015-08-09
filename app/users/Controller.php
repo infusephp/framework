@@ -1,10 +1,12 @@
 <?php
 
 /**
- * @package infuse/framework
  * @author Jared King <j@jaredtking.com>
+ *
  * @link http://jaredtking.com
+ *
  * @version 1.0.0
+ *
  * @copyright 2015 Jared King
  * @license MIT
  */
@@ -22,21 +24,6 @@ class Controller
         'models' => [
             'User',
         ],
-        'routes' => [
-            'get /users/login' => 'loginForm',
-            'post /users/login' => 'login',
-            'get /users/logout' => 'logout',
-            'get /users/signup' => 'signupForm',
-            'post /users/signup' => 'signup',
-            'get /users/verifyEmail/:id' => 'verifiyEmail',
-            'get /users/verify/:id' => 'sendVerifyEmail',
-            'get /users/forgot' => 'forgotForm',
-            'post /users/forgot' => 'forgotStep1',
-            'get /users/forgot/:id' => 'forgotForm',
-            'post /users/forgot/:id' => 'forgotStep2',
-            'get /users/account' => 'accountSettings',
-            'post /users/account' => 'editAccountSettings',
-        ],
     ];
 
     public static $scaffoldAdmin;
@@ -46,6 +33,23 @@ class Controller
     public function __construct()
     {
         self::$viewsDir = __DIR__.'/views';
+    }
+
+    public function middleware($req, $res)
+    {
+        $this->app->get('/users/login', 'loginForm')
+                  ->post('/users/login', 'login')
+                  ->get('/users/logout', 'logout')
+                  ->get('/users/signup', 'signupForm')
+                  ->post('/users/signup', 'signup')
+                  ->get('/users/verifyEmail/:id', 'verifiyEmail')
+                  ->get('/users/verify/:id', 'sendVerifyEmail')
+                  ->get('/users/forgot', 'forgotForm')
+                  ->post('/users/forgot', 'forgotStep1')
+                  ->get('/users/forgot/:id', 'forgotForm')
+                  ->post('/users/forgot/:id', 'forgotStep2')
+                  ->get('/users/account', 'accountSettings')
+                  ->post('/users/account', 'editAccountSettings');
     }
 
     public function loginForm($req, $res)
@@ -70,7 +74,7 @@ class Controller
             'redir' => $redir,
             'title' => 'Login',
             'loginUsername' => $req->request('user_email'),
-            'loginForm' => true ]);
+            'loginForm' => true, ]);
     }
 
     public function login($req, $res)
@@ -131,7 +135,7 @@ class Controller
             'title' => 'Forgot Password',
             'id' => $req->params('id'),
             'email' => $req->request('email'),
-            'user' => $user ]);
+            'user' => $user, ]);
     }
 
     public function forgotStep1($req, $res)
@@ -194,7 +198,7 @@ class Controller
             'redir' => $redir,
             'name' => $req->request('name'),
             'signupEmail' => ($req->request('user_email')) ? $req->request('user_email') : $req->query('user_email'),
-            'signupForm' => true ]);
+            'signupForm' => true, ]);
     }
 
     public function signup($req, $res)
@@ -244,7 +248,7 @@ class Controller
 
         return new View('verifyEmail', [
             'title' => 'Verify E-mail',
-            'success' => $user ]);
+            'success' => $user, ]);
     }
 
     public function sendVerifyEmail($req, $res)
@@ -261,7 +265,7 @@ class Controller
         $this->app[ 'auth' ]->sendVerificationEmail($user);
 
         return new View('verifyEmailSent', [
-            'title' => 'E-mail Verification Sent']);
+            'title' => 'E-mail Verification Sent', ]);
     }
 
     public function accountSettings($req, $res)
@@ -278,7 +282,7 @@ class Controller
         return new View('account', [
             'success' => $req->params('success'),
             'deleteError' => $req->params('deleteError'),
-            'title' => 'Account Settings' ]);
+            'title' => 'Account Settings', ]);
     }
 
     public function editAccountSettings($req, $res)
