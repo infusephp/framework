@@ -15,7 +15,10 @@ return [
     'middleware' => [
       'auth',
       'admin',
+      'api',
+      'cron',
       'email',
+      'statistics',
       'users',
     ],
     'all' => [
