@@ -37,19 +37,19 @@ class Controller
 
     public function middleware($req, $res)
     {
-        $this->app->get('/users/login', 'loginForm')
-                  ->post('/users/login', 'login')
-                  ->get('/users/logout', 'logout')
-                  ->get('/users/signup', 'signupForm')
-                  ->post('/users/signup', 'signup')
-                  ->get('/users/verifyEmail/:id', 'verifiyEmail')
-                  ->get('/users/verify/:id', 'sendVerifyEmail')
-                  ->get('/users/forgot', 'forgotForm')
-                  ->post('/users/forgot', 'forgotStep1')
-                  ->get('/users/forgot/:id', 'forgotForm')
-                  ->post('/users/forgot/:id', 'forgotStep2')
-                  ->get('/users/account', 'accountSettings')
-                  ->post('/users/account', 'editAccountSettings');
+        $this->app->get('/users/login', ['users\\Controller', 'loginForm'])
+                  ->post('/users/login', ['users\\Controller', 'login'])
+                  ->get('/users/logout', ['users\\Controller', 'logout'])
+                  ->get('/users/signup', ['users\\Controller', 'signupForm'])
+                  ->post('/users/signup', ['users\\Controller', 'signup'])
+                  ->get('/users/verifyEmail/:id', ['users\\Controller', 'verifiyEmail'])
+                  ->get('/users/verify/:id', ['users\\Controller', 'sendVerifyEmail'])
+                  ->get('/users/forgot', ['users\\Controller', 'forgotForm'])
+                  ->post('/users/forgot', ['users\\Controller', 'forgotStep1'])
+                  ->get('/users/forgot/:id', ['users\\Controller', 'forgotForm'])
+                  ->post('/users/forgot/:id', ['users\\Controller', 'forgotStep2'])
+                  ->get('/users/account', ['users\\Controller', 'accountSettings'])
+                  ->post('/users/account', ['users\\Controller', 'editAccountSettings']);
     }
 
     public function loginForm($req, $res)
