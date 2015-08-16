@@ -1,7 +1,7 @@
 Infuse Framework
 =====
 
-[![Build Status](https://travis-ci.org/infusephp/framework.png?branch=master)](https://travis-ci.org/infuse/framework)
+[![Build Status](https://travis-ci.org/infusephp/framework.png?branch=master)](https://travis-ci.org/infusephp/framework)
 
 Modular PHP framework built with infuse/libs
 

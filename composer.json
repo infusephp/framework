@@ -21,6 +21,7 @@
 	},
 	"require": {
 		"php": ">=5.4.0",
+
 		"infuse/bootstrap": "dev-master",
 		"infuse/auth": "dev-master",
 		"infuse/admin": "dev-master",
@@ -28,6 +29,7 @@
 		"infuse/cron": "dev-master",
 		"infuse/email": "~1.0",
 		"infuse/statistics": "dev-master",
+		"infuse/libs": "dev-master as 0.4.x-dev",
 		"robmorgan/phinx": "~0.3"
 	},
 	"require-dev": {
