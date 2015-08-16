@@ -22,6 +22,7 @@
 	"require": {
 		"php": ">=5.4.0",
 
+		"jaredtking/jaqb": "dev-master",
 		"infuse/bootstrap": "dev-master",
 		"infuse/auth": "dev-master",
 		"infuse/admin": "dev-master",
