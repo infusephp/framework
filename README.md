@@ -7,7 +7,7 @@ Modular PHP framework built with infuse/libs
 
 ## What is Infuse Framework?
 
-Infuse Framework is a tool for building modern web applications. It is built on top of [infuse/libs](https://github.com/infusephp/libs). The goal of this framework is scalability through a simple modular design.
+Infuse Framework is a tool for building modern web applications. It is built on top of [infuse/libs](https://github.com/infusephp/libs). The goal of this framework is scalability and an increase in developer productivity through a simple modular design.
 
 ## Features
 
