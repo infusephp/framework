@@ -12,3 +12,4 @@ config.php
 /public/static
 /assets/static.assets.json
 HEADER
+/composer.lock
